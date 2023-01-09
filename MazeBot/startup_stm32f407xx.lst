@@ -687,8 +687,8 @@ Command Line: --debug --xref --width=88 --diag_suppress=9931 --cpu=Cortex-M4.fp.
 s=interwork --depend=.\object\startup_stm32f407xx.d -o.\object\startup_stm32f407xx.o -IC
 :\Users\masha\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.16.0\Drivers\CMSIS\Device\ST\
 STM32F4xx\Include -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__UVISION_VERSION SETA 533
-" --predefine="STM32F407xx SETA 1" --list=.\startup_stm32f407xx.lst src\main\startup_stm
-32f407xx.s
+" --predefine="STM32F407xx SETA 1" --predefine="STM32F407xx SETA 1" --list=.\startup_stm
+32f407xx.lst src\main\startup_stm32f407xx.s
 
 
 

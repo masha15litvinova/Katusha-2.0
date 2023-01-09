@@ -1,0 +1,10 @@
+.\object\rtx_lib.o: C:\Users\masha\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\RTOS2\RTX\Source\rtx_lib.c
+.\object\rtx_lib.o: .\src\cmsis\cmsis_compiler.h
+.\object\rtx_lib.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\object\rtx_lib.o: .\src\cmsis\cmsis_armcc.h
+.\object\rtx_lib.o: .\RTE\CMSIS\RTX_Config.h
+.\object\rtx_lib.o: .\RTE\_Target_1\RTE_Components.h
+.\object\rtx_lib.o: C:\Users\masha\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\RTOS2\RTX\Include\rtx_os.h
+.\object\rtx_lib.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+.\object\rtx_lib.o: C:\Users\masha\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\RTOS2\Include\cmsis_os2.h
+.\object\rtx_lib.o: C:\Users\masha\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\RTOS2\RTX\Include\rtx_evr.h

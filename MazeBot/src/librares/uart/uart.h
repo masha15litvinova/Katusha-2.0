@@ -5,8 +5,9 @@
  extern "C" {
 #endif
 	 
-	 
-	 void InitUART6();
+	 void InitUART3(); //SparkFun module
+	 void InitUART6(); //camera OpenMV
+	 int GetUART3data();
 	 int GetUART6data();
 
 	 

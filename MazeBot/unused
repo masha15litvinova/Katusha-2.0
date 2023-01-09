@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 5060960: Last Updated: Mon Jan 09 17:45:08 2023
+;#<FEEDBACK># ARM Linker, 5060960: Last Updated: Mon Jan 09 20:48:19 2023
 ;VERSION 0.2
 ;FILE analog_input.o
 _ZN12Analog_input6getAdcEh <= USED 0
@@ -89,6 +89,9 @@ __asm___11_softI2C_cpp_a1e4d40e___ZN33_INTERNAL_11_softI2C_cpp_a1e4d40e5__RRXEj 
 __asm___11_softI2C_cpp_a1e4d40e___ZN33_INTERNAL_11_softI2C_cpp_a1e4d40e7__REV16Ej <= USED 0
 __asm___11_softI2C_cpp_a1e4d40e___ZN33_INTERNAL_11_softI2C_cpp_a1e4d40e7__REVSHEi <= USED 0
 ;FILE ssd1306.o
+_Z6setPinP12GPIO_TypeDeftb <= USED 0
+_Z6setPintb <= USED 0
+_Z7initPinthhh <= USED 0
 _ZN7SSD130610stopscrollEv <= USED 0
 _ZN7SSD130612fastSPIwriteEh <= USED 0
 _ZN7SSD130613drawFastHLineEssst <= USED 0
@@ -108,12 +111,14 @@ _ZN7SSD13067displayEv <= USED 0
 _ZN7SSD13068switchOnEv <= USED 0
 _ZN7SSD13069drawPixelEsst <= USED 0
 _ZN7SSD13069switchOffEv <= USED 0
+_ZN7SSD1306C1Ejtttttt <= USED 0
 _ZN7SSD1306C1Ev <= USED 0
 __asm___11_SSD1306_cpp_aca8cc00___ZN33_INTERNAL_11_SSD1306_cpp_aca8cc005__RRXEj <= USED 0
 __asm___11_SSD1306_cpp_aca8cc00___ZN33_INTERNAL_11_SSD1306_cpp_aca8cc007__REV16Ej <= USED 0
 __asm___11_SSD1306_cpp_aca8cc00___ZN33_INTERNAL_11_SSD1306_cpp_aca8cc007__REVSHEi <= USED 0
 ;FILE startup_stm32f407xx.o
 ;FILE stm32f407_pin.o
+_Z7initPinP12GPIO_TypeDefthhh <= USED 0
 __asm___17_stm32f407_pin_cpp_0a2cf403___ZN39_INTERNAL_17_stm32f407_pin_cpp_0a2cf4035__RRXEj <= USED 0
 __asm___17_stm32f407_pin_cpp_0a2cf403___ZN39_INTERNAL_17_stm32f407_pin_cpp_0a2cf4037__REV16Ej <= USED 0
 __asm___17_stm32f407_pin_cpp_0a2cf403___ZN39_INTERNAL_17_stm32f407_pin_cpp_0a2cf4037__REVSHEi <= USED 0
@@ -130,6 +135,9 @@ __asm___17_stm32f407_SPI_cpp_b247d881___ZN39_INTERNAL_17_stm32f407_SPI_cpp_b247d
 _Z11delayMicrosj <= USED 0
 _Z5delayj <= USED 0
 _Z6microsv <= USED 0
+_Z6millisv <= USED 0
+_Z7initRCCv <= USED 0
+_Z8sysStartv <= USED 0
 __asm___21_stm32f407_sysFunc_cpp__millis___ZN42_INTERNAL_21_stm32f407_sysFunc_cpp__millis5__RRXEj <= USED 0
 __asm___21_stm32f407_sysFunc_cpp__millis___ZN42_INTERNAL_21_stm32f407_sysFunc_cpp__millis7__REV16Ej <= USED 0
 __asm___21_stm32f407_sysFunc_cpp__millis___ZN42_INTERNAL_21_stm32f407_sysFunc_cpp__millis7__REVSHEi <= USED 0
@@ -515,9 +523,11 @@ __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa6
 __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa627__REV16Ej <= USED 0
 __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa627__REVSHEi <= USED 0
 ;FILE uart.o
-__asm___6_uart_c_ba7801c2___ZN27_INTERNAL_6_uart_c_ba7801c25__RRXEj <= USED 0
-__asm___6_uart_c_ba7801c2___ZN27_INTERNAL_6_uart_c_ba7801c27__REV16Ej <= USED 0
-__asm___6_uart_c_ba7801c2___ZN27_INTERNAL_6_uart_c_ba7801c27__REVSHEi <= USED 0
+GetUART3data <= USED 0
+GetUART6data <= USED 0
+__asm___6_uart_c_72988eb2___ZN27_INTERNAL_6_uart_c_72988eb25__RRXEj <= USED 0
+__asm___6_uart_c_72988eb2___ZN27_INTERNAL_6_uart_c_72988eb27__REV16Ej <= USED 0
+__asm___6_uart_c_72988eb2___ZN27_INTERNAL_6_uart_c_72988eb27__REVSHEi <= USED 0
 ;FILE vl53l0x.o
 _ZN5tasks5ITaskIjED0Ev <= USED 0
 _ZN5tasks5ITaskIjED2Ev <= USED 0

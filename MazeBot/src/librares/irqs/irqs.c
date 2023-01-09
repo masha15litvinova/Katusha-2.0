@@ -153,7 +153,7 @@ void initNVIC()
 {
 	NVIC_InitTypeDef nvic;
 	 nvic.NVIC_IRQChannel = EXTI15_10_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic.NVIC_IRQChannelPreemptionPriority = 1;
     nvic.NVIC_IRQChannelSubPriority = 0;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
@@ -163,10 +163,11 @@ void initNVIC()
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 	 nvic.NVIC_IRQChannel = EXTI3_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 2;
+    nvic.NVIC_IRQChannelPreemptionPriority = 1;
     nvic.NVIC_IRQChannelSubPriority = 0;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
+	
 	
 
   

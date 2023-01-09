@@ -28,6 +28,7 @@ int64_t e1 = 0;
 int x = 0;
 int m = 0;
 int camData = 0;
+int gyroData = 0;
 uint16_t r, g, b, c;
 
 int state = LINE;
@@ -44,23 +45,32 @@ int main()
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
 		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C3, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART6, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+	
+	time_service::init();
+  time_service::startTime();
+	
+	__enable_irq();
+	 
+	 
+	
+	 InitUART6();
+	 InitUART3();
+	 
 	
 	 initEndstops();
 	 initEXTI();
 	 initNVIC();
 	 
 	
+	//sysStart();
+	 
+  //int initImageTimer = millis();
+	
+	//SSD1306 disp(DISPLAY_SPI, DISPLAY_DC, DISPLAY_RESET, DISPLAY_CS, DISPLAY_PWR_EN, DISPLAY_SCK, DISPLAY_MOSI);
 	
 	
-	 InitUART6();
-	
-	 __enable_irq();
-	
-	sysStart();
-  int initImageTimer = millis();
-	time_service::init();
-  time_service::startTime();
-	SSD1306 disp(DISPLAY_SPI, DISPLAY_DC, DISPLAY_RESET, DISPLAY_CS, DISPLAY_PWR_EN, DISPLAY_SCK, DISPLAY_MOSI);
 	
 	/*disp.begin();
 	disp.clear();
@@ -110,47 +120,49 @@ int main()
 			else if(Button4() == 1)
 			{
 				state = BUTTON4_ON;
-			}*/
-			
-			camData = GetUART6data();//GetUART6data();
-			/*switch(state)
+			}
+		*/
+			/*camData = GetUART6data();//GetUART6data();
+			gyroData = GetUART3data();
+			switch(state)
 			{
 				case LINE:
 					
 					break;
 				case BUTTON1_ON: 
 					x = 3;
-					delay(1000);
+				time_service::delay_ms(1000);
+					//delay(1000);
 					x = 0;
 					state = LINE;
 				resetButton1();
 					break;
 				case BUTTON2_ON:
 					x = 4;
-					delay(1000);
+				time_service::delay_ms(1000);
+					//delay(1000);
 					x = 0;
 					state = LINE;
 				resetButton2();
 					break;
 				case BUTTON3_ON:
 					x = 5;
-					delay(1000);
+				time_service::delay_ms(1000);
+					//delay(1000);
 					x = 0;
 					state = LINE;
 				resetButton3();
 					break;
 				case BUTTON4_ON:
 					x = 6;
-					delay(1000);
+				time_service::delay_ms(1000);
+					//delay(1000);
 					x = 0;
 					state = LINE;
 				resetButton4();
 					break;
 			}*/
 			
-    
-    //delay(10);
-			//resetButtons();
 		}
 		
 		
