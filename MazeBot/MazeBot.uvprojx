@@ -339,7 +339,7 @@
               <MiscControls>--feedback=unused --cpp11</MiscControls>
               <Define>USE_FULL_ASSERT, USE_STDPERIPH_DRIVER, STM32F407xx, STM32F40_41xxx, HSE_VALUE=12000000</Define>
               <Undefine></Undefine>
-              <IncludePath>.\src\circular_buffer;.\src\cmsis;.\src\external;.\src\global_macros;.\src\librares;.\src\main;.\src\spl4\inc;.\src\spl4\src;.\src\spl4;.\src\support_pacage\arm;.\src\support_pacage\gcc\linker;.\src\support_pacage\gcc;.\src\support_pacage\inc;.\src\support_pacage;.\src\time_service;.\src\uart4;.\src;.\src\librares\vl53l0x;.\src\librares\vl53l0x\core\inc;.\src\librares\vl53l0x\core\src;.\src\librares\vl53l0x\platform\inc;.\src\librares\vl53l0x\platform\src;.\src\librares\vl53l0x\core;.\src\librares\vl53l0x\platform;.\src\librares\display\Inc;.\src\librares\display\Src;.\src\librares\display\ssd1351;.\src\librares\pwm;.\src\librares\irqs;.\src\librares\ssd1306\stm32-ssd1306-master\ssd1306;.\src\librares\ssd1306\SSD1306;.\src\librares\periph_library;.\src\librares\periph_library\inc;.\src\librares\ssd1306\SSD1306\inc;.\src\librares\tcs34725;.\src\librares\endstops</IncludePath>
+              <IncludePath>.\src\circular_buffer;.\src\cmsis;.\src\external;.\src\global_macros;.\src\librares;.\src\main;.\src\spl4\inc;.\src\spl4\src;.\src\spl4;.\src\support_pacage\arm;.\src\support_pacage\gcc\linker;.\src\support_pacage\gcc;.\src\support_pacage\inc;.\src\support_pacage;.\src\time_service;.\src\uart4;.\src;.\src\librares\vl53l0x;.\src\librares\vl53l0x\core\inc;.\src\librares\vl53l0x\core\src;.\src\librares\vl53l0x\platform\inc;.\src\librares\vl53l0x\platform\src;.\src\librares\vl53l0x\core;.\src\librares\vl53l0x\platform;.\src\librares\display\Inc;.\src\librares\display\Src;.\src\librares\display\ssd1351;.\src\librares\pwm;.\src\librares\irqs;.\src\librares\ssd1306\stm32-ssd1306-master\ssd1306;.\src\librares\ssd1306\SSD1306;.\src\librares\periph_library;.\src\librares\periph_library\inc;.\src\librares\ssd1306\SSD1306\inc;.\src\librares\tcs34725;.\src\librares\endstops;.\src\librares\uart</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -911,7 +911,19 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>New Group</GroupName>
+          <GroupName>uart</GroupName>
+          <Files>
+            <File>
+              <FileName>uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\librares\uart\uart.h</FilePath>
+            </File>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\librares\uart\uart.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>

@@ -72,3 +72,4 @@
 .\object\main.o: .\src\librares\irqs\irqs.h
 .\object\main.o: .\src\librares\InitImage.h
 .\object\main.o: .\src\librares\tcs34725\tcs34725.h
+.\object\main.o: .\src\librares\uart\uart.h

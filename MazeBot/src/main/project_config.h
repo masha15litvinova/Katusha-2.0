@@ -26,6 +26,8 @@
 
 
 
+
+
 #define DISPLAY_SPI	_SPI3
 #define DISPLAY_CS	PA11
 #define DISPLAY_SCK	PC10

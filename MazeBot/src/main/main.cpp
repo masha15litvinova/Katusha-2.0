@@ -13,10 +13,11 @@
 #include "irqs.h"
 #include "InitImage.h"
 #include "tcs34725.h"
+#include "uart.h"
 
 
 		
-Display display;
+//Display display;
 	
 static const uint8_t distFrontAdress = 20;
 static const uint8_t distBackAdress = 18;
@@ -26,6 +27,7 @@ static const uint8_t distLeftFrontAdress = 10;
 int64_t e1 = 0;
 int x = 0;
 int m = 0;
+int camData = 0;
 uint16_t r, g, b, c;
 
 int state = LINE;
@@ -42,32 +44,42 @@ int main()
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
 		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C3, ENABLE);
+	
+	 initEndstops();
+	 initEXTI();
+	 initNVIC();
+	 
+	
+	
+	
+	 InitUART6();
+	
+	 __enable_irq();
+	
 	sysStart();
   int initImageTimer = millis();
 	time_service::init();
   time_service::startTime();
 	SSD1306 disp(DISPLAY_SPI, DISPLAY_DC, DISPLAY_RESET, DISPLAY_CS, DISPLAY_PWR_EN, DISPLAY_SCK, DISPLAY_MOSI);
 	
-	disp.begin();
+	/*disp.begin();
 	disp.clear();
 	
 	disp.invert(0);
 	disp.rotate(2);
 	
-	delay(500);
+	//delay(500);
 	disp.clear();
 	disp.display();
 	//Initialize display
-	display.init(&disp);
+	//display.init(&disp);
 
 	
-	delay(500);
+	delay(500);*/
 		//setupScreens();
- __enable_irq();
 
-	 initEndstops();
-	 initEXTI();
-	 initNVIC();
+
+	
 	
 /*initMotorPins();
 		initPWM();*/
@@ -83,7 +95,7 @@ int main()
 		
    // tcs34725_getData(&r, &g, &b, &c);
     
-			if(Button1() == 1)
+			/*if(Button1() == 1)
 			{
 				state = BUTTON1_ON;
 			}
@@ -98,11 +110,13 @@ int main()
 			else if(Button4() == 1)
 			{
 				state = BUTTON4_ON;
-			}
+			}*/
 			
-			switch(state)
+			camData = GetUART6data();//GetUART6data();
+			/*switch(state)
 			{
 				case LINE:
+					
 					break;
 				case BUTTON1_ON: 
 					x = 3;
@@ -132,10 +146,10 @@ int main()
 					state = LINE;
 				resetButton4();
 					break;
-			}
+			}*/
 			
     
-    delay(10);
+    //delay(10);
 			//resetButtons();
 		}
 		

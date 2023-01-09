@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 5060960: Last Updated: Thu Jan 05 11:47:01 2023
+;#<FEEDBACK># ARM Linker, 5060960: Last Updated: Mon Jan 09 17:45:08 2023
 ;VERSION 0.2
 ;FILE analog_input.o
 _ZN12Analog_input6getAdcEh <= USED 0
@@ -22,12 +22,20 @@ __asm___7_i2c_cpp_2b87a2b6___ZN28_INTERNAL_7_i2c_cpp_2b87a2b65__RRXEj <= USED 0
 __asm___7_i2c_cpp_2b87a2b6___ZN28_INTERNAL_7_i2c_cpp_2b87a2b67__REV16Ej <= USED 0
 __asm___7_i2c_cpp_2b87a2b6___ZN28_INTERNAL_7_i2c_cpp_2b87a2b67__REVSHEi <= USED 0
 ;FILE irqs.o
+Button1 <= USED 0
+Button2 <= USED 0
+Button3 <= USED 0
+Button4 <= USED 0
 Encoder1 <= USED 0
 Encoder2 <= USED 0
 _Z12InitEncodersv <= USED 0
 __asm___6_irqs_c_enc1___ZN23_INTERNAL_6_irqs_c_enc15__RRXEj <= USED 0
 __asm___6_irqs_c_enc1___ZN23_INTERNAL_6_irqs_c_enc17__REV16Ej <= USED 0
 __asm___6_irqs_c_enc1___ZN23_INTERNAL_6_irqs_c_enc17__REVSHEi <= USED 0
+resetButton1 <= USED 0
+resetButton2 <= USED 0
+resetButton3 <= USED 0
+resetButton4 <= USED 0
 ;FILE main.o
 __asm___8_main_cpp_4c634235___ZN29_INTERNAL_8_main_cpp_4c6342355__RRXEj <= USED 0
 __asm___8_main_cpp_4c634235___ZN29_INTERNAL_8_main_cpp_4c6342357__REV16Ej <= USED 0
@@ -82,15 +90,21 @@ __asm___11_softI2C_cpp_a1e4d40e___ZN33_INTERNAL_11_softI2C_cpp_a1e4d40e7__REV16E
 __asm___11_softI2C_cpp_a1e4d40e___ZN33_INTERNAL_11_softI2C_cpp_a1e4d40e7__REVSHEi <= USED 0
 ;FILE ssd1306.o
 _ZN7SSD130610stopscrollEv <= USED 0
+_ZN7SSD130612fastSPIwriteEh <= USED 0
 _ZN7SSD130613drawFastHLineEssst <= USED 0
 _ZN7SSD130613drawFastVLineEssst <= USED 0
+_ZN7SSD130615ssd1306_commandEh <= USED 0
 _ZN7SSD130615startscrollleftEhh <= USED 0
 _ZN7SSD130616startscrollrightEhh <= USED 0
 _ZN7SSD130619startscrolldiagleftEhh <= USED 0
 _ZN7SSD130620startscrolldiagrightEhh <= USED 0
 _ZN7SSD13063dimEb <= USED 0
 _ZN7SSD13064drawEv <= USED 0
+_ZN7SSD13065beginEhb <= USED 0
+_ZN7SSD13065clearEv <= USED 0
+_ZN7SSD13066invertEh <= USED 0
 _ZN7SSD13067displayEPh <= USED 0
+_ZN7SSD13067displayEv <= USED 0
 _ZN7SSD13068switchOnEv <= USED 0
 _ZN7SSD13069drawPixelEsst <= USED 0
 _ZN7SSD13069switchOffEv <= USED 0
@@ -107,11 +121,14 @@ __asm___17_stm32f407_pin_cpp_0a2cf403___ZN39_INTERNAL_17_stm32f407_pin_cpp_0a2cf
 _Z12SPIAvailablej <= USED 0
 _Z12readRxBufSPIj <= USED 0
 _Z13writeTxBufSPIjt <= USED 0
+_Z7initSPIjbhtiiii <= USED 0
+_Z8writeSPIjt <= USED 0
 __asm___17_stm32f407_SPI_cpp_b247d881___ZN39_INTERNAL_17_stm32f407_SPI_cpp_b247d8815__RRXEj <= USED 0
 __asm___17_stm32f407_SPI_cpp_b247d881___ZN39_INTERNAL_17_stm32f407_SPI_cpp_b247d8817__REV16Ej <= USED 0
 __asm___17_stm32f407_SPI_cpp_b247d881___ZN39_INTERNAL_17_stm32f407_SPI_cpp_b247d8817__REVSHEi <= USED 0
 ;FILE stm32f407_sysfunc.o
 _Z11delayMicrosj <= USED 0
+_Z5delayj <= USED 0
 _Z6microsv <= USED 0
 __asm___21_stm32f407_sysFunc_cpp__millis___ZN42_INTERNAL_21_stm32f407_sysFunc_cpp__millis5__RRXEj <= USED 0
 __asm___21_stm32f407_sysFunc_cpp__millis___ZN42_INTERNAL_21_stm32f407_sysFunc_cpp__millis7__REV16Ej <= USED 0
@@ -215,14 +232,12 @@ __asm___16_stm32f4xx_exti_c_28b3b60e___ZN38_INTERNAL_16_stm32f4xx_exti_c_28b3b60
 __asm___16_stm32f4xx_exti_c_28b3b60e___ZN38_INTERNAL_16_stm32f4xx_exti_c_28b3b60e7__REVSHEi <= USED 0
 ;FILE stm32f4xx_gpio.o
 GPIO_DeInit <= USED 0
-GPIO_PinAFConfig <= USED 0
 GPIO_PinLockConfig <= USED 0
 GPIO_ReadInputData <= USED 0
 GPIO_ReadOutputData <= USED 0
 GPIO_ReadOutputDataBit <= USED 0
 GPIO_ResetBits <= USED 0
 GPIO_SetBits <= USED 0
-GPIO_StructInit <= USED 0
 GPIO_ToggleBits <= USED 0
 GPIO_Write <= USED 0
 GPIO_WriteBit <= USED 0
@@ -287,7 +302,6 @@ RCC_ClearFlag <= USED 0
 RCC_ClearITPendingBit <= USED 0
 RCC_ClockSecuritySystemCmd <= USED 0
 RCC_DeInit <= USED 0
-RCC_GetClocksFreq <= USED 0
 RCC_GetFlagStatus <= USED 0
 RCC_GetITStatus <= USED 0
 RCC_GetSYSCLKSource <= USED 0
@@ -455,24 +469,18 @@ __asm___15_stm32f4xx_tim_c_c458916b___ZN37_INTERNAL_15_stm32f4xx_tim_c_c458916b7
 __asm___15_stm32f4xx_tim_c_c458916b___ZN37_INTERNAL_15_stm32f4xx_tim_c_c458916b7__REVSHEi <= USED 0
 ;FILE stm32f4xx_usart.o
 USART_ClearFlag <= USED 0
-USART_ClearITPendingBit <= USED 0
 USART_ClockInit <= USED 0
 USART_ClockStructInit <= USED 0
-USART_Cmd <= USED 0
 USART_DMACmd <= USED 0
 USART_DeInit <= USED 0
 USART_GetFlagStatus <= USED 0
-USART_GetITStatus <= USED 0
 USART_HalfDuplexCmd <= USED 0
-USART_ITConfig <= USED 0
-USART_Init <= USED 0
 USART_IrDACmd <= USED 0
 USART_IrDAConfig <= USED 0
 USART_LINBreakDetectLengthConfig <= USED 0
 USART_LINCmd <= USED 0
 USART_OneBitMethodCmd <= USED 0
 USART_OverSampling8Cmd <= USED 0
-USART_ReceiveData <= USED 0
 USART_ReceiverWakeUpCmd <= USED 0
 USART_SendBreak <= USED 0
 USART_SendData <= USED 0
@@ -506,6 +514,10 @@ _ZN12time_service8stopTimeEv <= USED 0
 __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa625__RRXEj <= USED 0
 __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa627__REV16Ej <= USED 0
 __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa627__REVSHEi <= USED 0
+;FILE uart.o
+__asm___6_uart_c_ba7801c2___ZN27_INTERNAL_6_uart_c_ba7801c25__RRXEj <= USED 0
+__asm___6_uart_c_ba7801c2___ZN27_INTERNAL_6_uart_c_ba7801c27__REV16Ej <= USED 0
+__asm___6_uart_c_ba7801c2___ZN27_INTERNAL_6_uart_c_ba7801c27__REVSHEi <= USED 0
 ;FILE vl53l0x.o
 _ZN5tasks5ITaskIjED0Ev <= USED 0
 _ZN5tasks5ITaskIjED2Ev <= USED 0

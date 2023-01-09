@@ -21,8 +21,8 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
 Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
-C:\Users\masha\Documents\MazeBot\MazeBot.uvprojx
-Project File Date:  01/05/2023
+C:\Users\masha\Documents\GitHub\LineBot\MazeBot\MazeBot.uvprojx
+Project File Date:  01/09/2023
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
@@ -36,18 +36,20 @@ compiling main.cpp...
   #endif
 .\src\librares\irqs\irqs.h(24): warning:  #1-D: last line of file ends without a newline
   #endif
-src\main\main.cpp(61): error:  #135: class "Display"  has no member "init"
-  	display.init(&disp);
-src\main\main.cpp(21): warning:  #177-D: variable "distFrontAdress"  was declared but never referenced
+.\src\librares\uart\uart.h(15): warning:  #1-D: last line of file ends without a newline
+  #endif
+src\main\main.cpp(22): warning:  #177-D: variable "distFrontAdress"  was declared but never referenced
   static const uint8_t distFrontAdress = 20;
-src\main\main.cpp(22): warning:  #177-D: variable "distBackAdress"  was declared but never referenced
+src\main\main.cpp(23): warning:  #177-D: variable "distBackAdress"  was declared but never referenced
   static const uint8_t distBackAdress = 18;
-src\main\main.cpp(23): warning:  #177-D: variable "distRightFrontAdress"  was declared but never referenced
+src\main\main.cpp(24): warning:  #177-D: variable "distRightFrontAdress"  was declared but never referenced
   static const uint8_t distRightFrontAdress = 12;
-src\main\main.cpp(24): warning:  #177-D: variable "distLeftFrontAdress"  was declared but never referenced
+src\main\main.cpp(25): warning:  #177-D: variable "distLeftFrontAdress"  was declared but never referenced
   static const uint8_t distLeftFrontAdress = 10;
-src\main\main.cpp: 8 warnings, 1 error
-".\Object\MazeBot.axf" - 1 Error(s), 8 Warning(s).
+src\main\main.cpp: 9 warnings, 0 errors
+linking...
+Program Size: Code=15190 RO-data=650 RW-data=8516 ZI-data=1636  
+".\Object\MazeBot.axf" - 0 Error(s), 9 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -60,7 +62,6 @@ Package Vendor: Keil
   C:\Users\masha\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.16.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
 
 <h2>Collection of Component Files used:</h2>
-Target not created.
 Build Time Elapsed:  00:00:01
 </pre>
 </body>

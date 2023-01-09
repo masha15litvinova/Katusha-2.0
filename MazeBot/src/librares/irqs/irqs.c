@@ -167,6 +167,10 @@ void initNVIC()
     nvic.NVIC_IRQChannelSubPriority = 0;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
+	
+
+  
+
 }
 void initEXTI()
 {
