@@ -108,7 +108,7 @@ int GetUART3data()
 }
 
 
-void USART6_IRQHandler(void)
+/*void USART6_IRQHandler(void)
 	{
       if (USART_GetITStatus(USART6, USART_IT_RXNE) != RESET)
     {
@@ -119,9 +119,9 @@ void USART6_IRQHandler(void)
 		{
 				USART_ClearITPendingBit(USART6, USART_SR_TC);
         USART_SendData(USART6, 10);
-		}*/
-	}
-void USART3_IRQHandler(void)
+		}
+	}*/
+/*void USART3_IRQHandler(void)
 	{
        if (USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
     {
@@ -132,8 +132,8 @@ void USART3_IRQHandler(void)
 		{
 				USART_ClearITPendingBit(USART3, USART_SR_TC);
         USART_SendData(USART3, 10);
-		}*/
-	}		
+		}
+	}		*/
 
  #ifdef __cplusplus
 }

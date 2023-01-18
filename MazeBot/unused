@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 5060960: Last Updated: Mon Jan 09 20:48:19 2023
+;#<FEEDBACK># ARM Linker, 5060960: Last Updated: Mon Jan 09 20:55:50 2023
 ;VERSION 0.2
 ;FILE analog_input.o
 _ZN12Analog_input6getAdcEh <= USED 0
@@ -477,11 +477,13 @@ __asm___15_stm32f4xx_tim_c_c458916b___ZN37_INTERNAL_15_stm32f4xx_tim_c_c458916b7
 __asm___15_stm32f4xx_tim_c_c458916b___ZN37_INTERNAL_15_stm32f4xx_tim_c_c458916b7__REVSHEi <= USED 0
 ;FILE stm32f4xx_usart.o
 USART_ClearFlag <= USED 0
+USART_ClearITPendingBit <= USED 0
 USART_ClockInit <= USED 0
 USART_ClockStructInit <= USED 0
 USART_DMACmd <= USED 0
 USART_DeInit <= USED 0
 USART_GetFlagStatus <= USED 0
+USART_GetITStatus <= USED 0
 USART_HalfDuplexCmd <= USED 0
 USART_IrDACmd <= USED 0
 USART_IrDAConfig <= USED 0
@@ -489,6 +491,7 @@ USART_LINBreakDetectLengthConfig <= USED 0
 USART_LINCmd <= USED 0
 USART_OneBitMethodCmd <= USED 0
 USART_OverSampling8Cmd <= USED 0
+USART_ReceiveData <= USED 0
 USART_ReceiverWakeUpCmd <= USED 0
 USART_SendBreak <= USED 0
 USART_SendData <= USED 0
@@ -517,8 +520,10 @@ __asm___10_tcs34725_c_4cb66956___ZN32_INTERNAL_10_tcs34725_c_4cb669565__RRXEj <=
 __asm___10_tcs34725_c_4cb66956___ZN32_INTERNAL_10_tcs34725_c_4cb669567__REV16Ej <= USED 0
 __asm___10_tcs34725_c_4cb66956___ZN32_INTERNAL_10_tcs34725_c_4cb669567__REVSHEi <= USED 0
 ;FILE time_service.o
+_ZN12time_service4initEv <= USED 0
 _ZN12time_service8delay_msEj <= USED 0
 _ZN12time_service8stopTimeEv <= USED 0
+_ZN12time_service9startTimeEv <= USED 0
 __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa625__RRXEj <= USED 0
 __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa627__REV16Ej <= USED 0
 __asm___16_time_service_cpp_b672aa62___ZN38_INTERNAL_16_time_service_cpp_b672aa627__REVSHEi <= USED 0

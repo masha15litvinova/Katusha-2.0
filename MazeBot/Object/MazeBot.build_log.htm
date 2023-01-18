@@ -27,17 +27,29 @@ Project File Date:  01/09/2023
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
-compiling uart.c...
-src\librares\uart\uart.h(16): warning:  #1-D: last line of file ends without a newline
+compiling main.cpp...
+.\src\librares\display\ssd1351\OLED_Driver.h(69): warning:  #47-D: incompatible redefinition of macro "BLACK"  (declared at line 18 of ".\src\librares\ssd1306\SSD1306\inc\SSD1306.h")
+  #define BLACK   0x0000
+.\src\librares\display\ssd1351\OLED_Driver.h(76): warning:  #47-D: incompatible redefinition of macro "WHITE"  (declared at line 19 of ".\src\librares\ssd1306\SSD1306\inc\SSD1306.h")
+  #define WHITE   0xFFFF
+.\src\librares\pwm\pwm.h(20): warning:  #1-D: last line of file ends without a newline
   #endif
-src\librares\uart\uart.c(12): warning:  #177-D: variable "nvic"  was declared but never referenced
-  		NVIC_InitTypeDef nvic;
-src\librares\uart\uart.c(140): warning:  #1-D: last line of file ends without a newline
+.\src\librares\irqs\irqs.h(24): warning:  #1-D: last line of file ends without a newline
   #endif
-src\librares\uart\uart.c: 3 warnings, 0 errors
+.\src\librares\uart\uart.h(16): warning:  #1-D: last line of file ends without a newline
+  #endif
+src\main\main.cpp(22): warning:  #177-D: variable "distFrontAdress"  was declared but never referenced
+  static const uint8_t distFrontAdress = 20;
+src\main\main.cpp(23): warning:  #177-D: variable "distBackAdress"  was declared but never referenced
+  static const uint8_t distBackAdress = 18;
+src\main\main.cpp(24): warning:  #177-D: variable "distRightFrontAdress"  was declared but never referenced
+  static const uint8_t distRightFrontAdress = 12;
+src\main\main.cpp(25): warning:  #177-D: variable "distLeftFrontAdress"  was declared but never referenced
+  static const uint8_t distLeftFrontAdress = 10;
+src\main\main.cpp: 9 warnings, 0 errors
 linking...
-Program Size: Code=6882 RO-data=486 RW-data=96 ZI-data=1632  
-".\Object\MazeBot.axf" - 0 Error(s), 3 Warning(s).
+Program Size: Code=5870 RO-data=486 RW-data=72 ZI-data=1632  
+".\Object\MazeBot.axf" - 0 Error(s), 9 Warning(s).
 
 <h2>Software Packages used:</h2>
 

@@ -48,16 +48,16 @@ int main()
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART6, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
 	
-	time_service::init();
-  time_service::startTime();
+	//time_service::init();
+  //time_service::startTime();
 	
-	__enable_irq();
+	
 	 
 	 
 	
 	 InitUART6();
 	 InitUART3();
-	 
+	 __enable_irq();
 	
 	 initEndstops();
 	 initEXTI();
