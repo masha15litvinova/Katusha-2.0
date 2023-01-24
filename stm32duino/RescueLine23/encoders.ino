@@ -1,11 +1,12 @@
 
-#define SPEED_COEFF_P 0.6//1.0
-#define SPEED_COEFF_D 0.8//0.8//0.3  //13
-#define SPEED_COEFF_I 0.04
+#define SPEED_COEFF_P 0.7//1.0
+#define SPEED_COEFF_D 0//0.8//0.8//0.8//0.3  //13
+#define SPEED_COEFF_I 0.05
 #define SPEED_COEFF_CUBE 0
 
 #define CPR 1050
-#define RPM 150
+#define RPM1 148
+#define RPM2 155
 
 #define ERR_LIM 4
 #define U_MAX 2048
@@ -67,16 +68,30 @@ float Err1() {
 float U1() {
   return u1;
 }
-int SpeedRPM(float speed)
+float CurrentSpeed2() {
+  return current_speed2;
+}
+float Err2() {
+  return err2;
+}
+float U2() {
+  return u2;
+}
+int SpeedRPM1(float speed)
 {
-int speed_rpm = map(round(speed), 0, 255, 0, RPM);
+int speed_rpm = map(round(speed), 0, 255, 0, RPM1);
+return speed_rpm;
+}
+int SpeedRPM2(float speed)
+{
+int speed_rpm = map(round(speed), 0, 255, 0, RPM2);
 return speed_rpm;
 }
 
 int vel1(float speed) {
-  state = !state;
-  int sp_rpm = SpeedRPM(speed);
-  current_speed1 = ((Enc1() - prev_enc1)*60 / (float)CPR) / ((float)MOTORS_TICK / (float)TIMER_FREQ);
+ // state = !state;
+  int sp_rpm = SpeedRPM1(speed);
+  current_speed1 = ((Enc1() - prev_enc1)*60000 / ((float)CPR*MOTORS_DELAY)) ;
   err1 = -current_speed1 + (float)sp_rpm;
 
   up1 = SPEED_COEFF_P * err1;
@@ -91,9 +106,33 @@ int vel1(float speed) {
 if(u1>U_MAX) u1=U_MAX;
 else if(u1<-U_MAX) u1 = -U_MAX;
 
-  int v1 = map(sp_rpm + round(u1), 0, RPM, 0, 255);
+  int v1 = map(sp_rpm + round(u1), 0, RPM1, 0, 255);
   prev_enc1 = Enc1();
   err1_old = err1;
   return v1;
+}
+
+int vel2(float speed) {
+  // state = !state;
+  int sp_rpm = SpeedRPM2(speed);
+  current_speed2 = ((Enc2() - prev_enc2)*60 / (float)CPR) / ((float)MOTORS_TICK / (float)TIMER_FREQ);
+  err2 = -current_speed2 + (float)sp_rpm;
+
+  up2 = SPEED_COEFF_P * err2;
+  ui2 = ui2 + SPEED_COEFF_I*err2;
+  ud2 = (err2-err2_old)*SPEED_COEFF_D;
+  
+  if(abs(err2)<ERR_LIM)
+  {
+    ui2 = 0;
+  }
+  u2 = up2+ui2+ud2;
+if(u2>U_MAX) u2=U_MAX;
+else if(u2<-U_MAX) u2 = -U_MAX;
+
+  int v2 = map(sp_rpm + round(u2), 0, RPM2, 0, 255);
+  prev_enc2 = Enc2();
+  err2_old = err2;
+  return v2;
 }
 

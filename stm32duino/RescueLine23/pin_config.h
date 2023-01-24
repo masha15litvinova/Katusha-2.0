@@ -23,8 +23,8 @@
 #define TX6 PG14
 /*********************************/
 
-#define BUTTON1 PF14
-#define BUTTON2 PF15
+#define BUTTON1 PC6//102
+#define BUTTON2 PC7//103
 
 
 
@@ -65,19 +65,29 @@
 /************************************/
 
 /*****LIGHT SENSORS**************/
-#define SENSOR1 PF_10
-#define SENSOR2 PF_9
-#define SENSOR3 PF_8
-#define SENSOR4 PF_7
-#define SENSOR5 PF_6
-#define SENSOR6 PF_3
+#define SENSOR1 PF10
+#define SENSOR2 PF9
+#define SENSOR3 PF8
+#define SENSOR4 PF7
+#define SENSOR5 PF6
+#define SENSOR6 PF3
 /*********************************/
-
+/*************SERVOS**************/
+#define SERVO1 PD12
+#define SERVO2 PD13
+#define SERVO3 PA5
+/********************************/
 /*****COLOR SENSORS**************/
 #define SDA2 PF0
 #define SCL2 PF1
 #define SDA3 PC9
 #define SCL3 PA8
+/*********************************/
+/*****ENDSTOPS**************/
+#define ENDSTOP1 PD11
+#define ENDSTOP2 PB15
+#define ENDSTOP3 PC3
+#define ENDSTOP4 PC2
 /*********************************/
 /******ANALOG SENSORS******/
 #define CURRENT1 PC1
