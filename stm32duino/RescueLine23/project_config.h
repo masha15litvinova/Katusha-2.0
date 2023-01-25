@@ -8,10 +8,11 @@
 #include <Servo.h>
 #include <SmartButton.h>
 
-
+#define GYRO_BYTE_SIGNAL 255
+#define MAX_ERR_ANGLE 4
 
 #define V_CALIBR 110
-#define V_MAIN 55
+#define V_MAIN 50
 #define DELAY_CALIBR_4 4000
 #define PWM_LEDS 100
 
@@ -32,6 +33,7 @@
 #define GYRO_DELAY 50
 #define LINE_SENS_DELAY 40
 
+
 /**********STATES************************/
 #define LINE 0
 #define MOTORS_PWM_COMPUTE 1
@@ -47,6 +49,7 @@
 #define LINE_SENS_READ 11
 #define DIST2_SENS_READ 12
 #define CALIBRATION 13
+#define ROTATING_GREEN 14
 /*****************************************/
 
 int slider_pwm_safety_treshold = 200;

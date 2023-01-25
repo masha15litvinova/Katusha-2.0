@@ -48,10 +48,10 @@ int v2_target = 0;
 int motor1 = 0;
 int motor2 = 0;
 
-float kp_line[6] = { -0.223, -0.184, -0.182, 0.182, 0.184, 0.223 };
-float ki_line[6] = { -0.00092, -0.00074, -0.00068, 0.00068, 0.00074, 0.00092 };
+float kp_line[6] = { -0.227, -0.16, -0.14, 0.14, 0.16, 0.227 };
+float ki_line[6] = { -0.0012, -0.00074, -0.00072, 0.00072, 0.00074, 0.0012};
 float kd_line[6] = { -1.2, -1.1, -1.0, 1.0, 1.1, 1.2 };
-int min_err_i = 22;
+int min_err_i = 25;
 
 int err_line_sens[6] = { 0, 0, 0, 0, 0, 0 };
 int err_old_line_sens[6] = { 0, 0, 0, 0, 0, 0 };
@@ -219,7 +219,7 @@ void setup() {
   display.display();
   ledBlinking();
   analogWrite(PWM_LIGHTS, PWM_LEDS);
-  state_robot = CALIBRATION;
+  state_robot = ROTATING_GREEN;
 }
 
 
@@ -350,7 +350,8 @@ void loop() {
 
       {
         if (GyroUART.available()) {
-          gyroData = GyroUART.read();
+          int uart_read = GyroUART.read();
+          if(uart_read!=GYRO_BYTE_SIGNAL) gyroData = uart_read;
           timeGyro = millis();
         }
         state_robot = LINE;
@@ -453,7 +454,9 @@ void loop() {
         display.println("UART Gyro Data:");
         display.setCursor(0, 40);
         if (GyroUART.available()) {
-          gyroData = GyroUART.read();
+          int uart_read = GyroUART.read();
+          if(uart_read!=GYRO_BYTE_SIGNAL) gyroData = uart_read;
+          
         }
         display.println(String(gyroData));
         display.display();
@@ -598,6 +601,16 @@ void loop() {
         display.println("Enc2 = " + String(Enc2()));
         display.display();
         break;
+      }
+      case(ROTATING_GREEN):
+      {
+        display.clearDisplay();
+        display.setTextSize(1);
+        display.setCursor(0, 0);
+        display.println("Rotating to target angle...");
+        display.display();
+
+      turnTargetAngle(40, 100);
       }
   }
 

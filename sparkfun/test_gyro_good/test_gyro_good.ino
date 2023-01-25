@@ -109,8 +109,7 @@ void setup()
   // Initialize LED, interrupt input, and serial port.
   // LED defaults to off:
   initHardware();
-  pinMode(INTERRUPT_PIN, OUTPUT);
-  digitalWrite(INTERRUPT_PIN, LOW);
+  
   SerialUSB.begin(9600);
 #ifdef ENABLE_NVRAM_STORAGE
   // Load previously-set logging parameters from nvram:
@@ -120,7 +119,7 @@ void setup()
   // Initialize the MPU-9250. Should return true on success:
   if ( !initIMU() )
   {
-    LOG_PORT.println("Error connecting to MPU-9250");
+    
     while (1) ; // Loop forever if we fail to connect
     // LED will remain off in this state.
   }
@@ -136,11 +135,11 @@ void setup()
 void loop()
 {
   // The loop constantly checks for new serial input:
-  if ( LOG_PORT.available() )
+  /*if ( LOG_PORT.available() )
   {
     // If new input is available on serial port
     parseSerialInput(LOG_PORT.read()); // parse it
-  }
+  }*/
 
   // Then check IMU for new data, and log it
   if ( !imu.fifoAvailable() ) // If no new data is available

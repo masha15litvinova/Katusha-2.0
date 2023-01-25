@@ -14,7 +14,7 @@
 // Enable Non-Volatile Memory Storage //
 ////////////////////////////////////////
 // If defined, FlashStorage library must be installed
-#define ENABLE_NVRAM_STORAGE
+//#define ENABLE_NVRAM_STORAGE
 
 ////////////////////////
 // Serial Port Config //
