@@ -10,7 +10,8 @@
 
 
 
-#define V_CALIBR 80
+#define V_CALIBR 110
+#define V_MAIN 55
 #define DELAY_CALIBR_4 4000
 #define PWM_LEDS 100
 

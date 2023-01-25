@@ -84,7 +84,7 @@ void initPins() {
   pinMode(SERVO3, OUTPUT);
 
   pinMode(PWM_LIGHTS, OUTPUT);
-  analogWriteFrequency(2000);
+  analogWriteFrequency(16000);
 
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
@@ -131,32 +131,34 @@ void initServos()
   servo1.write(90);
 }
 void initColorSensors() {
+  display.setTextColor(SH110X_WHITE);
   if (tcs1.begin(0x29, &WIRE2)) {
     display.setCursor(0, 40);
     display.println("Found TCS1 sensor");
     display.display();
-    delay(1000);
+    delay(300);
   } else {
     display.setCursor(0, 40);
     display.println("No TCS1 found");
     display.display();
-    delay(1000);
+    delay(300);
   }
   if (tcs2.begin(0x29, &WIRE3)) {
     display.setCursor(0, 50);
     display.println("Found TCS2 sensor");
     display.display();
-    delay(1000);
+    delay(300);
   } else {
     display.setCursor(0, 50);
     display.println("No TCS2 found");
     display.display();
-    delay(1000);
+    delay(300);
   }
-  delay(400);
+  delay(1000);
 }
 
 void initLaserDists() {
+  display.setTextColor(SH110X_WHITE);
   digitalWrite(XSHUT1, HIGH);
   sensor1.begin();
   int status1 = sensor1.InitSensor(0xC0);
@@ -179,9 +181,22 @@ void initLaserDists() {
     display.display();
     Serial.println("");
   }
+  else{
+    display.setCursor(0, 0);
+    display.println("Init sensor1 ok...");
+    display.display();
+    Serial.println("");
+  }
+  
   if (status2) {
     display.setCursor(0, 10);
     display.println("Init sensor2 failed...");
+    display.display();
+    Serial.println("");
+  }
+  else{
+    display.setCursor(0, 10);
+    display.println("Init sensor2 ok...");
     display.display();
     Serial.println("");
   }
@@ -191,11 +206,23 @@ void initLaserDists() {
     display.display();
     Serial.println("");
   }
+  else{
+    display.setCursor(0, 20);
+    display.println("Init sensor3 ok...");
+    display.display();
+    Serial.println("");
+  }
   if (status4) {
     display.setCursor(0, 30);
     display.println("Init sensor4 failed...");
     display.display();
     Serial.println("");
   }
-  delay(400);
+  else{
+    display.setCursor(0, 30);
+    display.println("Init sensor4 ok...");
+    display.display();
+    Serial.println("");
+  }
+  delay(1000);
 }
