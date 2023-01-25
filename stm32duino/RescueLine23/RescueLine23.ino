@@ -41,17 +41,17 @@ int gyroData = 0;
 
 bool state = true;
 
-int v = 80;
+int v = 35;
 int v1_target = 0;
 int v2_target = 0;
 
 int motor1 = 0;
 int motor2 = 0;
 
-float kp_line[6] = { 0.1, 0.075, 0.05, -0.05, -0.075, -0.1 };
+float kp_line[6] = {-0.25, -0.15, -0.1, 0.1, 0.15, 0.25};
 
 int err_line_sens[6] = { 0, 0, 0, 0, 0, 0 };
-
+int err_old_line_sens[6] = { 0, 0, 0, 0, 0, 0 };
 int u_line = 0;
 
 uint32_t distance1;
@@ -272,6 +272,7 @@ void loop() {
       }
     case (LINE):
       {
+        u_line = 0;
         motors(motor1, motor2);
         for (int i = 0; i < 6; i++) {
           err_line_sens[i] = sensors[i] - grey[i];
@@ -279,8 +280,8 @@ void loop() {
         for (int i = 0; i < 6; i++) {
           u_line = u_line + err_line_sens[i] * kp_line[i];
         }
-        v1_target = 90;//v + u_line;
-        v2_target = 90;//v - u_line;
+        v1_target = v + u_line;
+        v2_target = v - u_line;
         //if (millis() - timeDist2 > DIST2_DELAY) state_robot = DIST2_SENS_READ;
         if (millis() - timeLineSens > LINE_SENS_DELAY) state_robot = LINE_SENS_READ;
         if (millis() - timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
