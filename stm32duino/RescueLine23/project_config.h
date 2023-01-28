@@ -9,7 +9,8 @@
 #include <SmartButton.h>
 
 #define GYRO_BYTE_SIGNAL 255
-#define MAX_ERR_ANGLE 4
+#define UART_BAUDRATE 115200
+
 
 #define V_CALIBR 110
 #define V_MAIN 50
@@ -43,19 +44,20 @@
 #define STOP_SCREEN4 5       //current sensors and sliders position, ball sensor
 #define STOP_SCREEN5 6       //encoders
 #define STOP_SCREEN0 7       //STOP
-#define AFTER_STOP_SCREEN 8  //clear display
-#define CAMERA_READ_DATA 9
-#define GYRO_READ_DATA 10
-#define LINE_SENS_READ 11
-#define DIST2_SENS_READ 12
-#define CALIBRATION 13
-#define ROTATING_GREEN 14
+#define AFTER_STOP_SCREEN_LINE 8  
+#define AFTER_STOP_SCREEN_ROTATE 9 
+#define CAMERA_READ_DATA 10
+#define GYRO_READ_DATA 11
+#define LINE_SENS_READ 12
+#define DIST2_SENS_READ 13
+#define CALIBRATION 14
+#define ROTATING_GREEN 15
 /*****************************************/
 
 int slider_pwm_safety_treshold = 200;
 
-int state_robot = CALIBRATION;
-int last_state_robot = LINE;
+int state_robot = ROTATING_GREEN;
+int last_state_robot = ROTATING_GREEN;
 
 
 

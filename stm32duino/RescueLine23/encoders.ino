@@ -1,7 +1,7 @@
 
-#define SPEED_COEFF_P 0.7//1.0
-#define SPEED_COEFF_D 0//0.8//0.8//0.8//0.3  //13
-#define SPEED_COEFF_I 0.05
+#define SPEED_COEFF_P 0.9  //1.0
+#define SPEED_COEFF_D 0    //0.8//0.8//0.8//0.3  //13
+#define SPEED_COEFF_I 0.06
 #define SPEED_COEFF_CUBE 0
 
 #define CPR 1050
@@ -77,34 +77,31 @@ float Err2() {
 float U2() {
   return u2;
 }
-int SpeedRPM1(float speed)
-{
-int speed_rpm = map(round(speed), 0, 255, 0, RPM1);
-return speed_rpm;
+int SpeedRPM1(float speed) {
+  int speed_rpm = map(round(speed), 0, 255, 0, RPM1);
+  return speed_rpm;
 }
-int SpeedRPM2(float speed)
-{
-int speed_rpm = map(round(speed), 0, 255, 0, RPM2);
-return speed_rpm;
+int SpeedRPM2(float speed) {
+  int speed_rpm = map(round(speed), 0, 255, 0, RPM2);
+  return speed_rpm;
 }
 
 int vel1(float speed) {
- // state = !state;
+  // state = !state;
   int sp_rpm = SpeedRPM1(speed);
-  current_speed1 = ((Enc1() - prev_enc1)*60000 / ((float)CPR*MOTORS_DELAY)) ;
+  current_speed1 = ((Enc1() - prev_enc1) * 60000 / ((float)CPR * MOTORS_DELAY));
   err1 = -current_speed1 + (float)sp_rpm;
 
   up1 = SPEED_COEFF_P * err1;
-  ui1 = ui1 + SPEED_COEFF_I*err1;
-  ud1 = (err1-err1_old)*SPEED_COEFF_D;
-  
-  if(abs(err1)<ERR_LIM)
-  {
+  ui1 = ui1 + SPEED_COEFF_I * err1;
+  ud1 = (err1 - err1_old) * SPEED_COEFF_D;
+
+  if (abs(err1) < ERR_LIM) {
     ui1 = 0;
   }
-  u1 = up1+ui1+ud1;
-if(u1>U_MAX) u1=U_MAX;
-else if(u1<-U_MAX) u1 = -U_MAX;
+  u1 = up1 + ui1 + ud1;
+  if (u1 > U_MAX) u1 = U_MAX;
+  else if (u1 < -U_MAX) u1 = -U_MAX;
 
   int v1 = map(sp_rpm + round(u1), 0, RPM1, 0, 255);
   prev_enc1 = Enc1();
@@ -115,24 +112,22 @@ else if(u1<-U_MAX) u1 = -U_MAX;
 int vel2(float speed) {
   // state = !state;
   int sp_rpm = SpeedRPM2(speed);
-  current_speed2 = ((Enc2() - prev_enc2)*60 / (float)CPR) / ((float)MOTORS_TICK / (float)TIMER_FREQ);
+  current_speed2 = ((Enc2() - prev_enc2) * 60 / (float)CPR) / ((float)MOTORS_TICK / (float)TIMER_FREQ);
   err2 = -current_speed2 + (float)sp_rpm;
 
   up2 = SPEED_COEFF_P * err2;
-  ui2 = ui2 + SPEED_COEFF_I*err2;
-  ud2 = (err2-err2_old)*SPEED_COEFF_D;
-  
-  if(abs(err2)<ERR_LIM)
-  {
+  ui2 = ui2 + SPEED_COEFF_I * err2;
+  ud2 = (err2 - err2_old) * SPEED_COEFF_D;
+
+  if (abs(err2) < ERR_LIM) {
     ui2 = 0;
   }
-  u2 = up2+ui2+ud2;
-if(u2>U_MAX) u2=U_MAX;
-else if(u2<-U_MAX) u2 = -U_MAX;
+  u2 = up2 + ui2 + ud2;
+  if (u2 > U_MAX) u2 = U_MAX;
+  else if (u2 < -U_MAX) u2 = -U_MAX;
 
   int v2 = map(sp_rpm + round(u2), 0, RPM2, 0, 255);
   prev_enc2 = Enc2();
   err2_old = err2;
   return v2;
 }
-

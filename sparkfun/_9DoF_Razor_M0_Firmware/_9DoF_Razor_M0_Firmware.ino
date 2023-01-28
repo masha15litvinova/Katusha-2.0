@@ -3,20 +3,25 @@ SparkFun 9DoF Razor M0 Example Firmware
 Jim Lindblom @ SparkFun Electronics
 Original creation date: November 22, 2016
 https://github.com/sparkfun/9DOF_Razor_IMU/Firmware
+
 This example firmware for the SparkFun 9DoF Razor IMU M0 
 demonstrates how to grab accelerometer, gyroscope, magnetometer,
 and quaternion values from the MPU-9250's digital motion processor
 (DMP). It prints those values to a serial port and, if a card is
 present, an SD card.
+
 Values printed can be configured using the serial port. Settings
 can be modified using the included "config.h" file.
+
 Resources:
 SparkFun MPU9250-DMP Arduino Library:
   https://github.com/sparkfun/SparkFun_MPU-9250-DMP_Arduino_Library
 FlashStorage Arduino Library
   https://github.com/cmaglie/FlashStorage
+
 Development environment specifics:
   Firmware developed using Arduino IDE 1.6.12
+
 Hardware:
   SparkFun 9DoF Razor IMU M0 (SEN-14001)
   https://www.sparkfun.com/products/14001
@@ -94,7 +99,8 @@ void blinkLED()
   FlashStorage(flashGyroFSR, unsigned short);
   FlashStorage(flashLogRate, unsigned short);
 #endif
-int yaw = 0;
+int angle = 0;
+
 void setup()
 {
   // Initialize LED, interrupt input, and serial port.
@@ -123,7 +129,7 @@ void setup()
 
   // For production testing only
   // To catch a "$" and enter testing mode
-
+  Serial1.begin(115200);
 }
 
 void loop()
@@ -203,7 +209,8 @@ void logIMUData(void)
     {
       imuLog += String(imu.calcMag(imu.mx)) + ", ";
       imuLog += String(imu.calcMag(imu.my)) + ", ";
-      imuLog += String(imu.calcMag(imu.mz)) + ", ";    
+      imuLog += String(imu.calcMag(imu.mz)) + ", ";  
+     
     }
     else
     {
@@ -220,23 +227,24 @@ void logIMUData(void)
       imuLog += String(imu.calcQuat(imu.qx), 4) + ", ";
       imuLog += String(imu.calcQuat(imu.qy), 4) + ", ";
       imuLog += String(imu.calcQuat(imu.qz), 4) + ", ";
+      
     }
     else
     {
       imuLog += String(imu.qw) + ", ";
       imuLog += String(imu.qx) + ", ";
       imuLog += String(imu.qy) + ", ";
-      imuLog += String(imu.qz) + ", ";      
+      imuLog += String(imu.qz) + ", ";     
+      
     }
   }
-  
   if (enableEuler) // If Euler-angle logging is enabled
   {
     imu.computeEulerAngles();
     imuLog += String(imu.pitch, 2) + ", ";
     imuLog += String(imu.roll, 2) + ", ";
     imuLog += String(imu.yaw, 2) + ", ";
-    yaw = imu.yaw;
+     angle = imu.yaw;   
   }
   if (enableHeading) // If heading logging is enabled
   {
@@ -247,9 +255,14 @@ void logIMUData(void)
   imuLog.remove(imuLog.length() - 2, 2);
   imuLog += "\r\n"; // Add a new line
 
-  yaw = map(yaw, 0, 360, 0, 254);
-    LOG_PORT.write(yaw); // Print log line to serial port
-LOG_PORT.write(255);
+  if (enableSerialLogging)  // If serial port logging is enabled
+    {
+      angle = map(angle, 0, 360, 0, 254);
+    Serial1.write(angle);
+    delay(10);
+    Serial1.write(255);
+    delay(10);
+    }
   // If SD card logging is enabled & a card is plugged in
   if ( sdCardPresent && enableSDLogging)
   {
@@ -286,7 +299,6 @@ void initHardware(void)
 
   // Set up serial log port
   LOG_PORT.begin(SERIAL_BAUD_RATE);
-  delay(6000);
 }
 
 bool initIMU(void)
@@ -689,3 +701,4 @@ void set_nets_all_inputs()
     pinMode(net_2_pins[i], INPUT);
   }   
 }
+

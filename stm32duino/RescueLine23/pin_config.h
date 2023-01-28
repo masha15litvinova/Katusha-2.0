@@ -1,10 +1,10 @@
 
 /*********OLED DISPLAY************/
-#define OLED_MOSI     PC12
-#define OLED_CLK      PC10
-#define OLED_DC       PC13
-#define OLED_CS       PA11
-#define OLED_RST      PA12
+#define OLED_MOSI PC12
+#define OLED_CLK PC10
+#define OLED_DC PC13
+#define OLED_CS PA11
+#define OLED_RST PA12
 /*********************************/
 
 /*********LED PINS************/
@@ -16,15 +16,15 @@
 #define USART3
 #define USART6
 
-#define RX3 PD9 //GYRO
+#define RX3 PD9  //GYRO
 #define TX3 PD8
 
-#define RX6 PG9 //CAMERA
+#define RX6 PG9  //CAMERA
 #define TX6 PG14
 /*********************************/
 
-#define BUTTON1 PC6//102
-#define BUTTON2 PC7//103
+#define BUTTON1 PC6  //102
+#define BUTTON2 PC7  //103
 
 
 
@@ -93,8 +93,8 @@
 #define CURRENT1 PC1
 #define CURRENT2 PC0
 
-#define POTENTIOMETER1 PF_4//84//PF4
-#define POTENTIOMETER2 85//PF5
+#define POTENTIOMETER1 PF_4  //84//PF4
+#define POTENTIOMETER2 85    //PF5
 /*********************************/
 /*****ENCODERS SENSORS********/
 #define ENC1 PG3

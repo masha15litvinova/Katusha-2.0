@@ -49,7 +49,7 @@ int motor1 = 0;
 int motor2 = 0;
 
 float kp_line[6] = { -0.227, -0.16, -0.14, 0.14, 0.16, 0.227 };
-float ki_line[6] = { -0.0012, -0.00074, -0.00072, 0.00072, 0.00074, 0.0012};
+float ki_line[6] = { -0.0012, -0.00074, -0.00072, 0.00072, 0.00074, 0.0012 };
 float kd_line[6] = { -1.2, -1.1, -1.0, 1.0, 1.1, 1.2 };
 int min_err_i = 25;
 
@@ -79,11 +79,18 @@ public:
 void modeSmartButton1::onHold() {
   switch (state_robot) {
     case (STOP_SCREEN0):
-      state_robot = AFTER_STOP_SCREEN;
-      break;
-    case (AFTER_STOP_SCREEN):
-      state_robot = LINE;
-      break;
+      {
+        if (last_state_robot == LINE) {
+          state_robot = AFTER_STOP_SCREEN_LINE;
+          break;
+        } else if (last_state_robot == ROTATING_GREEN) {
+          state_robot = AFTER_STOP_SCREEN_ROTATE;
+          break;
+        } else {
+          state_robot = AFTER_STOP_SCREEN_LINE;
+          break;
+        }
+      }
     default:
       state_robot = STOP_SCREEN0;
       break;
@@ -92,11 +99,18 @@ void modeSmartButton1::onHold() {
 void modeSmartButton1::onClick() {
   switch (state_robot) {
     case (STOP_SCREEN0):
-      state_robot = AFTER_STOP_SCREEN;
-      break;
-    case (AFTER_STOP_SCREEN):
-      state_robot = LINE;
-      break;
+      {
+        if (last_state_robot == LINE) {
+          state_robot = AFTER_STOP_SCREEN_LINE;
+          break;
+        } else if (last_state_robot == ROTATING_GREEN) {
+          state_robot = AFTER_STOP_SCREEN_ROTATE;
+          break;
+        } else {
+          state_robot = AFTER_STOP_SCREEN_LINE;
+          break;
+        }
+      }
     default:
       state_robot = STOP_SCREEN0;
       break;
@@ -199,8 +213,8 @@ void setup() {
   CamUART.setRx(RX6);
   CamUART.setTx(TX6);
 
-  GyroUART.begin(115200);
-  CamUART.begin(115200);
+  GyroUART.begin(UART_BAUDRATE);
+  CamUART.begin(UART_BAUDRATE);
 
   display.begin(0, true);
   display.display();
@@ -215,11 +229,12 @@ void setup() {
   initLaserDists();
 
   initColorSensors();
+  initGyro();
   display.clearDisplay();
   display.display();
   ledBlinking();
   analogWrite(PWM_LIGHTS, PWM_LEDS);
-  state_robot = ROTATING_GREEN;
+  state_robot = STOP_SCREEN0;
 }
 
 
@@ -259,6 +274,8 @@ void loop() {
   switch (state_robot) {
     case (CALIBRATION):
       {
+        btn1.run();
+        btn2.run();
         display.clearDisplay();
         display.setTextSize(1);
         display.setCursor(0, 0);
@@ -280,6 +297,8 @@ void loop() {
       }
     case (LINE):
       {
+        btn1.run();
+        btn2.run();
         up_line = 0;
         ud_line = 0;
         motors(motor1, motor2);
@@ -309,15 +328,17 @@ void loop() {
         if (millis() - timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
         //if (millis() - timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
         //if (millis() - timeGyro > GYRO_DELAY) state_robot = GYRO_READ_DATA;*/
-
+        last_state_robot = LINE;
         break;
       }
     case (MOTORS_PWM_COMPUTE):
       {
+
         motor1 = vel1(round(v1_target));
         motor2 = vel2(round(v2_target));
         timeMotors = millis();
-        state_robot = LINE;
+
+        state_robot = last_state_robot;
 
         break;
       }
@@ -330,6 +351,7 @@ void loop() {
         sensors[4] = analogRead(SENSOR5);
         sensors[5] = analogRead(SENSOR6);
         timeLineSens = millis();
+
         state_robot = LINE;
 
         break;
@@ -351,9 +373,10 @@ void loop() {
       {
         if (GyroUART.available()) {
           int uart_read = GyroUART.read();
-          if(uart_read!=GYRO_BYTE_SIGNAL) gyroData = uart_read;
+          if (uart_read != GYRO_BYTE_SIGNAL) gyroData = uart_read;
           timeGyro = millis();
         }
+
         state_robot = LINE;
         break;
       }
@@ -371,6 +394,8 @@ void loop() {
       }
     case (STOP_SCREEN0):
       {
+        btn1.run();
+        btn2.run();
         motor1 = 0;
         motor2 = 0;
         ui_line = 0;
@@ -385,23 +410,51 @@ void loop() {
         display.println("Press 1: moving");
         display.setCursor(0, 30);
         display.println("Press 2: watch values");
+
+        display.setCursor(0, 50);
+        if (last_state_robot == LINE) display.println("Do LINE");
+        if (last_state_robot == ROTATING_GREEN) display.println("Do ROTATING_GREEN");
         display.display();
         break;
       }
-    case (AFTER_STOP_SCREEN):
+    case (AFTER_STOP_SCREEN_LINE):
 
 
       {
+        btn1.run();
+        btn2.run();
         motors(0, 0);
         display.clearDisplay();
         display.setTextSize(2);
         display.setCursor(0, 0);
-        display.println("LINE FOLLOWING...");
+        display.println("LINE");
+        display.setCursor(0, 20);
+        display.println("FOLLOWING...");
         display.display();
+        state_robot = LINE;
+        break;
+      }
+    case (AFTER_STOP_SCREEN_ROTATE):
+
+
+      {
+        btn1.run();
+        btn2.run();
+        motors(0, 0);
+        display.clearDisplay();
+        display.setTextSize(2);
+        display.setCursor(0, 0);
+        display.println("ROTATE TO");
+        display.setCursor(0, 20);
+        display.println("TARGET...");
+        display.display();
+        state_robot = ROTATING_GREEN;
         break;
       }
     case (STOP_SCREEN1):
       {
+        btn1.run();
+        btn2.run();
         motors(0, 0);
 
         display.clearDisplay();
@@ -440,6 +493,8 @@ void loop() {
       }
     case (STOP_SCREEN2):
       {
+        btn1.run();
+        btn2.run();
         motors(0, 0);
         display.clearDisplay();
         display.setTextSize(1);
@@ -455,8 +510,7 @@ void loop() {
         display.setCursor(0, 40);
         if (GyroUART.available()) {
           int uart_read = GyroUART.read();
-          if(uart_read!=GYRO_BYTE_SIGNAL) gyroData = uart_read;
-          
+          if (uart_read != GYRO_BYTE_SIGNAL) gyroData = map(uart_read, 0, 254, 0, 360);
         }
         display.println(String(gyroData));
         display.display();
@@ -464,6 +518,8 @@ void loop() {
       }
     case (STOP_SCREEN3):
       {
+        btn1.run();
+        btn2.run();
         motors(0, 0);
 
         display.clearDisplay();
@@ -565,6 +621,8 @@ void loop() {
       }
     case (STOP_SCREEN4):
       {
+        btn1.run();
+        btn2.run();
         motors(0, 0);
 
         display.clearDisplay();
@@ -591,6 +649,8 @@ void loop() {
       }
     case (STOP_SCREEN5):
       {
+        btn1.run();
+        btn2.run();
         display.clearDisplay();
         display.setTextSize(1);
         display.setCursor(0, 0);
@@ -602,15 +662,18 @@ void loop() {
         display.display();
         break;
       }
-      case(ROTATING_GREEN):
+    case (ROTATING_GREEN):
       {
+        btn1.run();
+        btn2.run();
         display.clearDisplay();
-        display.setTextSize(1);
-        display.setCursor(0, 0);
-        display.println("Rotating to target angle...");
-        display.display();
-
-      turnTargetAngle(40, 100);
+        digitalWrite(LED1, HIGH);
+        last_state_robot = ROTATING_GREEN;
+        //turnTargetAngle(40, 140, 30);
+        //turnAngle90Left(65, 30);
+        turnAngle180(65, 30);
+        delay(4000);
+        break;
       }
   }
 

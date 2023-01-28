@@ -12,7 +12,52 @@ void resetCamera() {
   delay(500);
   digitalWrite(CAMERA_RST, HIGH);
 }
+void initGyro() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("Init gyro...");
+  display.display();
+  long int time_uart_available = millis();
+  while (!GyroUART.available()) {
+    if ((millis() - time_uart_available) > 8000) {
+      v1_target = 0;
+      v2_target = 0;
+      resetGyro();
+      time_uart_available = millis();
+    }
+  }
+  long int gyro_test_start = millis();
+  int gyro_data = 0;
+  while ((millis() - gyro_test_start) < 20000) {
+    display.clearDisplay();
+    if (GyroUART.available()) {
+      int uart_read = GyroUART.read();
+      if (uart_read != GYRO_BYTE_SIGNAL) gyro_data = map(uart_read, 0, 254, 0, 360);
+    }
+    display.setCursor(0, 10);
+    display.println("Gyro data: " + String(gyro_data));
+    display.setCursor(0, 20);
+    if ((millis() - gyro_test_start) < 5000) {
+      display.println("Wait for 20 seconds");
+    } else if ((millis() - gyro_test_start) < 10000) {
+      display.println("Wait for 15 seconds");
+    } else if ((millis() - gyro_test_start) < 15000) {
+      display.println("Wait for 10 seconds");
+    } else if ((millis() - gyro_test_start) < 16000) {
+      display.println("Wait for 5 seconds");
+    } else if ((millis() - gyro_test_start) < 17000) {
+      display.println("Wait for 4 seconds");
+    } else if ((millis() - gyro_test_start) < 18000) {
+      display.println("Wait for 3 seconds");
+    } else if ((millis() - gyro_test_start) < 19000) {
+      display.println("Wait for 2 seconds");
+    } else if ((millis() - gyro_test_start) < 20000) {
+      display.println("Wait for 1 second");
+    } 
 
+    display.display();
+  }
+}
 
 void resetLaserDist() {
   digitalWrite(XSHUT1, LOW);
@@ -125,8 +170,7 @@ void ledBlinking() {
   digitalWrite(LED1, LOW);
 }
 
-void initServos()
-{
+void initServos() {
   servo1.attach(SERVO1);
   servo1.write(90);
 }
@@ -154,7 +198,7 @@ void initColorSensors() {
     display.display();
     delay(300);
   }
-  delay(1000);
+  delay(400);
 }
 
 void initLaserDists() {
@@ -180,21 +224,19 @@ void initLaserDists() {
     display.println("Init sensor1 failed...");
     display.display();
     Serial.println("");
-  }
-  else{
+  } else {
     display.setCursor(0, 0);
     display.println("Init sensor1 ok...");
     display.display();
     Serial.println("");
   }
-  
+
   if (status2) {
     display.setCursor(0, 10);
     display.println("Init sensor2 failed...");
     display.display();
     Serial.println("");
-  }
-  else{
+  } else {
     display.setCursor(0, 10);
     display.println("Init sensor2 ok...");
     display.display();
@@ -205,8 +247,7 @@ void initLaserDists() {
     display.println("Init sensor3 failed...");
     display.display();
     Serial.println("");
-  }
-  else{
+  } else {
     display.setCursor(0, 20);
     display.println("Init sensor3 ok...");
     display.display();
@@ -217,12 +258,11 @@ void initLaserDists() {
     display.println("Init sensor4 failed...");
     display.display();
     Serial.println("");
-  }
-  else{
+  } else {
     display.setCursor(0, 30);
     display.println("Init sensor4 ok...");
     display.display();
     Serial.println("");
   }
-  delay(1000);
+  delay(400);
 }
