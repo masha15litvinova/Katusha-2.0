@@ -11,6 +11,9 @@
 #define GYRO_BYTE_SIGNAL 255
 #define UART_BAUDRATE 115200
 
+#define GREEN_HIGH 600 //порог зеленого (может, другие цвета тоже нужны)
+#define GREEN_LOW 300
+
 
 #define V_CALIBR 110
 #define V_MAIN 50

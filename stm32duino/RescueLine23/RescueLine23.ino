@@ -667,12 +667,22 @@ void loop() {
         btn1.run();
         btn2.run();
         display.clearDisplay();
+
+
         digitalWrite(LED1, HIGH);
         last_state_robot = ROTATING_GREEN;
-        //turnTargetAngle(40, 140, 30);
-        //turnAngle90Left(65, 30);
-        turnAngle180(65, 30);
+
+
+        int dir = direction();
+        if (dir == 0) {
+          turnAngle180(65, 30);
+        } else if (dir == 1) {
+          turnAngle90Right(65, 30);
+        } else if (dir == 2) {
+          turnAngle90Left(65, 30);
+        }
         delay(4000);
+        stete_robot = STOP_SCREEN0;
         break;
       }
   }
