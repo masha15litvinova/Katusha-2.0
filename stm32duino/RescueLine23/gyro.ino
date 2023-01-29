@@ -75,7 +75,7 @@ void turnTargetAngle(int targetAngle, int max_v, int min_v) {  //поворот 
     display.display();
   }
 }
-
+Ы
 
 void turnAngle90Left(int max_v, int min_v) {  //поворот на данный угол относительно текущего
 

@@ -24,7 +24,6 @@ Servo servo1;
 Servo servo2;
 Servo servo3;
 
-
 int black[6] = { 0, 0, 0, 0, 0, 0 };
 int white[6] = { 1023, 1023, 1023, 1023, 1023, 1023 };
 int grey[6] = { 0, 0, 0, 0, 0, 0 };
@@ -80,16 +79,8 @@ void modeSmartButton1::onHold() {
   switch (state_robot) {
     case (STOP_SCREEN0):
       {
-        if (last_state_robot == LINE) {
-          state_robot = AFTER_STOP_SCREEN_LINE;
-          break;
-        } else if (last_state_robot == ROTATING_GREEN) {
-          state_robot = AFTER_STOP_SCREEN_ROTATE;
-          break;
-        } else {
-          state_robot = AFTER_STOP_SCREEN_LINE;
-          break;
-        }
+
+        state_robot = AFTER_STOP_SCREEN;
       }
     default:
       state_robot = STOP_SCREEN0;
@@ -100,16 +91,8 @@ void modeSmartButton1::onClick() {
   switch (state_robot) {
     case (STOP_SCREEN0):
       {
-        if (last_state_robot == LINE) {
-          state_robot = AFTER_STOP_SCREEN_LINE;
-          break;
-        } else if (last_state_robot == ROTATING_GREEN) {
-          state_robot = AFTER_STOP_SCREEN_ROTATE;
-          break;
-        } else {
-          state_robot = AFTER_STOP_SCREEN_LINE;
-          break;
-        }
+
+        state_robot = AFTER_STOP_SCREEN;
       }
     default:
       state_robot = STOP_SCREEN0;
@@ -323,12 +306,19 @@ void loop() {
         for (int i = 0; i < 6; i++) {
           err_old_line_sens[i] = err_line_sens[i];
         }
-        //if (millis() - timeDist2 > DIST2_DELAY) state_robot = DIST2_SENS_READ;
-        if (millis() - timeLineSens > LINE_SENS_DELAY) state_robot = LINE_SENS_READ;
+        //if (millis() - timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
+        if (millis() - timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
         if (millis() - timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
         //if (millis() - timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
         //if (millis() - timeGyro > GYRO_DELAY) state_robot = GYRO_READ_DATA;*/
         last_state_robot = LINE;
+
+        if ((sensors[0] + sensors[1] + sensors[2] + sensors[3] + sensors[4] + sensors[5]) > GREY_THRESHOLD * 6)  //условие перекрестка
+        {
+          motors(0, 0);
+          delay(300);
+          state_robot = COLOR_READ_DATA;
+        }
         break;
       }
     case (MOTORS_PWM_COMPUTE):
@@ -342,7 +332,7 @@ void loop() {
 
         break;
       }
-    case (LINE_SENS_READ):
+    case (LINE_READ_DATA):
       {
         sensors[0] = analogRead(SENSOR1);
         sensors[1] = analogRead(SENSOR2);
@@ -350,6 +340,11 @@ void loop() {
         sensors[3] = analogRead(SENSOR4);
         sensors[4] = analogRead(SENSOR5);
         sensors[5] = analogRead(SENSOR6);
+        for (int i = 0; i < 6; i++) {
+
+          sensors[i] = map(sensors[i], white[i], black[i], 0, 100);  //приведение к одному диапазону, т.к. разные поверхности по-разному отражают
+          //-->где-то ошибка больше, поэтому скорость больше
+        }
         timeLineSens = millis();
 
         state_robot = LINE;
@@ -364,7 +359,7 @@ void loop() {
           timeCamera = millis();
         }
 
-        state_robot = LINE;
+        state_robot = last_state_robot;
 
         break;
       }
@@ -380,7 +375,7 @@ void loop() {
         state_robot = LINE;
         break;
       }
-    case (DIST2_SENS_READ):
+    case (DIST2_READ_DATA):
       {
         int distance2_last = distance2;
         digitalWrite(XSHUT2, HIGH);
@@ -417,7 +412,7 @@ void loop() {
         display.display();
         break;
       }
-    case (AFTER_STOP_SCREEN_LINE):
+    case (AFTER_STOP_SCREEN):
 
 
       {
@@ -426,31 +421,16 @@ void loop() {
         motors(0, 0);
         display.clearDisplay();
         display.setTextSize(2);
+
         display.setCursor(0, 0);
-        display.println("LINE");
-        display.setCursor(0, 20);
-        display.println("FOLLOWING...");
+        display.println("GO...");
+
+
         display.display();
         state_robot = LINE;
         break;
       }
-    case (AFTER_STOP_SCREEN_ROTATE):
 
-
-      {
-        btn1.run();
-        btn2.run();
-        motors(0, 0);
-        display.clearDisplay();
-        display.setTextSize(2);
-        display.setCursor(0, 0);
-        display.println("ROTATE TO");
-        display.setCursor(0, 20);
-        display.println("TARGET...");
-        display.display();
-        state_robot = ROTATING_GREEN;
-        break;
-      }
     case (STOP_SCREEN1):
       {
         btn1.run();
@@ -670,10 +650,10 @@ void loop() {
 
 
         digitalWrite(LED1, HIGH);
-        last_state_robot = ROTATING_GREEN;
 
 
-        int dir = direction();
+
+
         if (dir == 0) {
           turnAngle180(65, 30);
         } else if (dir == 1) {
@@ -682,7 +662,16 @@ void loop() {
           turnAngle90Left(65, 30);
         }
         delay(4000);
-        stete_robot = STOP_SCREEN0;
+        state_robot = last_state_robot;
+        last_state_robot = ROTATING_GREEN;
+        break;
+      }
+    case (COLOR_READ_DATA):
+      {
+        dir = -1;
+        display.clearDisplay();
+        dir = direction();
+        state_robot = ROTATING_GREEN;
         break;
       }
   }

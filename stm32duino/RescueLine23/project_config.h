@@ -11,6 +11,8 @@
 #define GYRO_BYTE_SIGNAL 255
 #define UART_BAUDRATE 115200
 
+#define GREY_THRESHOLD 70
+
 #define GREEN_HIGH 600 //порог зеленого (может, другие цвета тоже нужны)
 #define GREEN_LOW 300
 
@@ -47,14 +49,15 @@
 #define STOP_SCREEN4 5       //current sensors and sliders position, ball sensor
 #define STOP_SCREEN5 6       //encoders
 #define STOP_SCREEN0 7       //STOP
-#define AFTER_STOP_SCREEN_LINE 8  
-#define AFTER_STOP_SCREEN_ROTATE 9 
-#define CAMERA_READ_DATA 10
-#define GYRO_READ_DATA 11
-#define LINE_SENS_READ 12
-#define DIST2_SENS_READ 13
-#define CALIBRATION 14
-#define ROTATING_GREEN 15
+#define AFTER_STOP_SCREEN 8  
+
+#define CAMERA_READ_DATA 9
+#define GYRO_READ_DATA 10
+#define LINE_READ_DATA 11
+#define DIST2_READ_DATA 12
+#define CALIBRATION 13
+#define ROTATING_GREEN 14
+#define COLOR_READ_DATA 15
 /*****************************************/
 
 int slider_pwm_safety_treshold = 200;
@@ -62,5 +65,6 @@ int slider_pwm_safety_treshold = 200;
 int state_robot = ROTATING_GREEN;
 int last_state_robot = ROTATING_GREEN;
 
+int dir = -1;
 
 

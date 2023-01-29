@@ -113,6 +113,7 @@ long int calibr_begin = millis();
   for(int i=0; i<6; i++)
   {
     grey[i]=(white[i]+black[i])/2;
+    grey[i] = map(grey[i], white[i], black[i], 0, 100);//по идее должно быть 50(+-1) у всех датчиков -среднее в диспазоне черный-белый
   }
 
 }
