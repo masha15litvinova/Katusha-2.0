@@ -427,7 +427,8 @@ void loop() {
 
 
         display.display();
-        state_robot = LINE;
+        delay(500);
+        state_robot = COLOR_READ_DATA;
         break;
       }
 
@@ -671,6 +672,7 @@ void loop() {
         dir = -1;
         display.clearDisplay();
         dir = direction();
+
         state_robot = ROTATING_GREEN;
         break;
       }

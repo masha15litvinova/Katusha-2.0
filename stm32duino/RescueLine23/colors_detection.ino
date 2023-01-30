@@ -11,15 +11,17 @@ int direction() {
   uint16_t r1, g1, b1, c1;
    uint16_t r2, g2, b2, c2;
   tcs1.setIntegrationTime(TCS34725_INTEGRATIONTIME_154MS);
-  //delay(300); // Delay for one old integ. time period (to finish old reading)
+  delay(300); // Delay for one old integ. time period (to finish old reading)
   delay(154);  // Delay for one new integ. time period (to allow new reading)
   tcs1.getRawData(&r1, &g1, &b1, &c1);
+  digitalWrite(LED2, LOW);
   display.setCursor(0, 20);
   display.print("Right: "+String(g1));
   tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_154MS);
-  //delay(300); // Delay for one old integ. time period (to finish old reading)
+  delay(300); // Delay for one old integ. time period (to finish old reading)
   delay(154);  // Delay for one new integ. time period (to allow new reading)
-  tcs1.getRawData(&r2, &g2, &b2, &c2);
+  tcs2.getRawData(&r2, &g2, &b2, &c2);
+  digitalWrite(LED2, HIGH);
   display.setCursor(0, 30);
   display.print("Left: "+String(g2));
 display.display();
@@ -46,6 +48,7 @@ display.display();
   {
     display.print("NO");
   }
+
   return dir;
 
 

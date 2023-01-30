@@ -13,8 +13,8 @@
 
 #define GREY_THRESHOLD 70
 
-#define GREEN_HIGH 600 //порог зеленого (может, другие цвета тоже нужны)
-#define GREEN_LOW 300
+#define GREEN_HIGH 120 //порог зеленого (может, другие цвета тоже нужны)
+#define GREEN_LOW 90
 
 
 #define V_CALIBR 110
@@ -62,8 +62,8 @@
 
 int slider_pwm_safety_treshold = 200;
 
-int state_robot = ROTATING_GREEN;
-int last_state_robot = ROTATING_GREEN;
+int state_robot = COLOR_READ_DATA;
+int last_state_robot = COLOR_READ_DATA;
 
 int dir = -1;
 
