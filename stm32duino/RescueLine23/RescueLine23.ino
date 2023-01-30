@@ -28,24 +28,17 @@ int black[6] = { 0, 0, 0, 0, 0, 0 };
 int white[6] = { 1023, 1023, 1023, 1023, 1023, 1023 };
 int grey[6] = { 0, 0, 0, 0, 0, 0 };
 
-long int timeGyro = 0;
-long int timeCamera = 0;
-long int timeDist2 = 0;  //передний дальномер снизу (опрашивается, когда робот следует по линии)
-long int timeMotors = 0;
-long int timeLED = 0;
-long int timeLineSens = 0;
 
 int cameraData = 0;
 int gyroData = 0;
 
 bool state = true;
 
+uint32_t distance1;
+uint32_t distance2;
+uint32_t distance3;
+uint32_t distance4;
 
-int v1_target = 0;
-int v2_target = 0;
-
-int motor1 = 0;
-int motor2 = 0;
 
 float kp_line[6] = { -0.227, -0.16, -0.14, 0.14, 0.16, 0.227 };
 float ki_line[6] = { -0.0012, -0.00074, -0.00072, 0.00072, 0.00074, 0.0012 };
@@ -54,16 +47,9 @@ int min_err_i = 25;
 
 int err_line_sens[6] = { 0, 0, 0, 0, 0, 0 };
 int err_old_line_sens[6] = { 0, 0, 0, 0, 0, 0 };
-int u_line = 0;
 
-int up_line = 0;
-int ui_line = 0;
-int ud_line = 0;
 
-uint32_t distance1;
-uint32_t distance2;
-uint32_t distance3;
-uint32_t distance4;
+
 
 class modeSmartButton1 : public SmartButton {
 public:
@@ -82,6 +68,11 @@ void modeSmartButton1::onHold() {
 
         state_robot = AFTER_STOP_SCREEN;
       }
+      case (AFTER_STOP_SCREEN):
+      {
+
+        state_robot = last_state_robot;
+      }
     default:
       state_robot = STOP_SCREEN0;
       break;
@@ -93,6 +84,11 @@ void modeSmartButton1::onClick() {
       {
 
         state_robot = AFTER_STOP_SCREEN;
+      }
+      case (AFTER_STOP_SCREEN):
+      {
+
+        state_robot = last_state_robot;
       }
     default:
       state_robot = STOP_SCREEN0;
@@ -165,7 +161,12 @@ void modeSmartButton2::offClick() {}
 modeSmartButton1 btn1(BUTTON1);
 modeSmartButton2 btn2(BUTTON2);
 
+
+Robot robot;
+
 void setup() {
+
+
   initPins();
   ledBlinking();
 
@@ -217,7 +218,7 @@ void setup() {
   display.display();
   ledBlinking();
   analogWrite(PWM_LIGHTS, PWM_LEDS);
-  state_robot = STOP_SCREEN0;
+  state_robot = COLOR_READ_DATA;
 }
 
 
@@ -227,23 +228,19 @@ int status2_read = 0;
 int status3_read = 0;
 int status4_read = 0;
 
-int sensors[6] = { 0, 0, 0, 0, 0, 0 };
+
 
 
 void loop() {
   display.clearDisplay();
   btn1.run();
   btn2.run();
-  //pwm_start(PWM_LIGHTS, 8000, 100, PERCENT_COMPARE_FORMAT);
 
 
 
 
-  int current1 = 0;
-  int current2 = 0;
 
-  int potentiometer1 = 0;
-  int potentiometer2 = 0;
+
 
 
   int time_now = millis();
@@ -257,8 +254,7 @@ void loop() {
   switch (state_robot) {
     case (CALIBRATION):
       {
-        btn1.run();
-        btn2.run();
+
         display.clearDisplay();
         display.setTextSize(1);
         display.setCursor(0, 0);
@@ -280,40 +276,39 @@ void loop() {
       }
     case (LINE):
       {
-        btn1.run();
-        btn2.run();
-        up_line = 0;
-        ud_line = 0;
-        motors(motor1, motor2);
+
+        robot.up_line = 0;
+        robot.ud_line = 0;
+        motors(robot.motor1, robot.motor2);
         for (int i = 0; i < 6; i++) {
-          err_line_sens[i] = sensors[i] - grey[i];
+          err_line_sens[i] = robot.sensors[i] - grey[i];
         }
         for (int i = 0; i < 6; i++) {
-          up_line = up_line + err_line_sens[i] * kp_line[i];
+          robot.up_line = robot.up_line + err_line_sens[i] * kp_line[i];
         }
         for (int i = 0; i < 6; i++) {
-          ud_line = ud_line + (err_line_sens[i] - err_old_line_sens[i]) * kd_line[i];
+          robot.ud_line = robot.ud_line + (err_line_sens[i] - err_old_line_sens[i]) * kd_line[i];
         }
         for (int i = 0; i < 6; i++) {
           if (abs(err_line_sens[i]) >= min_err_i) {
-            ui_line = ui_line + err_line_sens[i] * ki_line[i];
+            robot.ui_line = robot.ui_line + err_line_sens[i] * ki_line[i];
           }
         }
 
-        u_line = up_line + ui_line + ud_line;
-        v1_target = V_MAIN + u_line;
-        v2_target = V_MAIN - u_line;
+        robot.u_line = robot.up_line + robot.ui_line + robot.ud_line;
+        robot.v1_target = V_MAIN + robot.u_line;
+        robot.v2_target = V_MAIN - robot.u_line;
         for (int i = 0; i < 6; i++) {
           err_old_line_sens[i] = err_line_sens[i];
         }
-        //if (millis() - timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
-        if (millis() - timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
-        if (millis() - timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
-        //if (millis() - timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
-        //if (millis() - timeGyro > GYRO_DELAY) state_robot = GYRO_READ_DATA;*/
+        //if (millis() - robot.timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
+        if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
+        if (millis() - robot.timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
+        //if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
+        //if (millis() - robot.timeGyro > GYRO_DELAY) state_robot = GYRO_READ_DATA;*/
         last_state_robot = LINE;
 
-        if ((sensors[0] + sensors[1] + sensors[2] + sensors[3] + sensors[4] + sensors[5]) > GREY_THRESHOLD * 6)  //условие перекрестка
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > GREY_THRESHOLD * 6)  //условие перекрестка
         {
           motors(0, 0);
           delay(300);
@@ -324,9 +319,9 @@ void loop() {
     case (MOTORS_PWM_COMPUTE):
       {
 
-        motor1 = vel1(round(v1_target));
-        motor2 = vel2(round(v2_target));
-        timeMotors = millis();
+        robot.motor1 = vel1(round(robot.v1_target));
+        robot.motor2 = vel2(round(robot.v2_target));
+        robot.timeMotors = millis();
 
         state_robot = last_state_robot;
 
@@ -334,18 +329,18 @@ void loop() {
       }
     case (LINE_READ_DATA):
       {
-        sensors[0] = analogRead(SENSOR1);
-        sensors[1] = analogRead(SENSOR2);
-        sensors[2] = analogRead(SENSOR3);
-        sensors[3] = analogRead(SENSOR4);
-        sensors[4] = analogRead(SENSOR5);
-        sensors[5] = analogRead(SENSOR6);
+        robot.sensors[0] = analogRead(SENSOR1);
+        robot.sensors[1] = analogRead(SENSOR2);
+        robot.sensors[2] = analogRead(SENSOR3);
+        robot.sensors[3] = analogRead(SENSOR4);
+        robot.sensors[4] = analogRead(SENSOR5);
+        robot.sensors[5] = analogRead(SENSOR6);
         for (int i = 0; i < 6; i++) {
 
-          sensors[i] = map(sensors[i], white[i], black[i], 0, 100);  //приведение к одному диапазону, т.к. разные поверхности по-разному отражают
+          robot.sensors[i] = map(robot.sensors[i], white[i], black[i], 0, 100);  //приведение к одному диапазону, т.к. разные поверхности по-разному отражают
           //-->где-то ошибка больше, поэтому скорость больше
         }
-        timeLineSens = millis();
+        robot.timeLineSens = millis();
 
         state_robot = LINE;
 
@@ -356,7 +351,7 @@ void loop() {
       {
         if (CamUART.available()) {
           cameraData = CamUART.read();
-          timeCamera = millis();
+          robot.timeCamera = millis();
         }
 
         state_robot = last_state_robot;
@@ -368,11 +363,11 @@ void loop() {
       {
         if (GyroUART.available()) {
           int uart_read = GyroUART.read();
-          if (uart_read != GYRO_BYTE_SIGNAL) gyroData = uart_read;
-          timeGyro = millis();
+          if (uart_read != GYRO_BYTE_SIGNAL) robot.angle = uart_read;
+          robot.timeGyro = millis();
         }
 
-        state_robot = LINE;
+        state_robot = last_state_robot;
         break;
       }
     case (DIST2_READ_DATA):
@@ -383,17 +378,16 @@ void loop() {
         if (status2_read != VL53L0X_ERROR_NONE) {
           distance2 = distance2_last;
         }
-        timeDist2 = millis();
+        robot.timeDist2 = millis();
         state_robot = LINE;
         break;
       }
     case (STOP_SCREEN0):
       {
-        btn1.run();
-        btn2.run();
-        motor1 = 0;
-        motor2 = 0;
-        ui_line = 0;
+
+        robot.motor1 = 0;
+        robot.motor2 = 0;
+        robot.ui_line = 0;
         motors(0, 0);
 
         display.clearDisplay();
@@ -416,8 +410,7 @@ void loop() {
 
 
       {
-        btn1.run();
-        btn2.run();
+
         motors(0, 0);
         display.clearDisplay();
         display.setTextSize(2);
@@ -428,14 +421,13 @@ void loop() {
 
         display.display();
         delay(500);
-        state_robot = COLOR_READ_DATA;
+        
         break;
       }
 
     case (STOP_SCREEN1):
       {
-        btn1.run();
-        btn2.run();
+
         motors(0, 0);
 
         display.clearDisplay();
@@ -444,15 +436,15 @@ void loop() {
         display.println("Line sensors:");
         display.setCursor(0, 10);
         analogWrite(PWM_LIGHTS, PWM_LEDS);
-        sensors[0] = analogRead(SENSOR1);
-        sensors[1] = analogRead(SENSOR2);
-        sensors[2] = analogRead(SENSOR3);
-        sensors[3] = analogRead(SENSOR4);
-        sensors[4] = analogRead(SENSOR5);
-        sensors[5] = analogRead(SENSOR6);
-        display.println(String(sensors[0]) + "    " + String(sensors[1]) + "    " + String(sensors[2]));
+        robot.sensors[0] = analogRead(SENSOR1);
+        robot.sensors[1] = analogRead(SENSOR2);
+        robot.sensors[2] = analogRead(SENSOR3);
+        robot.sensors[3] = analogRead(SENSOR4);
+        robot.sensors[4] = analogRead(SENSOR5);
+        robot.sensors[5] = analogRead(SENSOR6);
+        display.println(String(robot.sensors[0]) + "    " + String(robot.sensors[1]) + "    " + String(robot.sensors[2]));
         display.setCursor(0, 20);
-        display.println(String(sensors[3]) + "    " + String(sensors[4]) + "    " + String(sensors[5]));
+        display.println(String(robot.sensors[3]) + "    " + String(robot.sensors[4]) + "    " + String(robot.sensors[5]));
         display.setCursor(0, 30);
         display.println("RGB Color sensors:");
         uint16_t r, g, b, c;
@@ -474,8 +466,7 @@ void loop() {
       }
     case (STOP_SCREEN2):
       {
-        btn1.run();
-        btn2.run();
+
         motors(0, 0);
         display.clearDisplay();
         display.setTextSize(1);
@@ -499,8 +490,7 @@ void loop() {
       }
     case (STOP_SCREEN3):
       {
-        btn1.run();
-        btn2.run();
+
         motors(0, 0);
 
         display.clearDisplay();
@@ -602,8 +592,7 @@ void loop() {
       }
     case (STOP_SCREEN4):
       {
-        btn1.run();
-        btn2.run();
+
         motors(0, 0);
 
         display.clearDisplay();
@@ -612,16 +601,16 @@ void loop() {
 
         display.println("Current sensors:");
         display.setCursor(0, 10);
-        current1 = analogRead(CURRENT1);
-        current2 = analogRead(CURRENT2);
-        display.println("right: " + String(current1) + " left: " + String(current2));
+        robot.current1 = analogRead(CURRENT1);
+        robot.current2 = analogRead(CURRENT2);
+        display.println("right: " + String(robot.current1) + " left: " + String(robot.current2));
         display.setCursor(0, 20);
 
         display.println("Potentiometers:");
         display.setCursor(0, 30);
-        potentiometer1 = analogRead(POTENTIOMETER1);
-        potentiometer2 = analogRead(POTENTIOMETER2);
-        display.println("right: " + String(potentiometer1) + " left: " + String(potentiometer2));
+        robot.potentiometer1 = analogRead(POTENTIOMETER1);
+        robot.potentiometer2 = analogRead(POTENTIOMETER2);
+        display.println("right: " + String(robot.potentiometer1) + " left: " + String(robot.potentiometer2));
         display.setCursor(0, 40);
 
         display.println("Ball sensor:");
@@ -630,8 +619,7 @@ void loop() {
       }
     case (STOP_SCREEN5):
       {
-        btn1.run();
-        btn2.run();
+
         display.clearDisplay();
         display.setTextSize(1);
         display.setCursor(0, 0);
@@ -645,16 +633,15 @@ void loop() {
       }
     case (ROTATING_GREEN):
       {
-        btn1.run();
-        btn2.run();
+
         display.clearDisplay();
+        display.display();
+
+        digitalWrite(LED1, LOW);
 
 
-        digitalWrite(LED1, HIGH);
 
-
-
-
+        last_state_robot = ROTATING_GREEN;
         if (dir == 0) {
           turnAngle180(65, 30);
         } else if (dir == 1) {
@@ -662,9 +649,9 @@ void loop() {
         } else if (dir == 2) {
           turnAngle90Left(65, 30);
         }
-        delay(4000);
-        state_robot = last_state_robot;
-        last_state_robot = ROTATING_GREEN;
+
+        //state_robot = last_state_robot;
+
         break;
       }
     case (COLOR_READ_DATA):
@@ -673,24 +660,10 @@ void loop() {
         display.clearDisplay();
         dir = direction();
 
-        state_robot = ROTATING_GREEN;
+        if (dir != -1) {
+          state_robot = ROTATING_GREEN;
+        }
         break;
       }
   }
-
-
-  /*if (state_robot == LINE) {
-   
-  } else if (state_robot == MOTORS_PWM_COMPUTE) {
-
-    
-    motor1 = vel1(round(v1));
-     motor2 = vel2(round(v2));
-    state_robot = LINE;
-  }
-
-
-  motors(0, 0);*/
-  //  motors(motor1, motor2);
-  /**/
 }

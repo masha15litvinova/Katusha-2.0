@@ -20,8 +20,8 @@ void initGyro() {
   long int time_uart_available = millis();
   while (!GyroUART.available()) {
     if ((millis() - time_uart_available) > 8000) {
-      v1_target = 0;
-      v2_target = 0;
+      robot.v1_target = 0;
+      robot.v2_target = 0;
       resetGyro();
       time_uart_available = millis();
     }

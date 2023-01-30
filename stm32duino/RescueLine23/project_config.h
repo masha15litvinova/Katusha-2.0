@@ -7,9 +7,12 @@
 #include <vl53l0x_class.h>
 #include <Servo.h>
 #include <SmartButton.h>
+#include <Robot.h>
 
 #define GYRO_BYTE_SIGNAL 255
 #define UART_BAUDRATE 115200
+
+#define DEFAULT_START_POSITION 10000
 
 #define GREY_THRESHOLD 70
 
@@ -36,7 +39,7 @@
 #define DIST2_DELAY 500  //в миллисекундах
 #define MOTORS_DELAY 20
 #define CAMERA_DELAY 50
-#define GYRO_DELAY 50
+#define GYRO_DELAY 20
 #define LINE_SENS_DELAY 40
 
 
@@ -62,9 +65,9 @@
 
 int slider_pwm_safety_treshold = 200;
 
-int state_robot = COLOR_READ_DATA;
-int last_state_robot = COLOR_READ_DATA;
+int state_robot = ROTATING_GREEN;
+int last_state_robot = ROTATING_GREEN;
 
-int dir = -1;
+int dir = 0;
 
 

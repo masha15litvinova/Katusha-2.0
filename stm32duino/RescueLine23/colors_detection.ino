@@ -48,7 +48,14 @@ display.display();
   {
     display.print("NO");
   }
-
+  display.display();
+  delay(500);
+display.clearDisplay();
+display.setTextSize(1);
+ display.setCursor(0, 10);
+ display.println(String(robot.turnCompleted));
+ display.display();
+ delay(500);
   return dir;
 
 
