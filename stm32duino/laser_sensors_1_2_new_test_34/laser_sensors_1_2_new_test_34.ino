@@ -1,3 +1,12 @@
+#define MOTOR1_1 PB_0_ALT1
+#define MOTOR1_2 PB_1_ALT1
+#define MOTOR2_1 PE_5
+#define MOTOR2_2 PE_6
+#define MOTOR3_1 PB_4
+#define MOTOR3_2 PB_5
+#define MOTOR4_1 PB_11
+#define MOTOR4_2 PB_10
+
 
 /* Includes ------------------------------------------------------------------*/
 #include <Wire.h>
@@ -38,7 +47,7 @@ void setup() {
   // Initialize serial for output.
   Serial.begin(9600);
 
-  
+
 
   pinMode(PG10, OUTPUT);
   pinMode(PG11, OUTPUT);
@@ -50,19 +59,47 @@ void setup() {
   pinMode(PE2, OUTPUT);
   pinMode(PE3, OUTPUT);
 
+  pinMode(MOTOR1_1, OUTPUT);
+  pinMode(MOTOR1_2, OUTPUT);
+  pinMode(MOTOR2_1, OUTPUT);
+  pinMode(MOTOR2_2, OUTPUT);
+  pinMode(MOTOR3_1, OUTPUT);
+  pinMode(MOTOR3_2, OUTPUT);
+  pinMode(MOTOR4_1, OUTPUT);
+  pinMode(MOTOR4_2, OUTPUT);
 
+  digitalWrite(MOTOR1_1, LOW);
+  digitalWrite(MOTOR1_2, LOW);
+  digitalWrite(MOTOR2_1, LOW);
+  digitalWrite(MOTOR2_2, LOW);
+  digitalWrite(MOTOR3_1, LOW);
+  digitalWrite(MOTOR3_2, LOW);
+  digitalWrite(MOTOR4_1, LOW);
+  digitalWrite(MOTOR4_2, LOW);
+
+
+
+  // sensor1.SetDeviceMode(VL53L0X_DEVICEMODE_CONTINUOUS_RANGING);
+  /* sensor2.SetDeviceMode(VL53L0X_DEVICEMODE_CONTINUOUS_RANGING);
+    sensor3.SetDeviceMode(VL53L0X_DEVICEMODE_CONTINUOUS_RANGING);
+    sensor4.SetDeviceMode(VL53L0X_DEVICEMODE_CONTINUOUS_RANGING);*/
+  //
+  //sensor1.SetMeasurementTimingBudgetMicroSeconds(10);
+  //  sensor2.SetMeasurementTimingBudgetMicroSeconds(1);
+  //  sensor3.SetMeasurementTimingBudgetMicroSeconds(1);
+  //  sensor4.SetMeasurementTimingBudgetMicroSeconds(1);
   /*digitalWrite(PA9, LOW);
-  digitalWrite(PA10, LOW);
-  digitalWrite(PE2, LOW);
-  digitalWrite(PE3, LOW);
-  delay(500);
-  digitalWrite(PA9, HIGH);
-  digitalWrite(PA10, HIGH);
-  digitalWrite(PE2, HIGH);
-  digitalWrite(PE3, HIGH);
-  delay(500);*/
+    digitalWrite(PA10, LOW);
+    digitalWrite(PE2, LOW);
+    digitalWrite(PE3, LOW);
+    delay(500);
+    digitalWrite(PA9, HIGH);
+    digitalWrite(PA10, HIGH);
+    digitalWrite(PE2, HIGH);
+    digitalWrite(PE3, HIGH);
+    delay(500);*/
 
-// Initialize I2C bus.
+  // Initialize I2C bus.
   WIRE1.begin();
   //reset all sensors
   digitalWrite(PG10, LOW);
@@ -81,9 +118,9 @@ void setup() {
   digitalWrite(PG12, LOW);
   digitalWrite(PG13, LOW);
   /*sensor1.SetMeasurementTimingBudgetMicroSeconds(200000);
-  sensor2.SetMeasurementTimingBudgetMicroSeconds(200000);
-  sensor3.SetMeasurementTimingBudgetMicroSeconds(200000);
-  sensor4.SetMeasurementTimingBudgetMicroSeconds(200000);*/
+    sensor2.SetMeasurementTimingBudgetMicroSeconds(200000);
+    sensor3.SetMeasurementTimingBudgetMicroSeconds(200000);
+    sensor4.SetMeasurementTimingBudgetMicroSeconds(200000);*/
   // Configure VL53L0X component.
   digitalWrite(PG10, HIGH);
   sensor1.begin();
@@ -101,6 +138,7 @@ void setup() {
   digitalWrite(PG13, HIGH);
   sensor4.begin();
   status4 = sensor4.InitSensor(0x3C);
+
 
 
   // Start OLED
@@ -199,10 +237,11 @@ void loop() {
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SH110X_WHITE);
+
   if (status1 == VL53L0X_ERROR_NONE) {
     // Output data.
     char report[64];
-    snprintf(report, sizeof(report), "| Sensor1 [mm]: %ld |", distance1);
+    snprintf(report, sizeof(report), "S1: %ld", distance1);
 
     display.setCursor(0, 0);
     display.println(report);
@@ -210,13 +249,14 @@ void loop() {
     Serial.println(report);
   } else {
     display.setCursor(0, 0);
-    display.println("Error1: " + String(status1));
+    display.println("E1: " + String(status1));
     display.display();
   }
+
   if (status2 == VL53L0X_ERROR_NONE) {
     // Output data.
     char report[64];
-    snprintf(report, sizeof(report), "| Sensor2 [mm]: %ld |", distance2);
+    snprintf(report, sizeof(report), "S2: %ld", distance2);
 
     display.setCursor(0, 10);
     display.println(report);
@@ -224,13 +264,13 @@ void loop() {
     Serial.println(report);
   } else {
     display.setCursor(0, 10);
-    display.println("Error2: " + String(status2));
+    display.println("E2: " + String(status2));
     display.display();
   }
   if (status3 == VL53L0X_ERROR_NONE) {
     // Output data.
     char report[64];
-    snprintf(report, sizeof(report), "| Sensor3 [mm]: %ld |", distance3);
+    snprintf(report, sizeof(report), "S3: %ld", distance3);
 
     display.setCursor(0, 20);
     display.println(report);
@@ -238,14 +278,14 @@ void loop() {
     Serial.println(report);
   } else {
     display.setCursor(0, 20);
-    display.println("Error3: " + String(status3));
+    display.println("E3: " + String(status3));
     display.display();
   }
 
   if (status4 == VL53L0X_ERROR_NONE) {
     // Output data.
     char report[64];
-    snprintf(report, sizeof(report), "| Sensor4 [mm]: %ld |", distance4);
+    snprintf(report, sizeof(report), "S4: %ld", distance4);
 
     display.setCursor(0, 30);
     display.println(report);
@@ -253,15 +293,17 @@ void loop() {
     Serial.println(report);
   } else {
     display.setCursor(0, 30);
-    display.println("Error4: " + String(status4));
+    display.println("E4: " + String(status4));
     display.display();
   }
   int period = millis() - time_now;
   char report[64];
 
-  snprintf(report, sizeof(report), "| Time : %ld |", period);
+  snprintf(report, sizeof(report), "%ld", period);
   display.setCursor(0, 40);
   display.println(report);
   display.display();
-  Serial.println(report);
+
+
+
 }

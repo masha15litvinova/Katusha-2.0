@@ -35,7 +35,7 @@ int gyroData = 0;
 bool state = true;
 
 uint32_t distance1;
-uint32_t distance2;
+uint32_t distance2 = 1000;
 uint32_t distance3;
 uint32_t distance4;
 
@@ -56,7 +56,7 @@ float err_line_sens = 0;
 float err_old_line_sens = 0;
 
 
-
+boolean grab_completed = 0;
 
 class modeSmartButton1 : public SmartButton {
   public:
@@ -79,7 +79,6 @@ void modeSmartButton1::onHold() {
       }
     case (AFTER_STOP_SCREEN):
       {
-
         state_robot = last_state_robot;
         break;
       }
@@ -95,6 +94,7 @@ void modeSmartButton1::onClick() {
 
 
         state_robot = AFTER_STOP_SCREEN;
+
         break;
       }
     case (AFTER_STOP_SCREEN):
@@ -224,13 +224,13 @@ void setup() {
 
   initColorSensors();
 
-  initGyro();
+  //initGyro();
   display.clearDisplay();
   display.display();
   ledBlinking();
   analogWrite(PWM_LIGHTS, PWM_LEDS);
   //pwm_start(PWM_LIGHTS, 1000, 0, RESOLUTION_8B_COMPARE_FORMAT);
-  //initServos();
+  // initServos();
   //calibration_grab();
   sliders(0, 0);
   state_robot = CALIBRATION;
@@ -290,7 +290,12 @@ void loop() {
         GyroUART. write(0);
 
         digitalWrite(LED1, LOW);
-
+        display.clearDisplay();
+        display.setCursor(0, 30);
+        display.println(robot.dataCam[0]);
+        display.setCursor(0, 50);
+        display.println(robot.dataCam[1]);
+        display.display();
         robot.up_line = 0;
         robot.ud_line = 0;
         err_line_sens = 0;
@@ -317,35 +322,42 @@ void loop() {
           if (robot.u_line > 0)robot.u_line = u_max;
           else robot.u_line = -u_max;
         }
-        robot.angle_p = robot.angle_uart;
-        if ((abs(robot.angle_p - robot.start_angle_p) < 8) or (abs(robot.angle_p - robot.start_angle_p) > 350))robot.v = V_MAIN;
-        else if ((((robot.angle_p - robot.start_angle_p) > 12) and ((robot.angle_p - robot.start_angle_p) < 65)) or (((robot.angle_p - robot.start_angle_p) < -310) and ((robot.angle_p - robot.start_angle_p) > -350))) robot.v = V_GORKA_UP;
+        /*robot.angle_p = robot.angle_uart;
+          if ((abs(robot.angle_p - robot.start_angle_p) < 8) or (abs(robot.angle_p - robot.start_angle_p) > 350))robot.v = V_MAIN;
+          else if ((((robot.angle_p - robot.start_angle_p) > 12) and ((robot.angle_p - robot.start_angle_p) < 65)) or (((robot.angle_p - robot.start_angle_p) < -310) and ((robot.angle_p - robot.start_angle_p) > -350))) robot.v = V_GORKA_UP;
 
-        else if ((((robot.angle_p - robot.start_angle_p) < -10) and ((robot.angle_p - robot.start_angle_p) > -65)) or (((robot.angle_p - robot.start_angle_p) > 310) and ((robot.angle_p - robot.start_angle_p) < 350))) robot.v = V_GORKA_DOWN;
+          else if ((((robot.angle_p - robot.start_angle_p) < -10) and ((robot.angle_p - robot.start_angle_p) > -65)) or (((robot.angle_p - robot.start_angle_p) > 310) and ((robot.angle_p - robot.start_angle_p) < 350))) robot.v = V_GORKA_DOWN;
+        */
         robot.v1_target = robot.v + robot.u_line;
         robot.v2_target = robot.v - robot.u_line;
 
         err_old_line_sens = err_line_sens;
 
         motors(robot.motor1, robot.motor2);
-        //if (millis() - robot.timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
-        if (millis() - robot.timeGyro > GYRO_DELAY_LINE) state_robot = GYRO_READ_DATA;
+
+        //if (millis() - robot.timeGyro > GYRO_DELAY_LINE) state_robot = GYRO_READ_DATA;
         if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
         if (millis() - robot.timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
-        //if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
+        //if (millis() - robot.timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
+        if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
+
+        /*if (distance2 < 120)
+          {
+          state_robot = OBSTACLE;
+          break;
+          }*/
 
 
 
 
 
-
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) == 6) //условие перекрестка
-        {
+        /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) == 6) //условие перекрестка
+          {
           motors(0, 0);
           delay(300);
           state_robot = COLOR_READ_DATA;
 
-        }
+          }*/
 
 
         break;
@@ -414,6 +426,23 @@ void loop() {
       {
         if (CamUART.available()) {
           cameraData = CamUART.read();
+          if (cameraData == CAMERA_BYTE_SIGNAL)
+          {
+            robot.countCam = 0;
+            robot.dataCam[0] = 0;
+            robot.dataCam[1] = 0;
+            while (robot.countCam < 2)
+            {
+
+              while (!(CamUART.available())) {}
+              if (CamUART.available()) {
+                cameraData = CamUART.read();
+                robot.dataCam[robot.countCam] = cameraData;
+                robot.countCam++;
+              }
+            }
+          }
+
           robot.timeCamera = millis();
         }
 
@@ -429,7 +458,6 @@ void loop() {
         if (GyroUART.available()) {
           int uart_read = GyroUART.read();
           robot.angle_uart  = map(uart_read, 0, 255, 0, 360);
-
         }
         robot.timeGyro = millis();
         state_robot = last_state_robot;
@@ -567,6 +595,7 @@ void loop() {
         display.setTextSize(1);
         display.setCursor(0, 0);
         display.println("Laser dist sensors:");
+
         digitalWrite(XSHUT1, HIGH);
         status1_read = sensor1.GetDistance(&distance1);
         int status1 = sensor1.StaticInit();
@@ -736,7 +765,7 @@ void loop() {
             {
               motors(0, 0);
               int e1 = Enc1();
-              while ((Enc1() - e1) < 250)
+              while ((Enc1() - e1) < 150)
               {
                 motors(65, 65);
               }
@@ -768,10 +797,112 @@ void loop() {
     case (MOVE_SLIDERS):
       {
         move_servos_180_up();
-        sliders_movement(10);
+        sliders_movement(15);
         grab();
-        sliders_movement(0);
+        sliders_movement(15);
+        long int time_begin = millis();
+        while ((millis() - time_begin) < 2000)
+        {
+          motors(V_GRAB_BALL, V_GRAB_BALL);
+        }
+        motors(0, 0);
+
+
+        open_iris();
+        delay(1000);
+        time_begin = millis();
+        while ((millis() - time_begin) < 1000)
+        {
+          motors(-V_GRAB_BALL, -V_GRAB_BALL);
+        }
+        motors(0, 0);
+
         move_servos_180_down();
+        close_iris();
+        delay(1000);
+
+        break;
+      }
+    case (OBSTACLE):
+      {
+
+        motors(0, 0);
+        long int e1 = Enc1();
+        while ((Enc1() - e1) < 680)
+        {
+          motors(V_OBSTACLE, -V_OBSTACLE);
+        }
+        motors(0, 0);
+        e1 = Enc1();
+        while ((Enc1() - e1) < 700)
+        {
+          motors(V_OBSTACLE, V_OBSTACLE);
+        }
+        motors(0, 0);
+        long int e2 = Enc2();
+        while ((Enc2() - e2) < 750)
+        {
+          motors(-V_OBSTACLE, V_OBSTACLE);
+        }
+        motors(0, 0);
+        e1 = Enc1();
+        while ((Enc1() - e1) < 1600)
+        {
+          motors(V_OBSTACLE, V_OBSTACLE);
+        }
+        motors(0, 0);
+        e2 = Enc2();
+        while ((Enc2() - e2) < 740)
+        {
+          motors(-V_OBSTACLE, V_OBSTACLE);
+        }
+        motors(0, 0);
+        e1 = Enc1();
+        while ((Enc1() - e1) < 730)
+        {
+          motors(V_OBSTACLE, V_OBSTACLE);
+        }
+        motors(0, 0);
+        e1 = Enc1();
+        while ((Enc1() - e1) < 720)
+        {
+          motors(V_OBSTACLE, -V_OBSTACLE);
+        }
+        motors(0, 0);
+        e1 = Enc1();
+        while ((Enc1() - e1) < 700)
+        {
+          motors(V_OBSTACLE, V_OBSTACLE);
+        }
+        motors(0, 0);
+        state_robot = LINE;
+        distance2 = 1000;
+        robot.ui1 = 0;
+        robot.ui2 = 0;
+        robot.up1 = 0;
+        robot.u1 = 0;
+        robot.up2 = 0;
+        robot.ud1 = 0;
+        robot.ud2 = 0;
+        robot.u2 = 0;
+        robot.ui_line = 0;
+        robot.sensors[0] = 0;
+        robot.sensors[1] = 0;
+        robot.sensors[2] = 0;
+        robot.sensors[3] = 0;
+        robot.sensors[4] = 0;
+        robot.sensors[5] = 0;
+        robot.err1 = 0;
+        robot.err1_old = 0;
+        robot.err2 = 0;
+        robot.err2_old = 0;
+        robot.motor1 = 0;
+        robot.motor2 = 0;
+        robot.v1_target = 0;
+        robot.v2_target = 0;
+        robot.current_speed1 = 0;
+        robot.current_speed2 = 0;
+        delay(2000);
         break;
       }
   }

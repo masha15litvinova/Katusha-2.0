@@ -104,11 +104,10 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
       }
     }
     digitalWrite(LED1, HIGH);
-
     while (robot.startPosition == DEFAULT_START_POSITION) {
       if (GyroUART.available()) {
         int uart_read_data = GyroUART.read();
-
+         GyroUART. write(1);
         robot.startPosition = map(uart_read_data, 0, 255, 0, 360);
       }
     }
@@ -139,15 +138,15 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
         display.clearDisplay();
 
         display.setTextSize(1);
-
+        
         display.setCursor(0, 0);
-        display.println("angle: " + String(robot.angle));
-        display.setCursor(0, 10);
-        display.println("startPos: " + String(robot.startPosition));
-        display.setCursor(0, 20);
-        display.println("robot.targetAngle: " + String(robot.targetAngle));
-        display.setCursor(0, 30);
-        display.println("robot.errAngle: " + String(robot.errAngle));
+          display.println("angle: " + String(robot.angle));
+          display.setCursor(0, 10);
+          display.println("startPos: " + String(robot.startPosition));
+          display.setCursor(0, 20);
+          display.println("robot.targetAngle: " + String(robot.targetAngle));
+          display.setCursor(0, 30);
+          display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
         robot.angle = robot.angle_uart;
@@ -186,15 +185,15 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
         display.clearDisplay();
 
         display.setTextSize(1);
-
+        
         display.setCursor(0, 0);
-        display.println("angle: " + String(robot.angle));
-        display.setCursor(0, 10);
-        display.println("startPos: " + String(robot.startPosition));
-        display.setCursor(0, 20);
-        display.println("robot.targetAngle: " + String(robot.targetAngle));
-        display.setCursor(0, 30);
-        display.println("robot.errAngle: " + String(robot.errAngle));
+          display.println("angle: " + String(robot.angle));
+          display.setCursor(0, 10);
+          display.println("startPos: " + String(robot.startPosition));
+          display.setCursor(0, 20);
+          display.println("robot.targetAngle: " + String(robot.targetAngle));
+          display.setCursor(0, 30);
+          display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
         if (robot.angle_uart > 270) robot.angle = robot.angle_uart - 360;
@@ -269,12 +268,11 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
       }
     }
     digitalWrite(LED1, HIGH);
-
     while (robot.startPosition == DEFAULT_START_POSITION) {
       if (GyroUART.available()) {
         int uart_read_data = GyroUART.read();
-
-        robot.startPosition = map(uart_read_data, 0, 255, 0, 360);
+         GyroUART. write(1);
+       robot.startPosition = map(uart_read_data, 0, 255, 0, 360);
       }
     }
     robot.turnCompleted = false;
@@ -307,11 +305,11 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
         display.setCursor(0, 0);
         display.println("angle: " + String(robot.angle_uart));
         display.setCursor(0, 10);
-        display.println("startPos: " + String(robot.startPosition));
-        display.setCursor(0, 20);
-        display.println("robot.targetAngle: " + String(robot.targetAngle));
-        display.setCursor(0, 30);
-        display.println("robot.errAngle: " + String(robot.errAngle));
+          display.println("startPos: " + String(robot.startPosition));
+          display.setCursor(0, 20);
+          display.println("robot.targetAngle: " + String(robot.targetAngle));
+          display.setCursor(0, 30);
+          display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
         robot.angle = robot.angle_uart;
@@ -353,11 +351,11 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
         display.setCursor(0, 0);
         display.println("angle: " + String(robot.angle_uart));
         display.setCursor(0, 10);
-        display.println("startPos: " + String(robot.startPosition));
-        display.setCursor(0, 20);
-        display.println("robot.targetAngle: " + String(robot.targetAngle));
-        display.setCursor(0, 30);
-        display.println("robot.errAngle: " + String(robot.errAngle));
+          display.println("startPos: " + String(robot.startPosition));
+          display.setCursor(0, 20);
+          display.println("robot.targetAngle: " + String(robot.targetAngle));
+          display.setCursor(0, 30);
+          display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
         if (robot.angle_uart < 90) robot.angle = robot.angle_uart + 360;
@@ -435,11 +433,10 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
       }
     }
     digitalWrite(LED1, HIGH);
-
     while (robot.startPosition == DEFAULT_START_POSITION) {
       if (GyroUART.available()) {
         int uart_read_data = GyroUART.read();
-
+         GyroUART. write(1);
         robot.startPosition = map(uart_read_data, 0, 255, 0, 360);
       }
     }
@@ -456,7 +453,7 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
   if (!robot.turnCompleted) {
     if (robot.startPosition > 180) {
       robot.targetAngle = robot.startPosition - 180;
-
+      if (robot.targetAngle == 0) robot.targetAngle = 1;
       robot.errAngle = robot.startPosition - robot.targetAngle;
 
       if (abs(robot.errAngle) > MAX_ERR_ANGLE) {
@@ -472,12 +469,12 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
         display.setTextSize(1);
         display.setCursor(0, 0);
         display.println("angle: " + String(robot.angle));
-        display.setCursor(0, 10);
-        display.println("startPos: " + String(robot.startPosition));
-        display.setCursor(0, 20);
-        display.println("robot.targetAngle: " + String(robot.targetAngle));
-        display.setCursor(0, 30);
-        display.println("robot.errAngle: " + String(robot.errAngle));
+          display.setCursor(0, 10);
+          display.println("startPos: " + String(robot.startPosition));
+          display.setCursor(0, 20);
+          display.println("robot.targetAngle: " + String(robot.targetAngle));
+          display.setCursor(0, 30);
+          display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
         robot.angle = robot.angle_uart;
@@ -516,15 +513,15 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
         display.clearDisplay();
 
         display.setTextSize(1);
-
+        
         display.setCursor(0, 0);
-        display.println("angle: " + String(robot.angle));
-        display.setCursor(0, 10);
-        display.println("startPos: " + String(robot.startPosition));
-        display.setCursor(0, 20);
-        display.println("robot.targetAngle: " + String(robot.targetAngle));
-        display.setCursor(0, 30);
-        display.println("robot.errAngle: " + String(robot.errAngle));
+          display.println("angle: " + String(robot.angle));
+          display.setCursor(0, 10);
+          display.println("startPos: " + String(robot.startPosition));
+          display.setCursor(0, 20);
+          display.println("robot.targetAngle: " + String(robot.targetAngle));
+          display.setCursor(0, 30);
+          display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
         if (robot.angle > 180) robot.angle = robot.angle_uart - 360;

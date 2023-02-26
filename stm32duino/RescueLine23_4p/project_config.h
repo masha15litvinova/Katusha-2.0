@@ -10,18 +10,25 @@
 #include <Robot.h>
 
 #define GYRO_BYTE_SIGNAL 255
+#define GYRO_TIME_SIGNAL 254
 #define UART_BAUDRATE 115200
 
 #define DEFAULT_START_POSITION 10000
 
-#define GREY_THRESHOLD 70
+#define GREY_THRESHOLD 90
 
-#define GREEN_HIGH 120 //порог зеленого (может, другие цвета тоже нужны)
-#define GREEN_LOW 90
+#define GREEN_HIGH_R 138 //порог зеленого (может, другие цвета тоже нужны)
+#define GREEN_LOW_R 105
 
+#define GREEN_HIGH_L 130 //порог зеленого (может, другие цвета тоже нужны)
+#define GREEN_LOW_L 105
 
-#define V_CALIBR 110
-#define V_MAIN 50
+#define BLUE_RED_HIGH 116
+
+#define V_CALIBR 0//140
+#define V_MAIN 45
+#define V_GORKA_UP 80
+#define V_GORKA_DOWN 40
 #define DELAY_CALIBR_4 4000
 #define PWM_LEDS 100
 
@@ -39,9 +46,10 @@
 #define DIST2_DELAY 500  //в миллисекундах
 #define MOTORS_DELAY 20
 #define CAMERA_DELAY 50
-#define GYRO_DELAY 20
-#define LINE_SENS_DELAY 40
-
+#define GYRO_DELAY 12
+#define GYRO_DELAY_LINE 60
+#define LINE_SENS_DELAY 15
+#define CURRENT_SENS_DELAY 600
 
 /**********STATES************************/
 #define LINE 0
@@ -61,11 +69,15 @@
 #define CALIBRATION 13
 #define ROTATING_GREEN 14
 #define COLOR_READ_DATA 15
+#define MOVE_SLIDERS 16
 /*****************************************/
 
-int slider_pwm_safety_treshold = 200;
+int slider_pwm_safety_treshold = 255;
 
-int state_robot = MOVE_SLIDERS;
-int last_state_robot = MOVE_SLIDERS;
+int min_pwm = 0;
+int current_max = 300;
+
+int state_robot = STOP_SCREEN0;
+int last_state_robot = LINE;
 
 int dir = 0;

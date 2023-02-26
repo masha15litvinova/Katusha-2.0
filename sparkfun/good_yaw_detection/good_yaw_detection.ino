@@ -24,52 +24,64 @@ Supported Platforms:
 #include <SparkFunMPU9250-DMP.h>
 
 #define SerialPort SerialUSB
+#define LEDPIN 13
 
 MPU9250_DMP imu;
 
+long int time_begin = millis();
 
-void setup() 
-{
+int mode = 1;
+void setup() {
   SerialPort.begin(115200);
-Serial1.begin(115200);
+  Serial1.begin(115200);
+  pinMode(LEDPIN, OUTPUT);
   // Call imu.begin() to verify communication and initialize
-  if (imu.begin() != INV_SUCCESS)
-  {
-    while (1)
-    {
-      SerialPort.println("Unable to communicate with MPU-9250");
-      SerialPort.println("Check connections, and try again.");
-      SerialPort.println();
+  if (imu.begin() != INV_SUCCESS) {
+    while (1) {
+
       delay(5000);
     }
   }
-  
-  imu.dmpBegin(DMP_FEATURE_6X_LP_QUAT | // Enable 6-axis quat
-               DMP_FEATURE_GYRO_CAL, // Use gyro calibration
-              10); // Set DMP FIFO rate to 10 Hz
-  // DMP_FEATURE_LP_QUAT can also be used. It uses the 
+
+  imu.dmpBegin(DMP_FEATURE_6X_LP_QUAT |  // Enable 6-axis quat
+                 DMP_FEATURE_GYRO_CAL,   // Use gyro calibration
+               10);                      // Set DMP FIFO rate to 10 Hz
+  // DMP_FEATURE_LP_QUAT can also be used. It uses the
   // accelerometer in low-power mode to estimate quat's.
   // DMP_FEATURE_LP_QUAT and 6X_LP_QUAT are mutually exclusive
 }
-
-void loop() 
-{
+int angle_y = 0;
+int angle_p = 0;
+void loop() {
   // Check for new data in the FIFO
-  if ( imu.fifoAvailable() )
-  {
+  if (imu.fifoAvailable()) {
     // Use dmpUpdateFifo to update the ax, gx, mx, etc. values
-    if ( imu.dmpUpdateFifo() == INV_SUCCESS)
-    {
+    if (imu.dmpUpdateFifo() == INV_SUCCESS) {
       // computeEulerAngles can be used -- after updating the
       // quaternion values -- to estimate roll, pitch, and yaw
       imu.computeEulerAngles();
       printIMUData();
     }
   }
+  
+  if (Serial1.available()) {
+    mode = Serial1.read();
+  }
+
+  if (mode == 0) {
+    digitalWrite(LEDPIN, HIGH);
+    Serial1.write(angle_p);
+   
+   // Serial1.flush();
+  } else {
+    digitalWrite(LEDPIN, HIGH);
+    Serial1.write(angle_y);
+  //  Serial1.flush();
+  }
 }
 
-void printIMUData(void)
-{  
+void printIMUData(void) {
+  digitalWrite(LEDPIN, OUTPUT);
   // After calling dmpUpdateFifo() the ax, gx, mx, etc. values
   // are all updated.
   // Quaternion values are, by default, stored in Q30 long
@@ -79,16 +91,8 @@ void printIMUData(void)
   float q2 = imu.calcQuat(imu.qy);
   float q3 = imu.calcQuat(imu.qz);
 
-  SerialPort.println("Q: " + String(q0, 4) + ", " +
-                    String(q1, 4) + ", " + String(q2, 4) + 
-                    ", " + String(q3, 4));
-  SerialPort.println("R/P/Y: " + String(imu.roll) + ", "
-            + String(imu.pitch) + ", " + String(imu.yaw));
-  SerialPort.println("Time: " + String(imu.time) + " ms");
-  SerialPort.println();
-  int angle = map(imu.yaw, 0, 360, 0, 254);
-  
-  Serial1.write(angle);
-  Serial1.write(255);
+  int yaw1 = imu.yaw;
+  int pitch1 = imu.pitch;
+  angle_y = map(yaw1, 0, 360, 0, 255);
+  angle_p = map(pitch1, 0, 360, 0, 255);
 }
-

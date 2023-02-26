@@ -12,7 +12,7 @@ void endstop1()
   motors(0, 0);
   motors(-170, -30);
   long int time_begin = millis();
-  while ((millis() - time_begin) < 80) {}
+  while ((millis() - time_begin) < 60) {}
   motors(0, 0);
 }
 void endstop2()
@@ -24,7 +24,7 @@ void endstop3()
   motors(0, 0);
   motors(-30, -170);
   long int time_begin = millis();
-  while ((millis() - time_begin) < 80) {}
+  while ((millis() - time_begin) < 60) {}
   motors(0, 0);
 }
 void endstop4()
