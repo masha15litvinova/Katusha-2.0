@@ -39,6 +39,14 @@ class Robot {
 
     int countCam = 0;
     int dataCam[2] = {0, 0};
+    int camDir = 3;
+    int camLineAngle = 0;
+    int up_cam = 0;
+    int ui_cam = 0;
+    int ud_cam = 0;
+    float p_cam = -1.0;
+    float i_cam = 0;
+    float d_cam = 0;
 
     long int timeGyro = 0;
     long int timeCamera = 0;
@@ -64,14 +72,15 @@ class Robot {
     float err1 = 0;
     float err1_old = 0;
     float err2 = 0;
-float err2_old = 0;
 
-long int prev_enc1 = 0;
-long int prev_enc2 = 0;
+    float err2_old = 0;
 
-float current_speed1 = 0;
+    long int prev_enc1 = 0;
+    long int prev_enc2 = 0;
 
-float current_speed2 = 0;
+    float current_speed1 = 0;
+
+    float current_speed2 = 0;
 
 
 };

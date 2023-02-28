@@ -292,9 +292,9 @@ void loop() {
         digitalWrite(LED1, LOW);
         display.clearDisplay();
         display.setCursor(0, 30);
-        display.println(robot.dataCam[0]);
+        display.println(robot.camLineAngle);
         display.setCursor(0, 50);
-        display.println(robot.dataCam[1]);
+        display.println(robot.camDir);
         display.display();
         robot.up_line = 0;
         robot.ud_line = 0;
@@ -314,9 +314,16 @@ void loop() {
         int u_max = 150;
         //if (err_line_sens != 0)
         //{
-        robot.u_line = robot.up_line + robot.ui_line + robot.ud_line;
+        robot.up_cam = robot.camLineAngle*robot.p_cam;
+        robot.u_line = robot.up_cam;//((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
+        
+        /*if((robot.sensors[0]+robot.sensors[1]+robot.sensors[2]+robot.sensors[3]+robot.sensors[4]+robot.sensors[5])==0)
+        {
+          robot.u_line = robot.up_cam;
+          }*/
+        
         //}
-
+        
         if (abs(robot.u_line) > u_max)
         {
           if (robot.u_line > 0)robot.u_line = u_max;
@@ -440,6 +447,8 @@ void loop() {
                 robot.dataCam[robot.countCam] = cameraData;
                 robot.countCam++;
               }
+              robot.camLineAngle =  robot.dataCam[0]-60;
+              robot.camDir = robot.dataCam[1];
             }
           }
 
