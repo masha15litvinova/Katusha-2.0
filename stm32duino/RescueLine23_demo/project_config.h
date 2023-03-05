@@ -10,6 +10,8 @@
 #include <Robot.h>
 
 #define CAMERA_BYTE_SIGNAL 255
+#define CAM_X_SIZE 320
+
 
 #define GYRO_BYTE_SIGNAL 255
 #define GYRO_TIME_SIGNAL 254
@@ -28,11 +30,14 @@
 #define BLUE_RED_HIGH 116
 
 #define V_CALIBR 0//140
-#define V_MAIN 45
+#define V_MAIN 50
 #define V_GORKA_UP 95
 #define V_GORKA_DOWN 35
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
+#define V_MIN 20
+
+
 #define DELAY_CALIBR_4 4000
 #define PWM_LEDS 100
 
@@ -48,8 +53,8 @@
 #define LINE_SENS_TICK 4000
 
 #define DIST2_DELAY 650  //в миллисекундах
-#define MOTORS_DELAY 16
-#define CAMERA_DELAY 25
+#define MOTORS_DELAY 14
+#define CAMERA_DELAY 60
 #define GYRO_DELAY 8
 #define GYRO_DELAY_LINE 7
 #define LINE_SENS_DELAY 14

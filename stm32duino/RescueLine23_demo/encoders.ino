@@ -1,7 +1,6 @@
-
-#define SPEED_COEFF_P 0.7  //1.0
+#define SPEED_COEFF_P 0.6  //1.0
 #define SPEED_COEFF_D 0.8    //0.8//0.8//0.8//0.3  //13
-#define SPEED_COEFF_I 0.06//0.06
+#define SPEED_COEFF_I 0.04//0.06
 #define SPEED_COEFF_CUBE 0
 
 #define CPR 1050
@@ -12,17 +11,6 @@
 #define U_MAX 2048
 long int encoder1 = 0;
 long int encoder2 = 0;
-
-
-
-
-
-
-
-
-
-
-
 
 void initEncoderIRQs() {
   attachInterrupt(digitalPinToInterrupt(ENC_INT1), enc1, FALLING);

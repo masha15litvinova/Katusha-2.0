@@ -95,23 +95,23 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
     robot.startPosition = DEFAULT_START_POSITION;
 
     long int time_uart_available = millis();
-    while (!GyroUART.available()) {
+
+    while (!parsingGyro()) {
       if ((millis() - time_uart_available) > 8000) {
         robot.v1_target = 0;
         robot.v2_target = 0;
         resetGyro();
         time_uart_available = millis();
       }
+      robot.startPosition = robot.angle_yaw;
     }
     digitalWrite(LED1, HIGH);
 
-    while (robot.startPosition == DEFAULT_START_POSITION) {
-      if (GyroUART.available()) {
-        int uart_read_data = GyroUART.read();
 
-        robot.startPosition = map(uart_read_data, 0, 255, 0, 360);
-      }
-    }
+
+
+
+
     robot.turnCompleted = false;
     robot.angle = robot.startPosition;
     robot.targetAngle = 0;
@@ -132,9 +132,11 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
 
 
 
-        if ((millis() - robot.timeGyro) > GYRO_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = GYRO_READ_DATA;
+        if (parsingGyro())
+        {
+          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
+
         }
         display.clearDisplay();
 
@@ -150,7 +152,7 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
         display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
-        robot.angle = robot.angle_uart;
+        robot.angle = robot.angle_yaw;
         robot.errAngle = robot.angle - robot.targetAngle;
         robot.up_gyro = robot.errAngle * kp_gyro;
         robot.ui_gyro = robot.errAngle * ki_gyro + robot.ui_gyro;
@@ -179,9 +181,11 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
 
 
 
-        if ((millis() - robot.timeGyro) > GYRO_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = GYRO_READ_DATA;
+        if (parsingGyro())
+        {
+          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
+
         }
         display.clearDisplay();
 
@@ -197,6 +201,7 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
         display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
+        robot.angle = robot.angle_yaw;
         if (robot.angle_uart > 270) robot.angle = robot.angle_uart - 360;
         else robot.angle = robot.angle_uart;
         robot.errAngle = robot.angle - robot.targetAngle;
@@ -260,23 +265,23 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
     robot.startPosition = DEFAULT_START_POSITION;
 
     long int time_uart_available = millis();
-    while (!GyroUART.available()) {
+
+    while (!parsingGyro()) {
       if ((millis() - time_uart_available) > 8000) {
         robot.v1_target = 0;
         robot.v2_target = 0;
         resetGyro();
         time_uart_available = millis();
       }
+      robot.startPosition = robot.angle_yaw;
     }
     digitalWrite(LED1, HIGH);
 
-    while (robot.startPosition == DEFAULT_START_POSITION) {
-      if (GyroUART.available()) {
-        int uart_read_data = GyroUART.read();
 
-        robot.startPosition = map(uart_read_data, 0, 255, 0, 360);
-      }
-    }
+
+
+
+
     robot.turnCompleted = false;
     robot.angle = robot.startPosition;
     robot.targetAngle = 0;
@@ -284,6 +289,7 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
     robot.ui_gyro = 0;
     robot.errAngle = 100;
   }
+
 
   if (robot.startPosition == DEFAULT_START_POSITION) robot.turnCompleted = true;
 
@@ -297,9 +303,11 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
 
 
 
-        if ((millis() - robot.timeGyro) > GYRO_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = GYRO_READ_DATA;
+        if (parsingGyro())
+        {
+          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
+
         }
         display.clearDisplay();
 
@@ -314,7 +322,7 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
         display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
-        robot.angle = robot.angle_uart;
+        robot.angle = robot.angle_yaw;
         robot.errAngle = robot.angle - robot.targetAngle;
         robot.up_gyro = robot.errAngle * kp_gyro;
         robot.ui_gyro = robot.errAngle * ki_gyro + robot.ui_gyro;
@@ -343,9 +351,11 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
 
 
 
-        if ((millis() - robot.timeGyro) > GYRO_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = GYRO_READ_DATA;
+        if (parsingGyro())
+        {
+          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
+
         }
         display.clearDisplay();
 
@@ -360,6 +370,7 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
         display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
+        robot.angle = robot.angle_uart;
         if (robot.angle_uart < 90) robot.angle = robot.angle_uart + 360;
         else robot.angle = robot.angle_uart;
 
@@ -426,23 +437,23 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
     robot.startPosition = DEFAULT_START_POSITION;
 
     long int time_uart_available = millis();
-    while (!GyroUART.available()) {
+
+    while (!parsingGyro()) {
       if ((millis() - time_uart_available) > 8000) {
         robot.v1_target = 0;
         robot.v2_target = 0;
         resetGyro();
         time_uart_available = millis();
       }
+      robot.startPosition = robot.angle_yaw;
     }
     digitalWrite(LED1, HIGH);
 
-    while (robot.startPosition == DEFAULT_START_POSITION) {
-      if (GyroUART.available()) {
-        int uart_read_data = GyroUART.read();
 
-        robot.startPosition = map(uart_read_data, 0, 255, 0, 360);
-      }
-    }
+
+
+
+
     robot.turnCompleted = false;
     robot.angle = robot.startPosition;
     robot.targetAngle = 0;
@@ -450,6 +461,7 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
     robot.ui_gyro = 0;
     robot.errAngle = 100;
   }
+
 
   if (robot.startPosition == DEFAULT_START_POSITION) robot.turnCompleted = true;
 
@@ -463,9 +475,11 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
 
 
 
-        if ((millis() - robot.timeGyro) > GYRO_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = GYRO_READ_DATA;
+        if (parsingGyro())
+        {
+          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
+
         }
         display.clearDisplay();
 
@@ -480,7 +494,7 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
         display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
-        robot.angle = robot.angle_uart;
+        robot.angle = robot.angle_yaw;
         robot.errAngle = robot.angle - robot.targetAngle;
         robot.up_gyro = robot.errAngle * kp_gyro;
         robot.ui_gyro = robot.errAngle * ki_gyro + robot.ui_gyro;
@@ -509,9 +523,11 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
 
 
 
-        if ((millis() - robot.timeGyro) > GYRO_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = GYRO_READ_DATA;
+        if (parsingGyro())
+        {
+          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
+
         }
         display.clearDisplay();
 
@@ -527,6 +543,7 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
         display.println("robot.errAngle: " + String(robot.errAngle));
 
         display.display();
+        robot.angle = robot.angle_yaw;
         if (robot.angle > 180) robot.angle = robot.angle_uart - 360;
         else robot.angle = robot.angle_uart;
         robot.errAngle = robot.angle - robot.targetAngle;

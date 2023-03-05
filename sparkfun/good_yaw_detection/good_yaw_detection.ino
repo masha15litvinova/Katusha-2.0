@@ -63,21 +63,9 @@ void loop() {
       printIMUData();
     }
   }
-  
-  if (Serial1.available()) {
-    mode = Serial1.read();
-  }
-
-  if (mode == 0) {
-    digitalWrite(LEDPIN, HIGH);
-    Serial1.write(angle_p);
+    Serial1.print(":"+String(angle_y)+"/"+String(angle_p)+"/"+";");
    
-   // Serial1.flush();
-  } else {
-    digitalWrite(LEDPIN, HIGH);
-    Serial1.write(angle_y);
-  //  Serial1.flush();
-  }
+   
 }
 
 void printIMUData(void) {

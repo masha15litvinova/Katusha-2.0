@@ -34,15 +34,17 @@ void initGyro() {
   int gyro_data = 0;
   while ((millis() - gyro_test_start) < 20000) {
     display.clearDisplay();
-    if (GyroUART.available()) {
-      int uart_read = GyroUART.read();
-      GyroUART.write(0);
-      gyro_data = map(uart_read, 0, 255, 0, 360);
+    if (parsingGyro())
+    {
+      robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
+      robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
 
     }
     display.setCursor(0, 10);
-    display.println("Gyro data: " + String(gyro_data));
+    display.println("Gyro yaw: " + String(robot.angle_yaw ));
     display.setCursor(0, 20);
+    display.println("Gyro pitch: " + String(robot.angle_pitch ));
+    display.setCursor(0, 30);
     if ((millis() - gyro_test_start) < 5000) {
       display.println("Wait for 20 seconds");
     } else if ((millis() - gyro_test_start) < 10000) {
@@ -62,9 +64,9 @@ void initGyro() {
     }
 
     display.display();
-    
-  robot.start_angle_p = gyro_data;
-  robot.angle_p = gyro_data;
+
+    robot.start_angle_p = robot.angle_pitch;
+
   }
 }
 

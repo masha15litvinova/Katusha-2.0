@@ -528,7 +528,7 @@ freq = 15
 info = Info_send()
 while(True):
     clock.tick()                    # Update the FPS clock.
-    img = sensor.snapshot().gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)         # Take a picture and return the image.
+    img = sensor.snapshot().gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)        # Take a picture and return the image.
 
 
 

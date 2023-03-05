@@ -31,6 +31,9 @@ int grey[6] = { 0, 0, 0, 0, 0, 0 };
 
 int cameraData = 0;
 int gyroData = 0;
+byte bufferCam[2];
+byte bufferGyro[2];
+
 
 bool state = true;
 
@@ -233,7 +236,7 @@ void setup() {
   // initServos();
   //calibration_grab();
   sliders(0, 0);
-  state_robot = CALIBRATION;
+  state_robot = STOP_SCREEN0;
   robot.v = V_MAIN;
 
 }
@@ -314,16 +317,17 @@ void loop() {
         int u_max = 150;
         //if (err_line_sens != 0)
         //{
-        robot.up_cam = robot.camLineAngle*robot.p_cam;
-        robot.u_line = robot.up_cam;//((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
-        
+        robot.up_cam = robot.camLineAngle * robot.p_cam;
+        //robot.ud_cam = (robot.camLineAngle-robot.camLineAngleOld)*robot.d_cam;
+        robot.u_line = robot.up_cam + robot.ud_cam; //((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
+
         /*if((robot.sensors[0]+robot.sensors[1]+robot.sensors[2]+robot.sensors[3]+robot.sensors[4]+robot.sensors[5])==0)
-        {
+          {
           robot.u_line = robot.up_cam;
           }*/
-        
+
         //}
-        
+
         if (abs(robot.u_line) > u_max)
         {
           if (robot.u_line > 0)robot.u_line = u_max;
@@ -339,6 +343,8 @@ void loop() {
         robot.v2_target = robot.v - robot.u_line;
 
         err_old_line_sens = err_line_sens;
+        robot.camLineAngleOld = robot.camLineAngle;
+
 
         motors(robot.motor1, robot.motor2);
 
@@ -346,8 +352,18 @@ void loop() {
         if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
         if (millis() - robot.timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
         //if (millis() - robot.timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
-        if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
-
+        //if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
+        if (parsingCam())
+        {
+          robot.camLineAngle =  map(bufferCam[0], 0, 255, -128, 128);
+          robot.camDir = bufferCam[1];
+        }
+        if (parsingGyro())
+        {
+          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
+          
+        }
         /*if (distance2 < 120)
           {
           state_robot = OBSTACLE;
@@ -431,34 +447,18 @@ void loop() {
     case (CAMERA_READ_DATA):
 
       {
-        if (CamUART.available()) {
-          cameraData = CamUART.read();
-          if (cameraData == CAMERA_BYTE_SIGNAL)
-          {
-            robot.countCam = 0;
-            robot.dataCam[0] = 0;
-            robot.dataCam[1] = 0;
-            while (robot.countCam < 2)
-            {
 
-              while (!(CamUART.available())) {}
-              if (CamUART.available()) {
-                cameraData = CamUART.read();
-                robot.dataCam[robot.countCam] = cameraData;
-                robot.countCam++;
-              }
-              robot.camLineAngle =  robot.dataCam[0]-60;
-              robot.camDir = robot.dataCam[1];
-            }
-          }
 
-          robot.timeCamera = millis();
-        }
 
+
+        robot.timeCamera = millis();
         state_robot = last_state_robot;
 
         break;
       }
+
+
+
     case (GYRO_READ_DATA):
 
       {
