@@ -42,16 +42,16 @@ uint32_t distance2 = 1000;
 uint32_t distance3;
 uint32_t distance4;
 
-float weights[6] = { -27, -20, -17, 17, 20, 25}; //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -27, -20, -17, 17, 20, 25 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 
 //float kp_line[6] = { -0.7, -0.6, -0.5, 0.5, 0.6, 0.7 };
 //float ki_line[6] = { -0.02, -0.01, -0.008, 0.008, 0.01, 0.02}; //{ -0.01, -0.009, -0.007, 0.007, 0.009, 0.01 };
 //float kd_line[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};//{ -1.5, -1.3, -1.1, 1.1, 1.3, 1.5 };
 
-float kp_line = 1.0;  //2.2
-float kcube_line = 0.016;//0.04; //0.028
-float kd_line = 0.5;//1.0;//-1.5;
-float ki_line = 0.005;//0.03;//2.0;//0.5;//0.012;//0.0005;//0.009;
+float kp_line = 1.0;       //2.2
+float kcube_line = 0.016;  //0.04; //0.028
+float kd_line = 0.5;       //1.0;//-1.5;
+float ki_line = 0.005;     //0.03;//2.0;//0.5;//0.012;//0.0005;//0.009;
 
 float min_err_i = 15;
 
@@ -62,12 +62,12 @@ float err_old_line_sens = 0;
 boolean grab_completed = 0;
 
 class modeSmartButton1 : public SmartButton {
-  public:
-    modeSmartButton1(int p)
-      : SmartButton(p) {}
-    virtual void onClick();
-    virtual void onHold();  // Методы для использования
-    virtual void offClick();
+public:
+  modeSmartButton1(int p)
+    : SmartButton(p) {}
+  virtual void onClick();
+  virtual void onHold();  // Методы для использования
+  virtual void offClick();
 };
 
 // Действие на клик: переключаем некий режим меню.
@@ -113,12 +113,12 @@ void modeSmartButton1::onClick() {
 }
 void modeSmartButton1::offClick() {}
 class modeSmartButton2 : public SmartButton {
-  public:
-    modeSmartButton2(int p)
-      : SmartButton(p) {}
-    virtual void onClick();
-    virtual void onHold();  // Методы для использования
-    virtual void offClick();
+public:
+  modeSmartButton2(int p)
+    : SmartButton(p) {}
+  virtual void onClick();
+  virtual void onHold();  // Методы для использования
+  virtual void offClick();
 };
 
 // Действие на клик: переключаем некий режим меню.
@@ -199,8 +199,8 @@ void setup() {
 
 
 
-  //resetGyro();
   resetCamera();
+  resetGyro();
 
   WIRE1.begin();
   WIRE2.begin();
@@ -238,7 +238,6 @@ void setup() {
   sliders(0, 0);
   state_robot = STOP_SCREEN0;
   robot.v = V_MAIN;
-
 }
 
 
@@ -290,7 +289,7 @@ void loop() {
     case (LINE):
       {
         last_state_robot = LINE;
-        GyroUART. write(0);
+
 
         digitalWrite(LED1, LOW);
         display.clearDisplay();
@@ -309,17 +308,16 @@ void loop() {
         robot.up_line = err_line_sens * kp_line + err_line_sens * err_line_sens * err_line_sens * kcube_line;
         robot.ud_line = (err_line_sens - err_old_line_sens) * kd_line;
         robot.ui_line = robot.ui_line + err_line_sens * ki_line;
-        if (abs(err_line_sens) < min_err_i)
-        {
+        if (abs(err_line_sens) < min_err_i) {
           robot.ui_line = 0;
         }
         int delta_grey = 20;
         int u_max = 150;
         //if (err_line_sens != 0)
         //{
-        robot.up_cam = robot.camLineAngle * robot.p_cam;
+        robot.up_cam = robot.camLineAngle * robot.p_cam;// + robot.camLineDev * robot.p_cam_line;
         //robot.ud_cam = (robot.camLineAngle-robot.camLineAngleOld)*robot.d_cam;
-        robot.u_line = robot.up_cam + robot.ud_cam; //((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
+        robot.u_line = robot.up_cam + robot.ud_cam;  //((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
 
         /*if((robot.sensors[0]+robot.sensors[1]+robot.sensors[2]+robot.sensors[3]+robot.sensors[4]+robot.sensors[5])==0)
           {
@@ -328,9 +326,8 @@ void loop() {
 
         //}
 
-        if (abs(robot.u_line) > u_max)
-        {
-          if (robot.u_line > 0)robot.u_line = u_max;
+        if (abs(robot.u_line) > u_max) {
+          if (robot.u_line > 0) robot.u_line = u_max;
           else robot.u_line = -u_max;
         }
         /*robot.angle_p = robot.angle_uart;
@@ -349,21 +346,21 @@ void loop() {
         motors(robot.motor1, robot.motor2);
 
         //if (millis() - robot.timeGyro > GYRO_DELAY_LINE) state_robot = GYRO_READ_DATA;
-        if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
+        //if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
         if (millis() - robot.timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
         //if (millis() - robot.timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
         //if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
-        if (parsingCam())
-        {
-          robot.camLineAngle =  map(bufferCam[0], 0, 255, -128, 128);
+        if (parsingCam()) {
+          robot.camLineAngle = map(bufferCam[0], 0, 255, -91, 91);
           robot.camDir = bufferCam[1];
+          //robot.camLineDev = map(bufferCam[2], 0, 255, -CAM_X_SIZE, CAM_X_SIZE);
         }
-        if (parsingGyro())
+        /*if (parsingGyro())
         {
           robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
           robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
           
-        }
+        }*/
         /*if (distance2 < 120)
           {
           state_robot = OBSTACLE;
@@ -387,13 +384,11 @@ void loop() {
       }
     case (MOTORS_PWM_COMPUTE):
       {
-        if (abs(robot.v1_target) < min_pwm)
-        {
+        if (abs(robot.v1_target) < min_pwm) {
           if (robot.v1_target > 0) robot.v1_target = min_pwm;
           else if (robot.v1_target < 0) robot.v1_target = -min_pwm;
         }
-        if (abs(robot.v2_target) < min_pwm)
-        {
+        if (abs(robot.v2_target) < min_pwm) {
           if (robot.v2_target > 0) robot.v2_target = min_pwm;
           else if (robot.v2_target < 0) robot.v2_target = -min_pwm;
         }
@@ -410,7 +405,7 @@ void loop() {
         display.clearDisplay();
 
         analogWrite(PWM_LIGHTS, PWM_LEDS);
-        int s[6] = {0, 0, 0, 0, 0, 0};
+        int s[6] = { 0, 0, 0, 0, 0, 0 };
         s[0] = analogRead(SENSOR1);
         s[1] = analogRead(SENSOR2);
         s[2] = analogRead(SENSOR3);
@@ -421,12 +416,10 @@ void loop() {
         int grey_scaled = 30;
 
         for (int i = 0; i < 6; i++) {
-          if (map(s[i], white[i], black[i], 0, 100) > grey_scaled)
-          {
+          if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
             robot.sensors[i] = 1;
             display.fillRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
-          }
-          else {
+          } else {
             robot.sensors[i] = 0;
             display.drawRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
           }
@@ -466,7 +459,7 @@ void loop() {
 
         if (GyroUART.available()) {
           int uart_read = GyroUART.read();
-          robot.angle_uart  = map(uart_read, 0, 255, 0, 360);
+          robot.angle_uart = map(uart_read, 0, 255, 0, 360);
         }
         robot.timeGyro = millis();
         state_robot = last_state_robot;
@@ -578,20 +571,24 @@ void loop() {
         display.setCursor(0, 0);
         display.println("UART Camera Data:");
         display.setCursor(0, 10);
-        if (CamUART.available()) {
-          cameraData = CamUART.read();
+        if (parsingCam()) {
+          robot.camLineAngle = map(bufferCam[0], 0, 255, -91, 91);
+          robot.camDir = bufferCam[1];
         }
-        display.println(String(cameraData));
+        if (parsingGyro()) {
+          robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+        }
+        display.println("Angle: " + String(robot.camLineAngle));
+        display.setCursor(0, 20);
+        display.println("Direction: " + String(robot.camDir));
         display.setCursor(0, 30);
         display.println("UART Gyro Data:");
         display.setCursor(0, 40);
-        if (GyroUART.available()) {
-          int uart_read = GyroUART.read();
-          gyroData = map(uart_read, 0, 255, 0, 360);
-        }
-        display.println(String(gyroData));
+
+        display.println("yaw: " + String(robot.angle_yaw));
         display.setCursor(0, 50);
-        display.println(String(robot.start_angle_p));
+        display.println("pitch: " + String(robot.angle_pitch));
         display.display();
         break;
       }
@@ -747,8 +744,8 @@ void loop() {
         display.display();
 
         digitalWrite(LED1, LOW);
-        GyroUART. write(1);
-        GyroUART. flush();
+        GyroUART.write(1);
+        GyroUART.flush();
 
         last_state_robot = ROTATING_GREEN;
         switch (dir) {
@@ -774,8 +771,7 @@ void loop() {
             {
               motors(0, 0);
               int e1 = Enc1();
-              while ((Enc1() - e1) < 150)
-              {
+              while ((Enc1() - e1) < 150) {
                 motors(65, 65);
               }
               motors(0, 0);
@@ -794,8 +790,8 @@ void loop() {
       }
     case (COLOR_READ_DATA):
       {
-        GyroUART. write(1);
-        GyroUART. flush();
+        GyroUART.write(1);
+        GyroUART.flush();
 
         dir = -1;
         display.clearDisplay();
@@ -810,8 +806,7 @@ void loop() {
         grab();
         sliders_movement(15);
         long int time_begin = millis();
-        while ((millis() - time_begin) < 2000)
-        {
+        while ((millis() - time_begin) < 2000) {
           motors(V_GRAB_BALL, V_GRAB_BALL);
         }
         motors(0, 0);
@@ -820,8 +815,7 @@ void loop() {
         open_iris();
         delay(1000);
         time_begin = millis();
-        while ((millis() - time_begin) < 1000)
-        {
+        while ((millis() - time_begin) < 1000) {
           motors(-V_GRAB_BALL, -V_GRAB_BALL);
         }
         motors(0, 0);
@@ -837,50 +831,42 @@ void loop() {
 
         motors(0, 0);
         long int e1 = Enc1();
-        while ((Enc1() - e1) < 680)
-        {
+        while ((Enc1() - e1) < 680) {
           motors(V_OBSTACLE, -V_OBSTACLE);
         }
         motors(0, 0);
         e1 = Enc1();
-        while ((Enc1() - e1) < 700)
-        {
+        while ((Enc1() - e1) < 700) {
           motors(V_OBSTACLE, V_OBSTACLE);
         }
         motors(0, 0);
         long int e2 = Enc2();
-        while ((Enc2() - e2) < 750)
-        {
+        while ((Enc2() - e2) < 750) {
           motors(-V_OBSTACLE, V_OBSTACLE);
         }
         motors(0, 0);
         e1 = Enc1();
-        while ((Enc1() - e1) < 1600)
-        {
+        while ((Enc1() - e1) < 1600) {
           motors(V_OBSTACLE, V_OBSTACLE);
         }
         motors(0, 0);
         e2 = Enc2();
-        while ((Enc2() - e2) < 740)
-        {
+        while ((Enc2() - e2) < 740) {
           motors(-V_OBSTACLE, V_OBSTACLE);
         }
         motors(0, 0);
         e1 = Enc1();
-        while ((Enc1() - e1) < 730)
-        {
+        while ((Enc1() - e1) < 730) {
           motors(V_OBSTACLE, V_OBSTACLE);
         }
         motors(0, 0);
         e1 = Enc1();
-        while ((Enc1() - e1) < 720)
-        {
+        while ((Enc1() - e1) < 720) {
           motors(V_OBSTACLE, -V_OBSTACLE);
         }
         motors(0, 0);
         e1 = Enc1();
-        while ((Enc1() - e1) < 700)
-        {
+        while ((Enc1() - e1) < 700) {
           motors(V_OBSTACLE, V_OBSTACLE);
         }
         motors(0, 0);

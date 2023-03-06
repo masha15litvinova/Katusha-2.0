@@ -13,10 +13,7 @@ void resetCamera() {
   digitalWrite(CAMERA_RST, HIGH);
 }
 void initGyro() {
-  GyroUART.write(0);
-  GyroUART. write(0);
-  GyroUART. write(0);
-  GyroUART. write(0);
+ 
   display.clearDisplay();
   display.setCursor(0, 0);
   display.println("Init gyro...");

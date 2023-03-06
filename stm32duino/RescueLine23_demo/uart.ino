@@ -6,7 +6,7 @@ int parsingCam() { /* :angle/dir/;   */
   static String number = "";
   if (CamUART.available()) {
     char in = CamUART.read();
-    CamUART.println("in = " + String(in));
+    
     if (in == ';') {        // завершение пакета
       parseStart = false;
       
@@ -28,7 +28,7 @@ int parsingCam() { /* :angle/dir/;   */
     if ((parseStart) and (in != '/')) {
       // - '0' это перевод в число (если отправитель print)
       number = number + (in - ASCII_CONVERT);
-      Serial.println("number = " + String(number));
+      
     }
 
   }
@@ -41,7 +41,7 @@ int parsingGyro() {  /* :yaw/pitch/;   */
   static String numberg = "";
   if (GyroUART.available()) {
     char in = GyroUART.read();
-    GyroUART.println("in = " + String(in));
+   
     if (in == ';') {        // завершение пакета
       parseStartg = false;
       
@@ -60,10 +60,10 @@ int parsingGyro() {  /* :yaw/pitch/;   */
       return 0;
     }
 
-    if ((parseStartg) and (in != '/')) {
+    if ((parseStartg) and (in != '/')and(in != 'n')) {
       // - '0' это перевод в число (если отправитель print)
-      numberg = numberg + (in - ASCII_CONVERT);
-      Serial.println("number = " + String(numberg));
+      numberg = numberg + (in - 0);
+      
     }
 
   }

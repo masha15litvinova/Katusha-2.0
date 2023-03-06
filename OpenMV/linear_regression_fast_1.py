@@ -10,15 +10,15 @@
 # method to fit the line. However, this method is NOT GOOD FOR ANY images that
 # have a lot (or really any) outlier points which corrupt the line fit...
 
-THRESHOLD = (0, 100) # Grayscale threshold for dark things...
-BINARY_VISIBLE = False # Does binary first so you can see what the linear regression
+THRESHOLD = (0, 70) # Grayscale threshold for dark things...
+BINARY_VISIBLE = True # Does binary first so you can see what the linear regression
                       # is being run on... might lower FPS though.
 
 import sensor, image, time
 
 sensor.reset()
 sensor.set_pixformat(sensor.GRAYSCALE)
-sensor.set_framesize(sensor.QQVGA)
+sensor.set_framesize(sensor.QVGA)
 sensor.skip_frames(time = 2000)
 clock = time.clock()
 

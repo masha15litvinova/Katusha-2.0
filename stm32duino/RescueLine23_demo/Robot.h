@@ -43,11 +43,13 @@ class Robot {
     int dataCam[2] = {0, 0};
     int camDir = 3;
     int camLineAngle = 0;
+    int camLineDev = 0;
     int camLineAngleOld = 0;
     int up_cam = 0;
     int ui_cam = 0;
     int ud_cam = 0;
-    float p_cam = -1.4;
+    float p_cam = -1.5;
+    float p_cam_line = -0.6;
     float i_cam = 0;
     float d_cam = -0.0;
 

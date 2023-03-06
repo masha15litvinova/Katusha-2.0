@@ -50,8 +50,8 @@ void setup() {
   // accelerometer in low-power mode to estimate quat's.
   // DMP_FEATURE_LP_QUAT and 6X_LP_QUAT are mutually exclusive
 }
-int angle_y = 0;
-int angle_p = 0;
+byte angle_y = 0;
+byte angle_p = 0;
 void loop() {
   // Check for new data in the FIFO
   if (imu.fifoAvailable()) {
@@ -63,9 +63,27 @@ void loop() {
       printIMUData();
     }
   }
-    Serial1.print(":"+String(angle_y)+"/"+String(angle_p)+"/"+";");
-   
-   
+  byte buff[6] = {':', angle_y, '/', angle_p, '/', ';'};
+  /*if (Serial1.availableForWrite()) {
+    //Serial1.println(":" + String(angle_y) + "/" + String(angle_p) + "/" + ";");
+    Serial1.write(':');
+  }
+  if (Serial1.availableForWrite()) { Serial1.write(angle_y); }
+  if (Serial1.availableForWrite()) { Serial1.write('/'); }
+  if (Serial1.availableForWrite()) { Serial1.write(angle_p); }
+  if (Serial1.availableForWrite()) { Serial1.write('/'); }
+  if (Serial1.availableForWrite()) { Serial1.write(';'); }*/
+  if (Serial1.availableForWrite())
+  {
+    Serial1.write(buff, 6);
+  }
+
+/*Serial1.print(':');
+  Serial1.print(angle_y);
+    Serial1.print('/');
+    Serial1.print(angle_p);
+    Serial1.print('/');
+    Serial1.print(';');*/
 }
 
 void printIMUData(void) {
@@ -81,6 +99,7 @@ void printIMUData(void) {
 
   int yaw1 = imu.yaw;
   int pitch1 = imu.pitch;
-  angle_y = map(yaw1, 0, 360, 0, 255);
-  angle_p = map(pitch1, 0, 360, 0, 255);
+
+  angle_y = (byte)map(yaw1, 0, 360, 0, 255);
+  angle_p = (byte)map(pitch1, 0, 360, 0, 255);
 }
