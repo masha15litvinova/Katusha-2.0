@@ -26,14 +26,17 @@ Supported Platforms:
 #define SerialPort SerialUSB
 #define LEDPIN 13
 
+
+void (*resetFunc)(void) = 0;
+
 MPU9250_DMP imu;
 
 long int time_begin = millis();
+byte calibrated = 0;
 
-int mode = 1;
 void setup() {
-  SerialPort.begin(115200);
-  Serial1.begin(115200);
+  SerialPort.begin(9600);
+  Serial1.begin(9600);
   pinMode(LEDPIN, OUTPUT);
   // Call imu.begin() to verify communication and initialize
   if (imu.begin() != INV_SUCCESS) {
@@ -63,27 +66,72 @@ void loop() {
       printIMUData();
     }
   }
-  byte buff[6] = {':', angle_y, '/', angle_p, '/', ';'};
+  
+  if ((millis() - time_begin) > 30000) calibrated = 1;
+  //char buff[8] = { ':', y, '/', p, '/', (char)calibrated, '/', ';' };
   /*if (Serial1.availableForWrite()) {
     //Serial1.println(":" + String(angle_y) + "/" + String(angle_p) + "/" + ";");
-    Serial1.write(':');
+    Serial1.print(':');
   }
-  if (Serial1.availableForWrite()) { Serial1.write(angle_y); }
-  if (Serial1.availableForWrite()) { Serial1.write('/'); }
-  if (Serial1.availableForWrite()) { Serial1.write(angle_p); }
-  if (Serial1.availableForWrite()) { Serial1.write('/'); }
-  if (Serial1.availableForWrite()) { Serial1.write(';'); }*/
-  if (Serial1.availableForWrite())
+  if (Serial1.availableForWrite()) { Serial1.print(angle_y); }
+  if (Serial1.availableForWrite()) { Serial1.print('/'); }
+  if (Serial1.availableForWrite()) { Serial1.print(angle_p); }
+  if (Serial1.availableForWrite()) { Serial1.print('/'); }
+  if (Serial1.availableForWrite()) { Serial1.print(';'); }*/
+  /*if (Serial1.availableForWrite())
   {
     Serial1.write(buff, 6);
+  }*/
+  if (Serial1.available()) {
+    byte rst = Serial1.read();
+    if (rst == 1) {
+      resetFunc();
+    }
   }
+  //Serial1.write(buff, 8);
+  //String send = ":" + String(angle_y) + "/" + String(angle_p) + "/" + String(calibrated) + "/;";
+  
 
-/*Serial1.print(':');
-  Serial1.print(angle_y);
-    Serial1.print('/');
-    Serial1.print(angle_p);
-    Serial1.print('/');
-    Serial1.print(';');*/
+  
+  /*for (int i = 0; i < 8; i++) {
+    Serial1.print(buff[i]);
+    Serial1.flush();
+    //delay(5);
+  }*/
+  //Serial1.flush();
+  //delay(10);
+  Serial1.write(':');
+  delay(12);
+  Serial1.write(angle_y);
+  delay(12);
+  Serial1.write('/');
+  delay(12);
+  Serial1.write(angle_p);
+  delay(12);
+  Serial1.write('/');
+  delay(12);
+  Serial1.write(calibrated);
+  delay(12);
+  Serial1.write('/');
+  delay(12);
+  Serial1.write(';');
+  delay(12);
+  /*Serial1.write(':');
+  delay(5);
+  Serial1.write((angle_y));
+  delay(5);
+  Serial1.write('/');
+  delay(5);
+  Serial1.write((angle_p));
+  delay(5);
+  Serial1.write('/');
+  delay(5);
+  Serial1.write((calibrated));
+  delay(5);
+  Serial1.write('/');
+  delay(5);
+  Serial1.write(';');
+  delay(5);*/
 }
 
 void printIMUData(void) {
@@ -100,6 +148,6 @@ void printIMUData(void) {
   int yaw1 = imu.yaw;
   int pitch1 = imu.pitch;
 
-  angle_y = (byte)map(yaw1, 0, 360, 0, 255);
-  angle_p = (byte)map(pitch1, 0, 360, 0, 255);
+  angle_y = map(yaw1, 0, 360, 0, 255);
+  angle_p = map(pitch1, 0, 360, 0, 255);
 }

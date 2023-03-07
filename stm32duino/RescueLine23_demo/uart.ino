@@ -6,19 +6,18 @@ int parsingCam() { /* :angle/dir/;   */
   static String number = "";
   if (CamUART.available()) {
     char in = CamUART.read();
-    
-    if (in == ';') {        // завершение пакета
+
+    if (in == ';') {  // завершение пакета
       parseStart = false;
-      
+
       return counter;
     }
-    if (in == ':') {        // начало пакета
+    if (in == ':') {  // начало пакета
       parseStart = true;
       counter = 0;
       return 0;
     }
-    if (in == '/')
-    {
+    if (in == '/') {
       bufferCam[counter] = number.toInt();
       number = "";
       counter++;
@@ -28,44 +27,59 @@ int parsingCam() { /* :angle/dir/;   */
     if ((parseStart) and (in != '/')) {
       // - '0' это перевод в число (если отправитель print)
       number = number + (in - ASCII_CONVERT);
-      
     }
-
   }
   return 0;
 }
 
-int parsingGyro() {  /* :yaw/pitch/;   */
+int parsingGyro() { /* :yaw/pitch/started/;   */
   static bool parseStartg = false;
   static byte counterg = 0;
   static String numberg = "";
   if (GyroUART.available()) {
     char in = GyroUART.read();
-   
-    if (in == ';') {        // завершение пакета
+    
+    if (in == ';') {  // завершение пакета
       parseStartg = false;
-      
       return counterg;
     }
-    if (in == ':') {        // начало пакета
+    if (in == ':') {  // начало пакета
       parseStartg = true;
       counterg = 0;
       return 0;
     }
-    if (in == '/')
-    {
+    if (in == '/') {
       bufferGyro[counterg] = numberg.toInt();
       numberg = "";
       counterg++;
       return 0;
     }
 
-    if ((parseStartg) and (in != '/')and(in != 'n')) {
+    if ((parseStartg) and (in != '/')) {
       // - '0' это перевод в число (если отправитель print)
-      numberg = numberg + (in - 0);
-      
+      numberg = numberg + (in - ASCII_CONVERT);
     }
-
   }
+  return 0;
+}
+
+void GyroUpdate() {
+  if (GyroUART.available()) {
+    GyroUART.readBytes(bufferGyro, 8);
+
+    robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+    robot.angle_pitch = map(bufferGyro[2], 0, 255, 0, 360);
+
+    robot.angle_pitch = module((robot.angle_pitch - robot.start_angle_p), 360);
+  }
+  
+ /* if (parsingGyro()) {
+    robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+    robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+  }*/
+}
+int module(int a, int mode) {
+  if (a >= 0) return a % mode;
+  else return (mode + a % mode);
   return 0;
 }

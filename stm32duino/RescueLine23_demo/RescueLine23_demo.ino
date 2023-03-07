@@ -31,8 +31,8 @@ int grey[6] = { 0, 0, 0, 0, 0, 0 };
 
 int cameraData = 0;
 int gyroData = 0;
-byte bufferCam[2];
-byte bufferGyro[2];
+byte bufferCam[3];
+byte bufferGyro[3];
 
 
 bool state = true;
@@ -200,7 +200,7 @@ void setup() {
 
 
   resetCamera();
-  resetGyro();
+  //resetGyro();
 
   WIRE1.begin();
   WIRE2.begin();
@@ -212,8 +212,8 @@ void setup() {
   CamUART.setRx(RX6);
   CamUART.setTx(TX6);
 
-  GyroUART.begin(UART_BAUDRATE);
-  CamUART.begin(UART_BAUDRATE);
+  GyroUART.begin(9600);
+  CamUART.begin(9600);
 
   display.begin(0, true);
   display.display();
@@ -227,7 +227,7 @@ void setup() {
 
   initColorSensors();
 
-  //initGyro();
+  initGyro();
   display.clearDisplay();
   display.display();
   ledBlinking();
@@ -293,8 +293,11 @@ void loop() {
 
         digitalWrite(LED1, LOW);
         display.clearDisplay();
+        display.setTextSize(1);
         display.setCursor(0, 30);
-        display.println(robot.camLineAngle);
+
+
+        display.println(String(robot.angle_pitch));
         display.setCursor(0, 50);
         display.println(robot.camDir);
         display.display();
@@ -315,8 +318,8 @@ void loop() {
         int u_max = 150;
         //if (err_line_sens != 0)
         //{
-        robot.up_cam = robot.camLineAngle * robot.p_cam;// + robot.camLineDev * robot.p_cam_line;
-        //robot.ud_cam = (robot.camLineAngle-robot.camLineAngleOld)*robot.d_cam;
+        robot.up_cam = robot.camLineAngle * robot.p_cam + robot.camLineDev * robot.p_cam_line;
+        robot.ud_cam = (robot.camLineAngle - robot.camLineAngleOld) * robot.d_cam;
         robot.u_line = robot.up_cam + robot.ud_cam;  //((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
 
         /*if((robot.sensors[0]+robot.sensors[1]+robot.sensors[2]+robot.sensors[3]+robot.sensors[4]+robot.sensors[5])==0)
@@ -343,7 +346,7 @@ void loop() {
         robot.camLineAngleOld = robot.camLineAngle;
 
 
-        motors(robot.motor1, robot.motor2);
+        //motors(robot.motor1, robot.motor2);
 
         //if (millis() - robot.timeGyro > GYRO_DELAY_LINE) state_robot = GYRO_READ_DATA;
         //if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
@@ -353,14 +356,16 @@ void loop() {
         if (parsingCam()) {
           robot.camLineAngle = map(bufferCam[0], 0, 255, -91, 91);
           robot.camDir = bufferCam[1];
-          //robot.camLineDev = map(bufferCam[2], 0, 255, -CAM_X_SIZE, CAM_X_SIZE);
+          robot.camLineDev = map(bufferCam[2], 0, 255, -CAM_X_SIZE / 2, CAM_X_SIZE / 2);
         }
-        /*if (parsingGyro())
-        {
-          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
-          
-        }*/
+        if (millis() - robot.timeGyro > GYRO_DELAY_LINE) {
+          GyroUpdate();
+          robot.timeGyro = millis();
+        }
+
+        if ((robot.angle < 10) or (robot.angle > 350)) robot.v = V_MAIN;
+        else if (robot.angle_pitch > 310) robot.v = V_GORKA_UP;
+        else if (robot.angle_pitch < 60) robot.v = V_GORKA_DOWN;
         /*if (distance2 < 120)
           {
           state_robot = OBSTACLE;
@@ -429,9 +434,6 @@ void loop() {
 
         robot.timeLineSens = millis();
 
-
-
-
         display.display();
         state_robot = LINE;
 
@@ -440,20 +442,11 @@ void loop() {
     case (CAMERA_READ_DATA):
 
       {
-
-
-
-
         robot.timeCamera = millis();
         state_robot = last_state_robot;
-
         break;
       }
-
-
-
     case (GYRO_READ_DATA):
-
       {
         digitalWrite(LED1, HIGH);
 
@@ -485,7 +478,6 @@ void loop() {
         robot.motor2 = 0;
         robot.ui_line = 0;
         motors(0, 0);
-
         display.clearDisplay();
         display.setTextSize(2);
         display.setCursor(0, 0);
@@ -495,7 +487,6 @@ void loop() {
         display.println("Press 1: moving");
         display.setCursor(0, 30);
         display.println("Press 2: watch values");
-
         display.setCursor(0, 50);
         if (last_state_robot == LINE) display.println("Do LINE");
         if (last_state_robot == ROTATING_GREEN) display.println("Do ROTATING_GREEN");
@@ -503,8 +494,6 @@ void loop() {
         break;
       }
     case (AFTER_STOP_SCREEN):
-
-
       {
         btn1.run();
         btn2.run();
@@ -512,22 +501,15 @@ void loop() {
         motors(0, 0);
         display.clearDisplay();
         display.setTextSize(2);
-
         display.setCursor(0, 0);
         display.println("GO...");
-
-
         display.display();
         delay(100);
-
         break;
       }
-
     case (STOP_SCREEN1):
       {
-
         motors(0, 0);
-
         display.clearDisplay();
         display.setTextSize(1);
         display.setCursor(0, 0);
@@ -552,7 +534,6 @@ void loop() {
         tcs1.getRawData(&r, &g, &b, &c);
         display.setCursor(0, 40);
         display.print("R: " + String(r) + " " + String(g) + " " + String(b) + " " + String(c));
-
         tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_154MS);
         //delay(300); // Delay for one old integ. time period (to finish old reading)
         //delay(154);  // Delay for one new integ. time period (to allow new reading)

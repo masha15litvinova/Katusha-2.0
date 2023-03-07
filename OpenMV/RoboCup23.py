@@ -12,11 +12,11 @@ sensor.set_framesize(sensor.QQVGA)
 sensor.skip_frames(time = 2000)
 clock = time.clock()
 
-uart = UART(3, 115200)
+uart = UART(3, 9600)
 last_clock = 0
 
 green_thresholds = [23, 81, -128, -7, -128, 127] #порог зеленого цвета
-black_thresholds = [0, 60, -128, 3, -128, 127] #порог черного цвета
+black_thresholds = [0, 19, -128, 9, -128, 127] #порог черного цвета
 yellow_thresholds = [0, 100, -128, 127, -128, 67]
 line_count = 25
 
@@ -27,7 +27,7 @@ y_size = 120
 y_k = 0.4
 delta_x = 20
 ky_regression = 0.5
-kx_regression =0.15
+kx_regression =0.25
 
 min_area = 40
 min_pixels = 40
@@ -153,7 +153,7 @@ while(True):
 
     if(line_get):
         angle = line_get.theta()
-        #linear_dev = round(-(line_get.x1()+line_get.x2())/2+x_size/2)
+        linear_dev = round(-(line_get.x1()+line_get.x2())/2+x_size/2)
         if(angle>90):
             angle = angle-180
         angle = -angle
@@ -185,7 +185,8 @@ while(True):
 
     transmitted_val = (map(angle, -91, 91, 0, 255))#map(angle, -max_transmitted_val, max_transmitted_val, 0, 254) #+math.copysign(abs(round(perp_coeff*(-perp_length+round(x_size/2)))),angle)'''
     #print(transmitted_val)
-    #transmitted_line_dev = map(linear_dev, -round(x_size/2), round(x_size/2), 0, 255)
+    #linear_dev = 0
+    transmitted_line_dev = map(linear_dev, -round(x_size/2), round(x_size/2), 0, 255)
     img.draw_string(10, 30, str(angle),(255,0,0),2)
 
     #print(angle)
@@ -198,11 +199,16 @@ while(True):
 
     #uart.writechar(3)
 
-    uart.write(":%d/%d/;" %(transmitted_val, 3))
+    #uart.write(":%d/%d/%d/;" %(transmitted_val, 3,transmitted_line_dev))
+    uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(transmitted_line_dev)+"/;")
+    time.sleep_ms(5)
+    #uart.sendbreak()
+    #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(126)+"/;")
+    #uart.print()
     #uart.sendbreak()
 
     #print(utime.ticks_diff(utime.ticks_ms(), last_clock))
-    #print(transmitted_val)
+    #print(transmitted_line_dev)
     last_clock = utime.ticks_ms()
 
 

@@ -2,9 +2,7 @@
 
 void resetGyro() {
 
-  digitalWrite(GYRO_RST, LOW);
-  delay(500);
-  digitalWrite(GYRO_RST, HIGH);
+  GyroUART.write(1);
 }
 
 void resetCamera() {
@@ -13,7 +11,7 @@ void resetCamera() {
   digitalWrite(CAMERA_RST, HIGH);
 }
 void initGyro() {
- 
+
   display.clearDisplay();
   display.setCursor(0, 0);
   display.println("Init gyro...");
@@ -28,20 +26,38 @@ void initGyro() {
     }
   }
   long int gyro_test_start = millis();
-  int gyro_data = 0;
+ //int gyroData = 0;
   while ((millis() - gyro_test_start) < 20000) {
     display.clearDisplay();
-    if (parsingGyro())
+    //if (GyroUART.available()) {
+    // GyroUART.readBytes(bufferGyro, 8);
+    if (parsingGyro()) {
+      robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+      robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+      robot.start_angle_p = robot.angle_pitch;
+      robot.gyroStarted = bufferGyro[2];
+      if (robot.gyroStarted == 209) {
+        break;
+      }
+    }
+    /*if (GyroUART.available()) {
+       gyroData = GyroUART.read();
+    }*/
+
+    /*if (parsingGyro())
     {
       robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
       robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
 
-    }
+    }*/
     display.setCursor(0, 10);
-    display.println("Gyro yaw: " + String(robot.angle_yaw ));
+    display.println("Gyro yaw: " + String(robot.angle_yaw));
+    //display.println(String(bufferGyro[0])+" "+String(bufferGyro[1])+" "+String(bufferGyro[2])+" "+String(bufferGyro[3])+" "+String(bufferGyro[4])+" "+String(bufferGyro[5])+" "+String(bufferGyro[6])+" "+String(bufferGyro[7]));
     display.setCursor(0, 20);
-    display.println("Gyro pitch: " + String(robot.angle_pitch ));
+    display.println("Gyro pitch: " + String(robot.angle_pitch));
     display.setCursor(0, 30);
+    display.println(String(robot.gyroStarted));
+    display.setCursor(0, 40);
     if ((millis() - gyro_test_start) < 5000) {
       display.println("Wait for 20 seconds");
     } else if ((millis() - gyro_test_start) < 10000) {
@@ -63,7 +79,6 @@ void initGyro() {
     display.display();
 
     robot.start_angle_p = robot.angle_pitch;
-
   }
 }
 

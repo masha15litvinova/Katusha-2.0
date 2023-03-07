@@ -30,8 +30,8 @@
 #define BLUE_RED_HIGH 116
 
 #define V_CALIBR 0//140
-#define V_MAIN 50
-#define V_GORKA_UP 95
+#define V_MAIN 55
+#define V_GORKA_UP 90
 #define V_GORKA_DOWN 35
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
@@ -56,7 +56,7 @@
 #define MOTORS_DELAY 14
 #define CAMERA_DELAY 60
 #define GYRO_DELAY 8
-#define GYRO_DELAY_LINE 7
+#define GYRO_DELAY_LINE 12
 #define LINE_SENS_DELAY 14
 #define CURRENT_SENS_DELAY 600
 
@@ -84,7 +84,7 @@
 
 int slider_pwm_safety_treshold = 255;
 
-int min_pwm = 0;
+int min_pwm = 10;
 int current_max = 1023;
 
 int state_robot = STOP_SCREEN0;

@@ -19,6 +19,7 @@ class Robot {
     int angle_uart;
     int angle_yaw = 0;
     int angle_pitch = 0;
+    byte gyroStarted = 0;
 
     float u_gyro = 0;
     float up_gyro = 0;
@@ -48,10 +49,10 @@ class Robot {
     int up_cam = 0;
     int ui_cam = 0;
     int ud_cam = 0;
-    float p_cam = -1.5;
-    float p_cam_line = -0.6;
+    float p_cam = -1.0;
+    float p_cam_line = 0;//-0.03;//0.02;
     float i_cam = 0;
-    float d_cam = -0.0;
+    float d_cam = -0.3;
 
     long int timeGyro = 0;
     long int timeCamera = 0;
