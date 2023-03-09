@@ -1,4 +1,8 @@
-
+void motorsCorrectedSpeed() {
+  robot.motor1 = vel1(round(robot.v1_target));
+  robot.motor2 = vel2(round(robot.v2_target));
+  motors(robot.motor1, robot.motor2);
+}
 
 void motors(int m1, int m2) {
 

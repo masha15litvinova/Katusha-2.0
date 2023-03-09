@@ -73,7 +73,7 @@ while(True):
     # Gamma, contrast, and brightness correction are applied to each color channel. The
     # values are scaled to the range per color channel per image type...
     img = sensor.snapshot()#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
-    img.mean(4)
+    #img.mean(4)
     left_roi = (0, round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)))
     right_roi = (round(x_size/2+delta_x), round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)))
     #img.draw_rectangle(0, round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)), (255,255,0),2,False)
@@ -200,8 +200,16 @@ while(True):
     #uart.writechar(3)
 
     #uart.write(":%d/%d/%d/;" %(transmitted_val, 3,transmitted_line_dev))
-    uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(transmitted_line_dev)+"/;")
-    time.sleep_ms(5)
+    #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(transmitted_line_dev)+"/;")
+    uart.write(":")
+    uart.write(transmitted_val)
+    uart.write("/")
+    uart.write(3)
+    uart.write("/")
+    uart.write(transmitted_line_dev)
+    uart.write("/")
+    uart.write(";")
+    #time.sleep_ms(5)
     #uart.sendbreak()
     #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(126)+"/;")
     #uart.print()

@@ -1,6 +1,6 @@
-#define SPEED_COEFF_P 0.63  //1.0
+#define SPEED_COEFF_P 0.63   //1.0
 #define SPEED_COEFF_D 0.8    //0.8//0.8//0.8//0.3  //13
-#define SPEED_COEFF_I 0.043//0.06
+#define SPEED_COEFF_I 0.043  //0.06
 #define SPEED_COEFF_CUBE 0
 
 #define CPR 1050
@@ -57,7 +57,8 @@ int SpeedRPM2(float speed) {
 int vel1(float speed) {
   // state = !state;
   int sp_rpm = SpeedRPM1(speed);
-  robot.current_speed1 = ((Enc1() - robot.prev_enc1) * 60000 / ((float)CPR * MOTORS_DELAY));
+  int delta_time = millis() - robot.timeMotor1;
+  robot.current_speed1 = ((Enc1() - robot.prev_enc1) * 60000 / ((float)CPR * delta_time));
   robot.err1 = -robot.current_speed1 + (float)sp_rpm;
 
   robot.up1 = SPEED_COEFF_P * robot.err1;
@@ -74,13 +75,15 @@ int vel1(float speed) {
   int v1 = map(sp_rpm + round(robot.u1), 0, RPM1, 0, 255);
   robot.prev_enc1 = Enc1();
   robot.err1_old = robot.err1;
+  robot.timeMotor1 = millis();
   return v1;
 }
 
 int vel2(float speed) {
   // state = !state;
   int sp_rpm = SpeedRPM2(speed);
-  robot.current_speed2 = ((Enc2() - robot.prev_enc2) * 60 / (float)CPR) / ((float)MOTORS_TICK / (float)TIMER_FREQ);
+  int delta_time = millis() - robot.timeMotor2;
+  robot.current_speed2 = ((Enc2() - robot.prev_enc2) * 60000 / ((float)CPR * delta_time));
   robot.err2 = -robot.current_speed2 + (float)sp_rpm;
 
   robot.up2 = SPEED_COEFF_P * robot.err2;
@@ -97,5 +100,6 @@ int vel2(float speed) {
   int v2 = map(sp_rpm + round(robot.u2), 0, RPM2, 0, 255);
   robot.prev_enc2 = Enc2();
   robot.err2_old = robot.err2;
+  robot.timeMotor2 = millis();
   return v2;
 }

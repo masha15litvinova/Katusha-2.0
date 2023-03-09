@@ -299,7 +299,7 @@ void loop() {
 
         display.println(String(robot.angle_pitch));
         display.setCursor(0, 50);
-        display.println(robot.camDir);
+        display.println(robot.angle);
         display.display();
         robot.up_line = 0;
         robot.ud_line = 0;
@@ -341,7 +341,7 @@ void loop() {
         */
         robot.v1_target = robot.v + robot.u_line;
         robot.v2_target = robot.v - robot.u_line;
-
+        motorsCorrectedSpeed();
         err_old_line_sens = err_line_sens;
         robot.camLineAngleOld = robot.camLineAngle;
 
@@ -350,7 +350,7 @@ void loop() {
 
         //if (millis() - robot.timeGyro > GYRO_DELAY_LINE) state_robot = GYRO_READ_DATA;
         //if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
-        if (millis() - robot.timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
+        //if (millis() - robot.timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
         //if (millis() - robot.timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
         //if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
         if (parsingCam()) {
@@ -358,12 +358,14 @@ void loop() {
           robot.camDir = bufferCam[1];
           robot.camLineDev = map(bufferCam[2], 0, 255, -CAM_X_SIZE / 2, CAM_X_SIZE / 2);
         }
-        if (millis() - robot.timeGyro > GYRO_DELAY_LINE) {
-          GyroUpdate();
-          robot.timeGyro = millis();
+        if (parsingGyro()) {
+          robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+
+          robot.angle = module((robot.angle_pitch - robot.start_angle_p), 360);
         }
 
-        if ((robot.angle < 10) or (robot.angle > 350)) robot.v = V_MAIN;
+        if ((robot.angle < 7) or (robot.angle > 353)) robot.v = V_MAIN;
         else if (robot.angle_pitch > 310) robot.v = V_GORKA_UP;
         else if (robot.angle_pitch < 60) robot.v = V_GORKA_DOWN;
         /*if (distance2 < 120)
@@ -372,10 +374,6 @@ void loop() {
           break;
           }*/
 
-
-
-
-
         /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) == 6) //условие перекрестка
           {
           motors(0, 0);
@@ -383,8 +381,6 @@ void loop() {
           state_robot = COLOR_READ_DATA;
 
           }*/
-
-
         break;
       }
     case (MOTORS_PWM_COMPUTE):

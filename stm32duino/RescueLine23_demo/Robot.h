@@ -61,6 +61,8 @@ class Robot {
     long int timeLED = 0;
     long int timeLineSens = 0;
     long int timeCurrSens = 0;
+    long int timeMotor1 = 0;
+    long int timeMotor2 = 0;
 
 
     float up1 = 0;

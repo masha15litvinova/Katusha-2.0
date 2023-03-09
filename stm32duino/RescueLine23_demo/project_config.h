@@ -32,7 +32,7 @@
 #define V_CALIBR 0//140
 #define V_MAIN 55
 #define V_GORKA_UP 90
-#define V_GORKA_DOWN 35
+#define V_GORKA_DOWN 30
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
 #define V_MIN 20

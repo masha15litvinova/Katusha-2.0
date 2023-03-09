@@ -68,9 +68,9 @@ void GyroUpdate() {
     GyroUART.readBytes(bufferGyro, 8);
 
     robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-    robot.angle_pitch = map(bufferGyro[2], 0, 255, 0, 360);
+    robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
 
-    robot.angle_pitch = module((robot.angle_pitch - robot.start_angle_p), 360);
+    robot.angle = module((robot.angle_pitch - robot.start_angle_p), 360);
   }
   
  /* if (parsingGyro()) {
@@ -82,4 +82,5 @@ int module(int a, int mode) {
   if (a >= 0) return a % mode;
   else return (mode + a % mode);
   return 0;
+ 
 }

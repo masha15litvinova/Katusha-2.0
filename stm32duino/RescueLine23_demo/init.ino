@@ -34,9 +34,9 @@ void initGyro() {
     if (parsingGyro()) {
       robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
       robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
-      robot.start_angle_p = robot.angle_pitch;
+      
       robot.gyroStarted = bufferGyro[2];
-      if (robot.gyroStarted == 209) {
+      if (robot.gyroStarted == 1) {
         break;
       }
     }
@@ -78,8 +78,9 @@ void initGyro() {
 
     display.display();
 
-    robot.start_angle_p = robot.angle_pitch;
+    
   }
+  robot.start_angle_p = robot.angle_pitch;
 }
 
 void resetLaserDist() {
