@@ -15,8 +15,8 @@ clock = time.clock()
 uart = UART(3, 9600)
 last_clock = 0
 
-green_thresholds = [23, 81, -128, -7, -128, 127] #порог зеленого цвета
-black_thresholds = [0, 19, -128, 9, -128, 127] #порог черного цвета
+green_thresholds = [37, 55, -128, -11, -128, 127] #порог зеленого цвета
+black_thresholds = [0, 25, -128, 5, -128, 127] #порог черного цвета
 yellow_thresholds = [0, 100, -128, 127, -128, 67]
 line_count = 25
 
@@ -31,6 +31,10 @@ kx_regression =0.25
 
 min_area = 40
 min_pixels = 40
+
+ky_green = 0.4
+kx_green = 0.45
+
 
 dir_turn = 0
 '''
@@ -48,6 +52,7 @@ perp_length = 0
 delta = 10
 
 transmitted_val = 0
+transmitted_sum = 0
 perp_coeff=0.01
 max_transmitted_val = round(x_size/2)*perp_coeff+90+1
 
@@ -72,7 +77,7 @@ while(True):
 
     # Gamma, contrast, and brightness correction are applied to each color channel. The
     # values are scaled to the range per color channel per image type...
-    img = sensor.snapshot()#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
+    img = sensor.snapshot().gamma_corr(gamma = 1.0, contrast = 1.0, brightness = 0.0)#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
     #img.mean(4)
     left_roi = (0, round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)))
     right_roi = (round(x_size/2+delta_x), round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)))
@@ -131,7 +136,7 @@ while(True):
             line_blobs.append([largest_blob.cx(), largest_blob.cy()])
 
 
-            centroid_sum += largest_blob.cx() * r[4] # r[4] is the roi weight.
+            centroid_sum += (largest_blob.cx()-round(x_size/2)) * r[4] # r[4] is the roi weight.
             count_line_blobs+=1
 
 
@@ -187,6 +192,7 @@ while(True):
     #print(transmitted_val)
     #linear_dev = 0
     transmitted_line_dev = map(linear_dev, -round(x_size/2), round(x_size/2), 0, 255)
+    transmitted_sum = map(centroid_sum, -line_count*round(x_size/2), line_count*round(x_size/2), 0, 255)
     img.draw_string(10, 30, str(angle),(255,0,0),2)
 
     #print(angle)
@@ -202,13 +208,21 @@ while(True):
     #uart.write(":%d/%d/%d/;" %(transmitted_val, 3,transmitted_line_dev))
     #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(transmitted_line_dev)+"/;")
     uart.write(":")
-    uart.write(transmitted_val)
+    time.sleep_ms(10)
+    uart.write(str(transmitted_val))
+    time.sleep_ms(10)
     uart.write("/")
-    uart.write(3)
+    time.sleep_ms(10)
+    uart.write(str(dir_turn))
+    time.sleep_ms(10)
     uart.write("/")
-    uart.write(transmitted_line_dev)
+    time.sleep_ms(10)
+    uart.write(str(transmitted_sum))
+    time.sleep_ms(10)
     uart.write("/")
+    time.sleep_ms(10)
     uart.write(";")
+    time.sleep_ms(10)
     #time.sleep_ms(5)
     #uart.sendbreak()
     #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(126)+"/;")

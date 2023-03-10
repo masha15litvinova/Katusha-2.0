@@ -11,6 +11,7 @@
 
 #define CAMERA_BYTE_SIGNAL 255
 #define CAM_X_SIZE 320
+#define CAM_LINE_COUNT 25
 
 
 #define GYRO_BYTE_SIGNAL 255
@@ -30,7 +31,7 @@
 #define BLUE_RED_HIGH 116
 
 #define V_CALIBR 0//140
-#define V_MAIN 55
+#define V_MAIN 42
 #define V_GORKA_UP 90
 #define V_GORKA_DOWN 30
 #define V_OBSTACLE 90

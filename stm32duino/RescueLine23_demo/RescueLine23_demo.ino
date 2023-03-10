@@ -236,7 +236,7 @@ void setup() {
   // initServos();
   //calibration_grab();
   sliders(0, 0);
-  state_robot = STOP_SCREEN0;
+  state_robot = ROTATING_GREEN;
   robot.v = V_MAIN;
 }
 
@@ -294,12 +294,14 @@ void loop() {
         digitalWrite(LED1, LOW);
         display.clearDisplay();
         display.setTextSize(1);
+        display.setCursor(0, 20);
+
+
+        display.println(String(robot.camLineAngle));
         display.setCursor(0, 30);
-
-
-        display.println(String(robot.angle_pitch));
-        display.setCursor(0, 50);
-        display.println(robot.angle);
+        display.println(robot.camLineDev);
+        display.setCursor(0, 40);
+        display.println(robot.angle_yaw);
         display.display();
         robot.up_line = 0;
         robot.ud_line = 0;
@@ -318,10 +320,14 @@ void loop() {
         int u_max = 150;
         //if (err_line_sens != 0)
         //{
-        robot.up_cam = robot.camLineAngle * robot.p_cam + robot.camLineDev * robot.p_cam_line;
+        robot.up_cam = robot.camLineAngle * robot.p_cam + robot.camLineDev * robot.p_cam_line + robot.camLineAngle * robot.camLineAngle * robot.camLineAngle * robot.p_cube_cam;
         robot.ud_cam = (robot.camLineAngle - robot.camLineAngleOld) * robot.d_cam;
-        robot.u_line = robot.up_cam + robot.ud_cam;  //((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
+        robot.ui_cam = robot.ui_cam + robot.camLineAngle * robot.i_cam;
+        robot.u_line = robot.up_cam + robot.ud_cam + robot.ui_cam;  //((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
 
+        if (abs(robot.camLineAngle) < 6) {
+          robot.ui_cam = 0;
+        }
         /*if((robot.sensors[0]+robot.sensors[1]+robot.sensors[2]+robot.sensors[3]+robot.sensors[4]+robot.sensors[5])==0)
           {
           robot.u_line = robot.up_cam;
@@ -365,9 +371,9 @@ void loop() {
           robot.angle = module((robot.angle_pitch - robot.start_angle_p), 360);
         }
 
-        if ((robot.angle < 7) or (robot.angle > 353)) robot.v = V_MAIN;
+        /*if ((robot.angle < 7) or (robot.angle > 353)) robot.v = V_MAIN;
         else if (robot.angle_pitch > 310) robot.v = V_GORKA_UP;
-        else if (robot.angle_pitch < 60) robot.v = V_GORKA_DOWN;
+        else if (robot.angle_pitch < 60) robot.v = V_GORKA_DOWN;*/
         /*if (distance2 < 120)
           {
           state_robot = OBSTACLE;
@@ -718,14 +724,15 @@ void loop() {
       {
 
         display.clearDisplay();
+        display.setCursor(0, 0);
+        display.println("start");
         display.display();
 
         digitalWrite(LED1, LOW);
-        GyroUART.write(1);
-        GyroUART.flush();
 
-        last_state_robot = ROTATING_GREEN;
-        switch (dir) {
+        state_robot = ROTATING_GREEN;
+
+        /*switch (dir) {
           case (0):
             {
               turnAngle180(60, 25);
@@ -762,7 +769,8 @@ void loop() {
               dir = -1;
               break;
             }
-        }
+        }*/
+        turnAngle(30, 60, 40);
         break;
       }
     case (COLOR_READ_DATA):

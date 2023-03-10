@@ -86,7 +86,67 @@ float ki_gyro = 0.01;
   }*/
 
 
+void turnAngle(int target_angle, int max_v, int min_v) {
+  if (target_angle < -180) target_angle = -180;
+  if (target_angle > 180) target_angle = 180;
+  //if (angle < 0) angle = angle + 360;
+  while (!parsingGyro());
+  int start_angle = robot.angle_yaw;
+  int err = target_angle;
+  int u = 0;
+  float kp = 1.0;
 
+
+
+
+
+  while (abs(err) > MAX_ERR_ANGLE) {
+    digitalWrite(LED1, LOW);
+    if (parsingGyro()) {
+      digitalWrite(LED1, HIGH);
+      robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+      robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+      robot.angle = module((robot.angle_yaw - start_angle), 360);
+      if ((robot.angle > 180) and (robot.angle < 360)) robot.angle = robot.angle - 360;
+    }
+    //digitalWrite(LED2, LOW);
+    
+    err = target_angle - robot.angle;
+    u = err * kp;
+    if (abs(u) > max_v) {
+      if (u > 0) u = max_v;
+      else if (u < 0) u = -max_v;
+    }
+    if (abs(u) < min_v) {
+      if (u > 0) u = min_v;
+      else if (u < 0) u = -min_v;
+    }
+    robot.v1_target = -u;
+    robot.v2_target = u;
+    motorsCorrectedSpeed();
+    display.clearDisplay();
+
+    display.setTextSize(1);
+    display.setCursor(0, 0);
+    display.println(String(start_angle));
+    display.setCursor(0, 10);
+    display.println(String(robot.angle));
+    display.setCursor(0, 20);
+    display.println(String(bufferGyro[0]) + " " + String(bufferGyro[1]) + " " + String(bufferGyro[2]));
+    display.display();
+  }
+  robot.v1_target = 0;
+  robot.v2_target = 0;
+  motors(0, 0);
+  display.clearDisplay();
+
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.display();
+  delay(5000);
+  display.clearDisplay();
+  display.display();
+}
 
 void turnAngle90Right(int max_v, int min_v) {  //поворот на данный угол относительно текущего
 
@@ -132,11 +192,9 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
 
 
 
-        if (parsingGyro())
-        {
-          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
-
+        if (parsingGyro()) {
+          robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
         }
         display.clearDisplay();
 
@@ -161,15 +219,11 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
         if (robot.u_gyro < -max_v) robot.u_gyro = -max_v;
         if (abs(robot.u_gyro) < min_v) {
           if (robot.u_gyro > 0) robot.u_gyro = min_v;
-          else if (robot.u_gyro < 0)robot.u_gyro = -min_v;
+          else if (robot.u_gyro < 0) robot.u_gyro = -min_v;
         }
         robot.v1_target = round(robot.u_gyro);
         robot.v2_target = -round(robot.u_gyro);
-        if (millis() - robot.timeMotors > MOTORS_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = MOTORS_PWM_COMPUTE;
-        }
-        motors(robot.motor1, robot.motor2);
+        motorsCorrectedSpeed();
       }
 
     } else {
@@ -181,11 +235,9 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
 
 
 
-        if (parsingGyro())
-        {
-          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
-
+        if (parsingGyro()) {
+          robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
         }
         display.clearDisplay();
 
@@ -216,11 +268,8 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
         }
         robot.v1_target = round(robot.u_gyro);
         robot.v2_target = -round(robot.u_gyro);
-        if (millis() - robot.timeMotors > MOTORS_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = MOTORS_PWM_COMPUTE;
-        }
-        motors(robot.motor1, robot.motor2);
+
+        motorsCorrectedSpeed();
       }
     }
   }
@@ -254,7 +303,6 @@ void turnAngle90Right(int max_v, int min_v) {  //поворот на данны�
     robot.sensors[3] = 0;
     robot.sensors[4] = 0;
     robot.sensors[5] = 0;
-
   }
 }
 
@@ -303,11 +351,9 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
 
 
 
-        if (parsingGyro())
-        {
-          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
-
+        if (parsingGyro()) {
+          robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
         }
         display.clearDisplay();
 
@@ -331,15 +377,12 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
         if (robot.u_gyro < -max_v) robot.u_gyro = -max_v;
         if (abs(robot.u_gyro) < min_v) {
           if (robot.u_gyro > 0) robot.u_gyro = min_v;
-          else if (robot.u_gyro < 0)robot.u_gyro = -min_v;
+          else if (robot.u_gyro < 0) robot.u_gyro = -min_v;
         }
         robot.v1_target = round(robot.u_gyro);
         robot.v2_target = -round(robot.u_gyro);
-        if (millis() - robot.timeMotors > MOTORS_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = MOTORS_PWM_COMPUTE;
-        }
-        motors(robot.motor1, robot.motor2);
+
+        motorsCorrectedSpeed();
       }
 
     } else {
@@ -351,11 +394,9 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
 
 
 
-        if (parsingGyro())
-        {
-          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
-
+        if (parsingGyro()) {
+          robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
         }
         display.clearDisplay();
 
@@ -386,11 +427,7 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
         }
         robot.v1_target = round(robot.u_gyro);
         robot.v2_target = -round(robot.u_gyro);
-        if (millis() - robot.timeMotors > MOTORS_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = MOTORS_PWM_COMPUTE;
-        }
-        motors(robot.motor1, robot.motor2);
+        motorsCorrectedSpeed();
       }
     }
   }
@@ -424,7 +461,6 @@ void turnAngle90Left(int max_v, int min_v) {  //поворот на данный
     robot.sensors[3] = 0;
     robot.sensors[4] = 0;
     robot.sensors[5] = 0;
-
   }
 }
 
@@ -475,11 +511,9 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
 
 
 
-        if (parsingGyro())
-        {
-          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
-
+        if (parsingGyro()) {
+          robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
         }
         display.clearDisplay();
 
@@ -507,11 +541,7 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
         }
         robot.v1_target = round(robot.u_gyro);
         robot.v2_target = -round(robot.u_gyro);
-        if (millis() - robot.timeMotors > MOTORS_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = MOTORS_PWM_COMPUTE;
-        }
-        motors(robot.motor1, robot.motor2);
+        motorsCorrectedSpeed();
       }
 
     } else {
@@ -523,11 +553,9 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
 
 
 
-        if (parsingGyro())
-        {
-          robot.angle_yaw =  map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch =  map(bufferGyro[1], 0, 255, 0, 360);
-
+        if (parsingGyro()) {
+          robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
         }
         display.clearDisplay();
 
@@ -558,11 +586,7 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
         }
         robot.v1_target = round(robot.u_gyro);
         robot.v2_target = -round(robot.u_gyro);
-        if (millis() - robot.timeMotors > MOTORS_DELAY) {
-          last_state_robot = ROTATING_GREEN;
-          state_robot = MOTORS_PWM_COMPUTE;
-        }
-        motors(robot.motor1, robot.motor2);
+        motorsCorrectedSpeed();
       }
     }
   }
@@ -596,6 +620,5 @@ void turnAngle180(int max_v, int min_v) {  //поворот на данный у
     robot.sensors[3] = 0;
     robot.sensors[4] = 0;
     robot.sensors[5] = 0;
-
   }
 }

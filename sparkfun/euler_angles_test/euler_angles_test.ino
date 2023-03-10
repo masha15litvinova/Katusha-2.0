@@ -24,24 +24,26 @@ Supported Platforms:
 #include <SparkFunMPU9250-DMP.h>
 
 #define SerialPort SerialUSB
-#define LEDPIN 13
-
-
-void (*resetFunc)(void) = 0;
 
 MPU9250_DMP imu;
 
-long int time_begin = millis();
-byte calibrated = 0;
+int yaw = 0;
+int pitch = 0;
+int roll = 0;
+
+int yaw_start = 0;
+int pitch_start = 0;
+int roll_start = 0;
 
 void setup() {
-  SerialPort.begin(9600);
-  Serial1.begin(9600);
-  pinMode(LEDPIN, OUTPUT);
+  SerialPort.begin(115200);
+
   // Call imu.begin() to verify communication and initialize
   if (imu.begin() != INV_SUCCESS) {
     while (1) {
-
+      SerialPort.println("Unable to communicate with MPU-9250");
+      SerialPort.println("Check connections, and try again.");
+      SerialPort.println();
       delay(5000);
     }
   }
@@ -53,9 +55,7 @@ void setup() {
   // accelerometer in low-power mode to estimate quat's.
   // DMP_FEATURE_LP_QUAT and 6X_LP_QUAT are mutually exclusive
 }
-byte angle_y = 0;
-byte angle_p = 0;
-byte angle_r = 0;
+
 void loop() {
   // Check for new data in the FIFO
   if (imu.fifoAvailable()) {
@@ -65,80 +65,25 @@ void loop() {
       // quaternion values -- to estimate roll, pitch, and yaw
       imu.computeEulerAngles();
       printIMUData();
+      roll = imu.roll;
+      pitch = imu.pitch;
+      yaw = imu.yaw;
     }
   }
+  SerialPort.println("start roll/pitch/yaw: " + String(roll_start) + " " + String(pitch_start) + " " + String(yaw_start));
+  SerialPort.println("roll/pitch/yaw: " + String(roll) + " " + String(pitch) + " " + String(yaw));
+ SerialPort.println("correct roll/pitch/yaw: " + String(roll-roll_start) + " " + String(pitch-pitch_start) + " " + String(yaw-yaw_start));
 
-  if ((millis() - time_begin) > 30000) calibrated = 1;
-  //char buff[8] = { ':', y, '/', p, '/', (char)calibrated, '/', ';' };
-  /*if (Serial1.availableForWrite()) {
-    //Serial1.println(":" + String(angle_y) + "/" + String(angle_p) + "/" + ";");
-    Serial1.print(':');
+  if (SerialPort.available()) {
+    char x = SerialPort.read();
+    roll_start = imu.roll;
+    pitch_start = imu.pitch;
+    yaw_start = imu.yaw;
   }
-  if (Serial1.availableForWrite()) { Serial1.print(angle_y); }
-  if (Serial1.availableForWrite()) { Serial1.print('/'); }
-  if (Serial1.availableForWrite()) { Serial1.print(angle_p); }
-  if (Serial1.availableForWrite()) { Serial1.print('/'); }
-  if (Serial1.availableForWrite()) { Serial1.print(';'); }*/
-  /*if (Serial1.availableForWrite())
-  {
-    Serial1.write(buff, 6);
-  }*/
-  if (Serial1.available()) {
-    byte rst = Serial1.read();
-    if (rst == 1) {
-      resetFunc();
-    }
-  }
-  //Serial1.write(buff, 8);
-  //String send = ":" + String(angle_y) + "/" + String(angle_p) + "/" + String(calibrated) + "/;";
-
-
-
-  /*for (int i = 0; i < 8; i++) {
-    Serial1.print(buff[i]);
-    Serial1.flush();
-    //delay(5);
-  }*/
-  //Serial1.flush();
-  //delay(10);
-  digitalWrite(LEDPIN, HIGH);
-  Serial1.print(':');
-  delay(12);
-  Serial1.print(angle_y);
-  delay(12);
-  Serial1.print('/');
-  delay(12);
-  Serial1.print(angle_p);
-  delay(12);
-  Serial1.print('/');
-  delay(12);
-  Serial1.print(calibrated);
-  delay(12);
-  Serial1.print('/');
-  delay(12);
-  Serial1.print(';');
-  delay(12);
-  digitalWrite(LEDPIN, LOW);
-  /*Serial1.write(':');
-  delay(5);
-  Serial1.write((angle_y));
-  delay(5);
-  Serial1.write('/');
-  delay(5);
-  Serial1.write((angle_p));
-  delay(5);
-  Serial1.write('/');
-  delay(5);
-  Serial1.write((calibrated));
-  delay(5);
-  Serial1.write('/');
-  delay(5);
-  Serial1.write(';');
-  delay(5);*/
+  delay(50);
 }
 
 void printIMUData(void) {
-  digitalWrite(LEDPIN, OUTPUT);
   // After calling dmpUpdateFifo() the ax, gx, mx, etc. values
   // are all updated.
   // Quaternion values are, by default, stored in Q30 long
@@ -148,11 +93,11 @@ void printIMUData(void) {
   float q2 = imu.calcQuat(imu.qy);
   float q3 = imu.calcQuat(imu.qz);
 
-  int yaw1 = imu.yaw;
-  int pitch1 = imu.pitch;
-  int roll1 = imu.roll;
-
-  angle_y = map(yaw1, 0, 360, 0, 255);
-  angle_p = map(pitch1, 0, 360, 0, 255);
-  angle_r = map(roll1, 0, 360, 0, 255);
+  /*SerialPort.println("Q: " + String(q0, 4) + ", " +
+                    String(q1, 4) + ", " + String(q2, 4) + 
+                    ", " + String(q3, 4));
+  SerialPort.println("R/P/Y: " + String(imu.roll) + ", "
+            + String(imu.pitch) + ", " + String(imu.yaw));
+  SerialPort.println("Time: " + String(imu.time) + " ms");
+  SerialPort.println();*/
 }
