@@ -31,8 +31,8 @@
 #define BLUE_RED_HIGH 116
 
 #define V_CALIBR 0//140
-#define V_MAIN 42
-#define V_GORKA_UP 90
+#define V_MAIN 40
+#define V_GORKA_UP 65
 #define V_GORKA_DOWN 30
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
@@ -58,7 +58,7 @@
 #define CAMERA_DELAY 60
 #define GYRO_DELAY 8
 #define GYRO_DELAY_LINE 12
-#define LINE_SENS_DELAY 14
+#define LINE_SENS_DELAY 6
 #define CURRENT_SENS_DELAY 600
 
 /**********STATES************************/
@@ -91,4 +91,4 @@ int current_max = 1023;
 int state_robot = STOP_SCREEN0;
 int last_state_robot = LINE;
 
-int dir = 0;
+int dir = 3;

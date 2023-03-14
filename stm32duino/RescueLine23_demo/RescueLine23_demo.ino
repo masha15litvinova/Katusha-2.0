@@ -28,7 +28,7 @@ int black[6] = { 0, 0, 0, 0, 0, 0 };
 int white[6] = { 1023, 1023, 1023, 1023, 1023, 1023 };
 int grey[6] = { 0, 0, 0, 0, 0, 0 };
 
-
+//int dir = 3;
 int cameraData = 0;
 int gyroData = 0;
 byte bufferCam[3];
@@ -42,18 +42,16 @@ uint32_t distance2 = 1000;
 uint32_t distance3;
 uint32_t distance4;
 
-float weights[6] = { -27, -20, -17, 17, 20, 25 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -30, -25, -17, 17, 25, 30 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights_sum = 0;
+
 
 //float kp_line[6] = { -0.7, -0.6, -0.5, 0.5, 0.6, 0.7 };
 //float ki_line[6] = { -0.02, -0.01, -0.008, 0.008, 0.01, 0.02}; //{ -0.01, -0.009, -0.007, 0.007, 0.009, 0.01 };
 //float kd_line[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};//{ -1.5, -1.3, -1.1, 1.1, 1.3, 1.5 };
 
-float kp_line = 1.0;       //2.2
-float kcube_line = 0.016;  //0.04; //0.028
-float kd_line = 0.5;       //1.0;//-1.5;
-float ki_line = 0.005;     //0.03;//2.0;//0.5;//0.012;//0.0005;//0.009;
 
-float min_err_i = 15;
+float min_err_i = 8.5;
 
 float err_line_sens = 0;
 float err_old_line_sens = 0;
@@ -197,6 +195,8 @@ void setup() {
   //initButtonsIRQs();
 
 
+  weights_sum = abs(weights[0]+weights[1]+weights[2]);
+
 
 
   resetCamera();
@@ -228,6 +228,7 @@ void setup() {
   initColorSensors();
 
   initGyro();
+  
   display.clearDisplay();
   display.display();
   ledBlinking();
@@ -236,7 +237,7 @@ void setup() {
   // initServos();
   //calibration_grab();
   sliders(0, 0);
-  state_robot = ROTATING_GREEN;
+  state_robot = CALIBRATION;
   robot.v = V_MAIN;
 }
 
@@ -297,33 +298,35 @@ void loop() {
         display.setCursor(0, 20);
 
 
-        display.println(String(robot.camLineAngle));
+        display.println(String(robot.angle));
         display.setCursor(0, 30);
-        display.println(robot.camLineDev);
+        display.println(robot.gorka);
         display.setCursor(0, 40);
-        display.println(robot.angle_yaw);
+        display.println(robot.camDir);
         display.display();
         robot.up_line = 0;
         robot.ud_line = 0;
         err_line_sens = 0;
         for (int i = 0; i < 5; i++) {
-          err_line_sens = err_line_sens + robot.sensors[i] * weights[i];
+          // err_line_sens = err_line_sens + robot.sensors[i] * weights[i];
+
+          err_line_sens = err_line_sens + robot.sensors_analog[i] * weights[i]/abs(weights_sum);
         }
 
-        robot.up_line = err_line_sens * kp_line + err_line_sens * err_line_sens * err_line_sens * kcube_line;
-        robot.ud_line = (err_line_sens - err_old_line_sens) * kd_line;
-        robot.ui_line = robot.ui_line + err_line_sens * ki_line;
+        robot.up_line = err_line_sens * robot.kp_line + err_line_sens * err_line_sens * err_line_sens * robot.kcube_line;
+        robot.ud_line = (err_line_sens - err_old_line_sens) * robot.kd_line;
+        robot.ui_line = robot.ui_line + err_line_sens * robot.ki_line;
         if (abs(err_line_sens) < min_err_i) {
           robot.ui_line = 0;
         }
         int delta_grey = 20;
-        int u_max = 150;
+        int u_max = 110;
         //if (err_line_sens != 0)
         //{
         robot.up_cam = robot.camLineAngle * robot.p_cam + robot.camLineDev * robot.p_cam_line + robot.camLineAngle * robot.camLineAngle * robot.camLineAngle * robot.p_cube_cam;
         robot.ud_cam = (robot.camLineAngle - robot.camLineAngleOld) * robot.d_cam;
         robot.ui_cam = robot.ui_cam + robot.camLineAngle * robot.i_cam;
-        robot.u_line = robot.up_cam + robot.ud_cam + robot.ui_cam;  //((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
+        robot.u_line = (robot.up_cam + robot.ud_cam + robot.ui_cam) + robot.up_line + robot.ud_line + robot.ui_line;  //((robot.up_line + robot.ui_line + robot.ud_line)+robot.up_cam*0.7)*0.7;
 
         if (abs(robot.camLineAngle) < 6) {
           robot.ui_cam = 0;
@@ -355,13 +358,15 @@ void loop() {
         //motors(robot.motor1, robot.motor2);
 
         //if (millis() - robot.timeGyro > GYRO_DELAY_LINE) state_robot = GYRO_READ_DATA;
-        //if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
+        if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
         //if (millis() - robot.timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
         //if (millis() - robot.timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
         //if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
         if (parsingCam()) {
           robot.camLineAngle = map(bufferCam[0], 0, 255, -91, 91);
-          robot.camDir = bufferCam[1];
+          if (bufferCam[1] != 3) {
+            robot.camDir = bufferCam[1];
+          }
           robot.camLineDev = map(bufferCam[2], 0, 255, -CAM_X_SIZE / 2, CAM_X_SIZE / 2);
         }
         if (parsingGyro()) {
@@ -370,7 +375,27 @@ void loop() {
 
           robot.angle = module((robot.angle_pitch - robot.start_angle_p), 360);
         }
-
+        /*if (((robot.angle) < 10)or(robot.angle>350) ) {
+          robot.v = V_MAIN;
+          robot.gorka = 0;
+        }
+        else
+        {
+          robot.v = V_GORKA_DOWN;
+        }*/
+        /*else if ((abs(robot.angle) > 10) and (robot.gorka == 0)) {
+          robot.v = V_GORKA_UP;
+          robot.gorka == 1;
+        } else if ((abs(robot.angle) < 3) and (robot.gorka == 1)) {
+          robot.v = V_MAIN;
+          robot.gorka = 2;
+        } else if ((abs(robot.angle) > 10) and (robot.gorka == 2)) {
+          robot.v = V_GORKA_DOWN;
+          robot.gorka = 3;
+        } else if ((abs(robot.angle) < 3) and (robot.gorka == 3)) {
+          robot.v = V_MAIN;
+          robot.gorka = 0;
+        }*/
         /*if ((robot.angle < 7) or (robot.angle > 353)) robot.v = V_MAIN;
         else if (robot.angle_pitch > 310) robot.v = V_GORKA_UP;
         else if (robot.angle_pitch < 60) robot.v = V_GORKA_DOWN;*/
@@ -380,13 +405,12 @@ void loop() {
           break;
           }*/
 
-        /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) == 6) //условие перекрестка
-          {
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) == 6)  //условие перекрестка
+        {
           motors(0, 0);
           delay(300);
           state_robot = COLOR_READ_DATA;
-
-          }*/
+        }
         break;
       }
     case (MOTORS_PWM_COMPUTE):
@@ -419,8 +443,10 @@ void loop() {
         s[3] = analogRead(SENSOR4);
         s[4] = analogRead(SENSOR5);
         s[5] = analogRead(SENSOR6);
-
-        int grey_scaled = 30;
+        for (int i = 0; i < 6; i++) {
+          robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100)/100;
+        }
+        int grey_scaled = 24;
 
         for (int i = 0; i < 6; i++) {
           if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
@@ -478,7 +504,10 @@ void loop() {
         btn2.run();
         robot.motor1 = 0;
         robot.motor2 = 0;
+        robot.ui1 = 0;
+        robot.ui2 = 0;
         robot.ui_line = 0;
+        robot.ui_cam = 0;
         motors(0, 0);
         display.clearDisplay();
         display.setTextSize(2);
@@ -724,30 +753,29 @@ void loop() {
       {
 
         display.clearDisplay();
-        display.setCursor(0, 0);
-        display.println("start");
+
         display.display();
 
         digitalWrite(LED1, LOW);
 
-        state_robot = ROTATING_GREEN;
+       // turnAngle(-179, 60, 40);
 
-        /*switch (dir) {
+        switch (dir) {
           case (0):
             {
-              turnAngle180(60, 25);
+              turnAngle(-179, 60, 40);
 
               break;
             }
           case (1):
             {
-              turnAngle90Right(60, 25);
+              turnAngle(-90, 60, 40);
 
               break;
             }
           case (2):
             {
-              turnAngle90Left(60, 25);
+              turnAngle(90, 60, 40);
 
               break;
             }
@@ -759,26 +787,31 @@ void loop() {
                 motors(65, 65);
               }
               motors(0, 0);
-              state_robot = LINE;
+
               robot.sensors[0] = 0;
               robot.sensors[1] = 0;
               robot.sensors[2] = 0;
               robot.sensors[3] = 0;
               robot.sensors[4] = 0;
               robot.sensors[5] = 0;
-              dir = -1;
+              dir = 3;
               break;
             }
-        }*/
-        turnAngle(30, 60, 40);
+        }
+        state_robot = LINE;
+        robot.sensors[0] = 0;
+        robot.sensors[1] = 0;
+        robot.sensors[2] = 0;
+        robot.sensors[3] = 0;
+        robot.sensors[4] = 0;
+        robot.sensors[5] = 0;
         break;
       }
     case (COLOR_READ_DATA):
       {
-        GyroUART.write(1);
-        GyroUART.flush();
 
-        dir = -1;
+
+        dir = 3;
         display.clearDisplay();
         dir = direction_color();
         state_robot = ROTATING_GREEN;

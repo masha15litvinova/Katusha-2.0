@@ -35,7 +35,7 @@ long int time_begin = millis();
 byte calibrated = 0;
 
 void setup() {
-  SerialPort.begin(9600);
+  //SerialPort.begin(9600);
   Serial1.begin(9600);
   pinMode(LEDPIN, OUTPUT);
   // Call imu.begin() to verify communication and initialize
@@ -103,21 +103,21 @@ void loop() {
   //delay(10);
   digitalWrite(LEDPIN, HIGH);
   Serial1.print(':');
-  delay(12);
+  delay(6);
   Serial1.print(angle_y);
-  delay(12);
+  delay(6);
   Serial1.print('/');
-  delay(12);
+  delay(6);
   Serial1.print(angle_p);
-  delay(12);
+  delay(6);
   Serial1.print('/');
-  delay(12);
+  delay(6);
   Serial1.print(calibrated);
-  delay(12);
+  delay(6);
   Serial1.print('/');
-  delay(12);
+  delay(6);
   Serial1.print(';');
-  delay(12);
+  delay(6);
   digitalWrite(LEDPIN, LOW);
   /*Serial1.write(':');
   delay(5);

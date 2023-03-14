@@ -1,4 +1,4 @@
-#define MAX_ERR_ANGLE 5
+#define MAX_ERR_ANGLE 4
 
 float kp_gyro = 0.5;
 float ki_gyro = 0.01;
@@ -87,32 +87,48 @@ float ki_gyro = 0.01;
 
 
 void turnAngle(int target_angle, int max_v, int min_v) {
+  GyroUARTClear();
   if (target_angle < -180) target_angle = -180;
   if (target_angle > 180) target_angle = 180;
-  //if (angle < 0) angle = angle + 360;
-  while (!parsingGyro());
+  while (!GyroUART.available()) {}
+  while (!parsingGyro()) {}
+  /*display.setCursor(0, 10);
+  display.println("buffer: " + String(bufferGyro[0]) + " " + String(bufferGyro[1]) + " " + String(bufferGyro[2]));
+  display.display();
+  delay(1000);*/
+  robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+  robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
   int start_angle = robot.angle_yaw;
-  int err = target_angle;
+  int err_turn = target_angle;
   int u = 0;
-  float kp = 1.0;
+  int ui = 0;
+  float kp = -1.0;
+  float ki = -0.001;
+  int angle_turn = 0;
 
+  display.setTextSize(1);
+  display.setCursor(0, 20);
+  display.println("err_turn: " + String(err_turn));
+  display.setCursor(0, 30);
+  display.println("start_angle: " + String(start_angle));
+  display.display();
+  delay(1000);
+  display.clearDisplay();
 
-
-
-
-  while (abs(err) > MAX_ERR_ANGLE) {
+  while (abs(err_turn) > MAX_ERR_ANGLE) {
     digitalWrite(LED1, LOW);
     if (parsingGyro()) {
       digitalWrite(LED1, HIGH);
       robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
       robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
-      robot.angle = module((robot.angle_yaw - start_angle), 360);
-      if ((robot.angle > 180) and (robot.angle < 360)) robot.angle = robot.angle - 360;
+      angle_turn = module((-robot.angle_yaw + start_angle), 360);
+      //if ((angle_turn > 180) and (angle_turn < 360)) angle_turn = angle_turn - 360;
     }
     //digitalWrite(LED2, LOW);
-    
-    err = target_angle - robot.angle;
-    u = err * kp;
+
+    err_turn = target_angle - angle_turn;
+    u = err_turn * kp;
+    ui = ui + err_turn * ki;
     if (abs(u) > max_v) {
       if (u > 0) u = max_v;
       else if (u < 0) u = -max_v;
@@ -121,8 +137,8 @@ void turnAngle(int target_angle, int max_v, int min_v) {
       if (u > 0) u = min_v;
       else if (u < 0) u = -min_v;
     }
-    robot.v1_target = -u;
-    robot.v2_target = u;
+    robot.v1_target = -u - ui;
+    robot.v2_target = u + ui;
     motorsCorrectedSpeed();
     display.clearDisplay();
 
@@ -130,7 +146,7 @@ void turnAngle(int target_angle, int max_v, int min_v) {
     display.setCursor(0, 0);
     display.println(String(start_angle));
     display.setCursor(0, 10);
-    display.println(String(robot.angle));
+    display.println(String(angle_turn));
     display.setCursor(0, 20);
     display.println(String(bufferGyro[0]) + " " + String(bufferGyro[1]) + " " + String(bufferGyro[2]));
     display.display();
@@ -141,9 +157,10 @@ void turnAngle(int target_angle, int max_v, int min_v) {
   display.clearDisplay();
 
   display.setTextSize(1);
-  display.setCursor(0, 0);
+  display.setCursor(0, 30);
+  display.println("stop");
   display.display();
-  delay(5000);
+  delay(1500);
   display.clearDisplay();
   display.display();
 }

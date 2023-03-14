@@ -84,3 +84,15 @@ int module(int a, int mode) {
   return 0;
  
 }
+
+void GyroUARTClear(){
+  while(GyroUART.available() > 0) {
+    char t = GyroUART.read();
+  }
+}
+
+void CamUARTClear(){
+  while(CamUART.available() > 0) {
+    char t = CamUART.read();
+  }
+}

@@ -15,8 +15,8 @@ clock = time.clock()
 uart = UART(3, 9600)
 last_clock = 0
 
-green_thresholds = [37, 55, -128, -11, -128, 127] #порог зеленого цвета
-black_thresholds = [0, 25, -128, 5, -128, 127] #порог черного цвета
+green_thresholds = [40, 56, -128, -10, -128, 127] #порог зеленого цвета
+black_thresholds = [0, 20, -128, 127, -128, 127] #порог черного цвета
 yellow_thresholds = [0, 100, -128, 127, -128, 67]
 line_count = 25
 
@@ -25,15 +25,15 @@ x_size = 160
 y_size = 120
 
 y_k = 0.4
-delta_x = 20
-ky_regression = 0.5
-kx_regression =0.25
+delta_x = -5
+ky_regression = 0.4
+kx_regression =0.15
 
 min_area = 40
 min_pixels = 40
 
-ky_green = 0.4
-kx_green = 0.45
+ky_green = 0.5
+kx_green = 0.4
 
 
 dir_turn = 0
@@ -81,8 +81,8 @@ while(True):
     #img.mean(4)
     left_roi = (0, round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)))
     right_roi = (round(x_size/2+delta_x), round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)))
-    #img.draw_rectangle(0, round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)), (255,255,0),2,False)
-    #img.draw_rectangle(round(x_size/2+delta_x), round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)), (0,255,255),2,False)
+    img.draw_rectangle(0, round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)), (255,255,0),2,False)
+    img.draw_rectangle(round(x_size/2+delta_x), round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)), (0,255,255),2,False)
 
     green_marker_left = img.find_blobs([green_thresholds], area_threshold = min_area, pixels_threshold = min_pixels, roi=left_roi)
     green_marker_right = img.find_blobs([green_thresholds], area_threshold = min_area, pixels_threshold = min_pixels, roi=right_roi)
@@ -223,6 +223,7 @@ while(True):
     time.sleep_ms(10)
     uart.write(";")
     time.sleep_ms(10)
+    #print(dir_turn)
     #time.sleep_ms(5)
     #uart.sendbreak()
     #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(126)+"/;")
