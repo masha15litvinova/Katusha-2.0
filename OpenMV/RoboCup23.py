@@ -15,8 +15,8 @@ clock = time.clock()
 uart = UART(3, 9600)
 last_clock = 0
 
-green_thresholds = [40, 56, -128, -10, -128, 127] #порог зеленого цвета
-black_thresholds = [0, 20, -128, 127, -128, 127] #порог черного цвета
+green_thresholds = [52, 91, -128, -7, -128, 127] #порог зеленого цвета
+black_thresholds = [0, 18, -128, 127, -128, 127] #порог черного цвета
 yellow_thresholds = [0, 100, -128, 127, -128, 67]
 line_count = 25
 
@@ -24,14 +24,15 @@ line_count = 25
 x_size = 160
 y_size = 120
 
-y_k = 0.4
-delta_x = -5
+y_k = 0.7
+x_k = 0.2
+delta_x = 2
+delta_y = 5
 ky_regression = 0.4
 kx_regression =0.15
 
-min_area = 40
-min_pixels = 40
-
+min_area = 80
+min_pixels = 80
 ky_green = 0.5
 kx_green = 0.4
 
@@ -77,18 +78,32 @@ while(True):
 
     # Gamma, contrast, and brightness correction are applied to each color channel. The
     # values are scaled to the range per color channel per image type...
-    img = sensor.snapshot().gamma_corr(gamma = 1.0, contrast = 1.0, brightness = 0.0)#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
+    img = sensor.snapshot().gamma_corr(gamma = 0.7, contrast = 3.0, brightness = 0.1)#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
     #img.mean(4)
-    left_roi = (0, round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)))
-    right_roi = (round(x_size/2+delta_x), round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)))
-    img.draw_rectangle(0, round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)), (255,255,0),2,False)
-    img.draw_rectangle(round(x_size/2+delta_x), round(y_size*y_k), round(x_size/2-delta_x), round(y_size*(1-y_k)), (0,255,255),2,False)
+    left_roi = (round(x_size*x_k), round(y_size*y_k)-delta_y, round(x_size/2-x_size*x_k-delta_x), round(y_size*(1-y_k)))
+    right_roi = (round(x_size/2+delta_x), round(y_size*y_k)-delta_y, round(x_size/2-x_size*x_k-delta_x), round(y_size*(1-y_k)))
+    img.draw_rectangle(left_roi[0], left_roi[1], left_roi[2], left_roi[3], (0,0,0),2,False)
+    img.draw_rectangle(right_roi[0], right_roi[1], right_roi[2], right_roi[3], (0,0,0),2,False)
 
     green_marker_left = img.find_blobs([green_thresholds], area_threshold = min_area, pixels_threshold = min_pixels, roi=left_roi)
     green_marker_right = img.find_blobs([green_thresholds], area_threshold = min_area, pixels_threshold = min_pixels, roi=right_roi)
 
+    left = 0
+    right = 0
 
-
+    for gl in green_marker_left:
+        pix = (gl.cx(), gl.cy()-8)
+        if(sum(img.get_pixel(pix[0], pix[1]))>250):
+            left += 1
+    for gr in green_marker_right:
+        pix = (gr.cx(), gr.cy()-8)
+        if(sum(img.get_pixel(pix[0], pix[1]))>250):
+            right += 1
+    '''for gml in green_marker_left:
+        width = 30
+        height = 15
+        roi_black = (max(min(round(gml.cx()-gml.w()/2),round(x_size)),0), max(min(round(gml.cy()-gml.h()/2-height),round(y_size/2)), 0), width, height)
+        img.draw_rectangle(roi_black[0], roi_black[1], roi_black[2], roi_black[3],(255,0,0), 2)'''
 
 
     '''if(len(green_marker_left)>0):
@@ -99,16 +114,16 @@ while(True):
          for gr in green_marker_right:
              img.draw_edges(gr.min_corners(), color=(255,0,0))
              img.draw_circle(gr.cx(), gl.cy(), 3, (255,0,0),2,True)'''
-    if(len(green_marker_left)>0)and(len(green_marker_right)>0):
+    if(left>0)and(right>0):
         dir_turn = 0
         img.draw_string(10, 10, "backward",(255,0,0),2)
-    elif(len(green_marker_left)==0)and(len(green_marker_right)>0):
+    elif(left==0)and(right>0):
         dir_turn = 1
         img.draw_string(10, 10, "right",(255,0,0),2)
-    elif(len(green_marker_left)>0)and(len(green_marker_right)==0):
+    elif(left>0)and(right==0):
         dir_turn = 2
         img.draw_string(10, 10, "left",(255,0,0),2)
-    elif(len(green_marker_left)==0)and(len(green_marker_right)==0):
+    elif(left==0)and(right==0):
         dir_turn = 3
         img.draw_string(10, 10, "no",(255,0,0),2)
 
@@ -142,7 +157,7 @@ while(True):
 
 
     new_img = img
-    new_img.binary([yellow_thresholds])
+    #new_img.binary([yellow_thresholds])
     line_get = new_img.get_regression([(0,0)], robust=True,roi=regression_roi, x_stride=1, y_stride = 1)
 
     if (line_get):
@@ -223,7 +238,7 @@ while(True):
     time.sleep_ms(10)
     uart.write(";")
     time.sleep_ms(10)
-    #print(dir_turn)
+    print(dir_turn)
     #time.sleep_ms(5)
     #uart.sendbreak()
     #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(126)+"/;")

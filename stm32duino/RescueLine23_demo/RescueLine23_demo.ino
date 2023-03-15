@@ -42,7 +42,7 @@ uint32_t distance2 = 1000;
 uint32_t distance3;
 uint32_t distance4;
 
-float weights[6] = { -30, -25, -17, 17, 25, 30 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -1, -1, -1, 1, 1, 1 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 float weights_sum = 0;
 
 
@@ -51,7 +51,7 @@ float weights_sum = 0;
 //float kd_line[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};//{ -1.5, -1.3, -1.1, 1.1, 1.3, 1.5 };
 
 
-float min_err_i = 8.5;
+float min_err_i = 0.01;
 
 float err_line_sens = 0;
 float err_old_line_sens = 0;
@@ -195,7 +195,7 @@ void setup() {
   //initButtonsIRQs();
 
 
-  weights_sum = abs(weights[0]+weights[1]+weights[2]);
+  weights_sum = abs(weights[0] + weights[1] + weights[2]);
 
 
 
@@ -212,7 +212,7 @@ void setup() {
   CamUART.setRx(RX6);
   CamUART.setTx(TX6);
 
-  GyroUART.begin(9600);
+  GyroUART.begin(115200);
   CamUART.begin(9600);
 
   display.begin(0, true);
@@ -228,7 +228,7 @@ void setup() {
   initColorSensors();
 
   initGyro();
-  
+
   display.clearDisplay();
   display.display();
   ledBlinking();
@@ -271,17 +271,20 @@ void loop() {
         display.clearDisplay();
         display.setTextSize(1);
         display.setCursor(0, 0);
-        display.println("Calibration");
-        display.setCursor(0, 10);
-        display.println("light sensors");
+        display.println("Calibrate line");
+
         display.display();
         calibration();
+        display.setCursor(0, 10);
+        display.println("White and black:");
         display.setCursor(0, 20);
-        display.println("Grey:");
+        display.println(String(white[0]) + " " + String(white[1]) + " " + String(white[2]));
         display.setCursor(0, 30);
-        display.println(String(grey[0]) + " " + String(grey[1]) + " " + String(grey[2]));
+        display.println(String(white[3]) + " " + String(white[4]) + " " + String(white[5]));
         display.setCursor(0, 40);
-        display.println(String(grey[3]) + " " + String(grey[4]) + " " + String(grey[5]));
+        display.println(String(black[0]) + " " + String(black[1]) + " " + String(black[2]));
+        display.setCursor(0, 50);
+        display.println(String(black[3]) + " " + String(black[4]) + " " + String(black[5]));
         display.display();
         delay(3000);
         state_robot = STOP_SCREEN0;
@@ -307,10 +310,10 @@ void loop() {
         robot.up_line = 0;
         robot.ud_line = 0;
         err_line_sens = 0;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
           // err_line_sens = err_line_sens + robot.sensors[i] * weights[i];
 
-          err_line_sens = err_line_sens + robot.sensors_analog[i] * weights[i]/abs(weights_sum);
+          err_line_sens = err_line_sens + robot.sensors_analog[i] * weights[i] / abs(weights_sum);
         }
 
         robot.up_line = err_line_sens * robot.kp_line + err_line_sens * err_line_sens * err_line_sens * robot.kcube_line;
@@ -366,6 +369,7 @@ void loop() {
           robot.camLineAngle = map(bufferCam[0], 0, 255, -91, 91);
           if (bufferCam[1] != 3) {
             robot.camDir = bufferCam[1];
+            robot.turn_detected = true;
           }
           robot.camLineDev = map(bufferCam[2], 0, 255, -CAM_X_SIZE / 2, CAM_X_SIZE / 2);
         }
@@ -405,8 +409,9 @@ void loop() {
           break;
           }*/
 
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) == 6)  //условие перекрестка
+        if (((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) >= 5) and robot.turn_detected)  //условие перекрестка
         {
+         
           motors(0, 0);
           delay(300);
           state_robot = COLOR_READ_DATA;
@@ -433,6 +438,7 @@ void loop() {
       }
     case (LINE_READ_DATA):
       {
+        bool analog = true;
         display.clearDisplay();
 
         analogWrite(PWM_LIGHTS, PWM_LEDS);
@@ -444,17 +450,24 @@ void loop() {
         s[4] = analogRead(SENSOR5);
         s[5] = analogRead(SENSOR6);
         for (int i = 0; i < 6; i++) {
-          robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100)/100;
+          robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
         }
         int grey_scaled = 24;
 
         for (int i = 0; i < 6; i++) {
           if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
             robot.sensors[i] = 1;
-            display.fillRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+            //display.fillRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
           } else {
             robot.sensors[i] = 0;
-            display.drawRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+            // display.drawRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+          }
+          //display.drawRect(10 + i * 15, 30, 7, 15, SH110X_WHITE);
+          if (analog) {
+            for (int i = 0; i < 6; i++) {
+              int x = map(s[i], white[i], black[i], 0, 100);
+              //display.fillRect(10 + i * 15, 30, 7, map(x, 0, 100, 0, 15), SH110X_WHITE);
+            }
           }
           //robot.sensors[i] = map(s[i], white[i], black[i], 0, 100)/100.0;  //приведение к одному диапазону, т.к. разные поверхности по-разному отражают
           //-->где-то ошибка больше, поэтому скорость больше
@@ -758,25 +771,25 @@ void loop() {
 
         digitalWrite(LED1, LOW);
 
-       // turnAngle(-179, 60, 40);
+        // turnAngle(-179, 60, 40);
 
         switch (dir) {
           case (0):
             {
-              turnAngle(-179, 60, 40);
-
+              turnAngle(-179, 50, 35);
+              robot.turn_detected = false;
               break;
             }
           case (1):
             {
-              turnAngle(-90, 60, 40);
-
+              turnAngle(-90, 50, 35);
+              robot.turn_detected = false;
               break;
             }
           case (2):
             {
-              turnAngle(90, 60, 40);
-
+              turnAngle(90, 50, 35);
+              robot.turn_detected = false;
               break;
             }
           default:
@@ -805,6 +818,11 @@ void loop() {
         robot.sensors[3] = 0;
         robot.sensors[4] = 0;
         robot.sensors[5] = 0;
+        display.clearDisplay();
+        display.setTextSize(2);
+        display.setCursor(0, 0);
+        display.println("GO...");
+        display.display();
         break;
       }
     case (COLOR_READ_DATA):

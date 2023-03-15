@@ -36,7 +36,7 @@ byte calibrated = 0;
 
 void setup() {
   //SerialPort.begin(9600);
-  Serial1.begin(9600);
+  Serial1.begin(115200);
   pinMode(LEDPIN, OUTPUT);
   // Call imu.begin() to verify communication and initialize
   if (imu.begin() != INV_SUCCESS) {
@@ -103,21 +103,29 @@ void loop() {
   //delay(10);
   digitalWrite(LEDPIN, HIGH);
   Serial1.print(':');
-  delay(6);
+  Serial1.flush();
+  delay(1);
   Serial1.print(angle_y);
-  delay(6);
+  Serial1.flush();
+  delay(1);
   Serial1.print('/');
-  delay(6);
+  Serial1.flush();
+  delay(1);
   Serial1.print(angle_p);
-  delay(6);
+  Serial1.flush();
+  delay(1);
   Serial1.print('/');
-  delay(6);
+  Serial1.flush();
+  delay(1);
   Serial1.print(calibrated);
-  delay(6);
+  Serial1.flush();
+  delay(1);
   Serial1.print('/');
-  delay(6);
+  Serial1.flush();
+  delay(1);
   Serial1.print(';');
-  delay(6);
+  Serial1.flush();
+  delay(1);
   digitalWrite(LEDPIN, LOW);
   /*Serial1.write(':');
   delay(5);

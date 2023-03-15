@@ -38,7 +38,7 @@ int parsingGyro() { /* :yaw/pitch/started/;   */
   static String numberg = "";
   if (GyroUART.available()) {
     char in = GyroUART.read();
-    
+
     if (in == ';') {  // завершение пакета
       parseStartg = false;
       return counterg;
@@ -72,8 +72,8 @@ void GyroUpdate() {
 
     robot.angle = module((robot.angle_pitch - robot.start_angle_p), 360);
   }
-  
- /* if (parsingGyro()) {
+
+  /* if (parsingGyro()) {
     robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
     robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
   }*/
@@ -82,17 +82,33 @@ int module(int a, int mode) {
   if (a >= 0) return a % mode;
   else return (mode + a % mode);
   return 0;
- 
 }
 
-void GyroUARTClear(){
-  while(GyroUART.available() > 0) {
+int conv_angle(int a, int start) {
+  int x1 = a - start;
+  int x2 = a - start + 360;
+  int x3 = a - start - 360;
+  int minimum = abs(x1);
+  if (abs(x2) < minimum) minimum = abs(x2);
+  if (abs(x3) < minimum) minimum = abs(x3);
+  
+
+
+
+    if ((abs(x1) == minimum)) return x1;
+    if ((abs(x2) == minimum)) return x2;
+    if ((abs(x3) == minimum)) return x3;
+    return 0;
+}
+
+void GyroUARTClear() {
+  while (GyroUART.available() > 0) {
     char t = GyroUART.read();
   }
 }
 
-void CamUARTClear(){
-  while(CamUART.available() > 0) {
+void CamUARTClear() {
+  while (CamUART.available() > 0) {
     char t = CamUART.read();
   }
 }

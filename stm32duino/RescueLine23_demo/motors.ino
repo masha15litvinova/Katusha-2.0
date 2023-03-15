@@ -78,3 +78,33 @@ void sliders(int m1, int m2) {
     //pwm_start(MOTOR4_2, 16000, -m2, RESOLUTION_8B_COMPARE_FORMAT);
   }
 }
+
+void move_forward(int enc, int v) {
+  robot.motor1 = 0;
+  robot.motor2 = 0;
+  robot.ui1 = 0;
+  robot.ui2 = 0;
+  int e1 = Enc1();
+
+  while ((Enc1() - e1) < enc) {
+    robot.v1_target = v;
+    robot.v2_target = v;
+    motorsCorrectedSpeed();
+    delay(5);
+  }
+  motors(0, 0);
+}
+void move_backward(int enc, int v) {
+  robot.motor1 = 0;
+  robot.motor2 = 0;
+  robot.ui1 = 0;
+  robot.ui2 = 0;
+  int e1 = Enc1();
+  while ((Enc1() - e1) > -enc) {
+    robot.v1_target = -v;
+    robot.v2_target = -v;
+    motorsCorrectedSpeed();
+    delay(5);
+  }
+  motors(0, 0);
+}

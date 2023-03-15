@@ -87,30 +87,40 @@ float ki_gyro = 0.01;
 
 
 void turnAngle(int target_angle, int max_v, int min_v) {
+  robot.motor1 = 0;
+  robot.motor2 = 0;
+  robot.ui1 = 0;
+  robot.ui2 = 0;
   GyroUARTClear();
   if (target_angle < -180) target_angle = -180;
   if (target_angle > 180) target_angle = 180;
-  while (!GyroUART.available()) {}
-  while (!parsingGyro()) {}
-  /*display.setCursor(0, 10);
-  display.println("buffer: " + String(bufferGyro[0]) + " " + String(bufferGyro[1]) + " " + String(bufferGyro[2]));
-  display.display();
-  delay(1000);*/
-  robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-  robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+  for (int i = 0; i < 5; i++) {
+    while (1) {
+      if (parsingGyro()) {
+        robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+        robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+
+        break;
+      }
+    }
+  }
+
+
   int start_angle = robot.angle_yaw;
   int err_turn = target_angle;
   int u = 0;
   int ui = 0;
-  float kp = -1.0;
-  float ki = -0.001;
+  float kp = 1.0;
+  float ki = 0.001;
   int angle_turn = 0;
-
+  display.clearDisplay();
   display.setTextSize(1);
   display.setCursor(0, 20);
-  display.println("err_turn: " + String(err_turn));
+  display.println("err: " + String(err_turn));
   display.setCursor(0, 30);
-  display.println("start_angle: " + String(start_angle));
+  display.println("start: " + String(start_angle));
+  display.setCursor(0, 30);
+  display.println("yaw_angle: " + String(robot.angle_yaw));
   display.display();
   delay(1000);
   display.clearDisplay();
@@ -121,11 +131,10 @@ void turnAngle(int target_angle, int max_v, int min_v) {
       digitalWrite(LED1, HIGH);
       robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
       robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
-      angle_turn = module((-robot.angle_yaw + start_angle), 360);
+      angle_turn = conv_angle(robot.angle_yaw, start_angle);
       //if ((angle_turn > 180) and (angle_turn < 360)) angle_turn = angle_turn - 360;
     }
     //digitalWrite(LED2, LOW);
-
     err_turn = target_angle - angle_turn;
     u = err_turn * kp;
     ui = ui + err_turn * ki;
@@ -148,7 +157,7 @@ void turnAngle(int target_angle, int max_v, int min_v) {
     display.setCursor(0, 10);
     display.println(String(angle_turn));
     display.setCursor(0, 20);
-    display.println(String(bufferGyro[0]) + " " + String(bufferGyro[1]) + " " + String(bufferGyro[2]));
+    display.println(String(robot.angle_yaw));
     display.display();
   }
   robot.v1_target = 0;

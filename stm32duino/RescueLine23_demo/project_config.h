@@ -40,7 +40,7 @@
 
 
 #define DELAY_CALIBR_4 4000
-#define PWM_LEDS 100
+#define PWM_LEDS 40
 
 #define HIGH_SPEED  //tcs
 
