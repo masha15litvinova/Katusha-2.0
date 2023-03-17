@@ -56,6 +56,7 @@ void setup() {
 byte angle_y = 0;
 byte angle_p = 0;
 byte angle_r = 0;
+long int time_send = millis();
 void loop() {
   // Check for new data in the FIFO
   if (imu.fifoAvailable()) {
@@ -65,22 +66,12 @@ void loop() {
       // quaternion values -- to estimate roll, pitch, and yaw
       imu.computeEulerAngles();
       imu.update(UPDATE_ACCEL | UPDATE_GYRO | UPDATE_COMPASS);
-      printIMUData();
+      if ((millis() - time_send) > 40) {
+        printIMUData();
+        time_send = millis();
+      }
     }
   }
-  float accelX = imu.calcAccel(imu.ax);
-  float accelY = imu.calcAccel(imu.ay);
-  float accelZ = imu.calcAccel(imu.az);
-  float gyroX = imu.calcGyro(imu.gx);
-  float gyroY = imu.calcGyro(imu.gy);
-  float gyroZ = imu.calcGyro(imu.gz);
-  float magX = imu.calcMag(imu.mx);
-  float magY = imu.calcMag(imu.my);
-  float magZ = imu.calcMag(imu.mz);
-  int pitch_robot = round(atan(accelY / accelZ) * 180 / PI);
-  byte send_pitch = map(pitch_robot, -90, 90, 0, 255);
-  if ((millis() - time_begin) > 30000) calibrated = 1;
-
   if (Serial1.available()) {
     byte signal = Serial1.read();
     if (signal == 1) {
@@ -93,27 +84,8 @@ void loop() {
       send = true;
     }
   }
-  if (send) {
-    digitalWrite(LEDPIN, HIGH);
-    Serial1.print(':');
-    delay(7);
-    Serial1.print(angle_y);
-    delay(7);
-    Serial1.print('/');
-    delay(7);
-    Serial1.print(send_pitch);
-    delay(7);
-    Serial1.print('/');
-    delay(7);
-    Serial1.print(calibrated);
-    delay(7);
-    Serial1.print('/');
-    delay(7);
-    Serial1.print(';');
-    delay(7);
-    digitalWrite(LEDPIN, LOW);
-  }
-  /*Serial1.write(':');
+}
+/*Serial1.write(':');
   delay(5);
   Serial1.write((angle_y));
   delay(5);
@@ -129,7 +101,7 @@ void loop() {
   delay(5);
   Serial1.write(';');
   delay(5);*/
-}
+
 
 void printIMUData(void) {
   digitalWrite(LEDPIN, OUTPUT);
@@ -149,4 +121,39 @@ void printIMUData(void) {
   angle_y = map(yaw1, 0, 360, 0, 255);
   angle_p = map(pitch1, 0, 360, 0, 255);
   angle_r = map(roll1, 0, 360, 0, 255);
+
+  float accelX = imu.calcAccel(imu.ax);
+  float accelY = imu.calcAccel(imu.ay);
+  float accelZ = imu.calcAccel(imu.az);
+  float gyroX = imu.calcGyro(imu.gx);
+  float gyroY = imu.calcGyro(imu.gy);
+  float gyroZ = imu.calcGyro(imu.gz);
+  float magX = imu.calcMag(imu.mx);
+  float magY = imu.calcMag(imu.my);
+  float magZ = imu.calcMag(imu.mz);
+  int pitch_robot = round(atan(accelY / accelZ) * 180 / PI);
+  byte send_pitch = map(pitch_robot, -180, 180, 0, 255);
+  if ((millis() - time_begin) > 30000) calibrated = 1;
+
+
+  if (send) {
+    digitalWrite(LEDPIN, HIGH);
+    Serial1.print(':');
+
+    Serial1.print(angle_y);
+
+    Serial1.print('/');
+
+    Serial1.print(send_pitch);
+
+    Serial1.print('/');
+
+    Serial1.print(calibrated);
+
+    Serial1.print('/');
+
+    Serial1.print(';');
+
+    digitalWrite(LEDPIN, LOW);
+  }
 }

@@ -39,6 +39,7 @@
 #define V_GRAB_BALL 80
 #define V_MIN 20
 
+#define ANGLE_GORKA 20
 
 #define DELAY_CALIBR_4 4000
 #define PWM_LEDS 40

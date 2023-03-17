@@ -8,7 +8,7 @@ int direction_color() {
 
 
   vyravn();
-  move_backward(50, 50);
+  move_backward(35, 50);
 vyravn();
   //0 - разворот на 180
   //1 - направо
@@ -71,7 +71,7 @@ vyravn();
   else if (dir1 = 2) display.print("LEFT");
   else display.print("NO");
   display.display();
-  move_forward(580, 60);
+  move_forward(530, 60);
   vyravn();
   delay(500);
   return dir1;

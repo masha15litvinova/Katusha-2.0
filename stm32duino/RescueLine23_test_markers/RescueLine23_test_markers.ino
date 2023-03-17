@@ -376,9 +376,12 @@ void loop() {
         }*/
         if (parsingGyro()) {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, -180, 180);
         }
 
+        if (abs(robot.angle_pitch) < 6) robot.v = V_MAIN;
+        else if (robot.angle_pitch > ANGLE_GORKA) robot.v = V_GORKA_UP;
+        else if (robot.angle_pitch < -ANGLE_GORKA) robot.v = V_GORKA_DOWN;
 
         if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 5))  //условие перекрестка
         {
@@ -387,6 +390,7 @@ void loop() {
           state_robot = COLOR_READ_DATA;
           StopGyro();
         }
+        
         break;
       }
     case (MOTORS_PWM_COMPUTE):
@@ -525,7 +529,7 @@ void loop() {
         CamUARTClear();
         StartGyro();
         delay(200);
-        state_robot=LINE;
+        state_robot = LINE;
         break;
       }
     case (STOP_SCREEN1):
