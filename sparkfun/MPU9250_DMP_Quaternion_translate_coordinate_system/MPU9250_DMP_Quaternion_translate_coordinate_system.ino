@@ -83,7 +83,7 @@ void loop() {
   float y3 = x2 * sin(yaw_0) + y2 * cos(yaw_0);
   float z3 = z2;
 
-  float pitch_corrected = asin(z3)*180/PI;  //asin(z3) * 180 / PI;  //vectors_angle(1, 0, 0, x3, y3, z3);
+  float pitch_corrected = asin(z3) * 180 / PI;  //asin(z3) * 180 / PI;  //vectors_angle(1, 0, 0, x3, y3, z3);
 
 
   if (calibrated) {
@@ -139,17 +139,3 @@ int conv_angle(int angle, int start) {
   if (abs(x3) == minimum) return x3;
   return 0;
 }
-
-public class RotationMatrix 
-{
-    public double r11 = 0;  //First row
-    public double r12 = 0;
-    public double r13 = 0;
-    public double r21 = 0;  //Second row
-    public double r22 = 0;
-    public double r23 = 0;
-    public double r31 = 0;  //Third row
-    public double r32 = 0;
-    public double r33 = 0;
-}
-
