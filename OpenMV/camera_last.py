@@ -14,7 +14,7 @@ class greenSquares():
 
     global x_size
     global y_size
-    green_thresholds = [26, 50, -128, -14, -128, 127] #порог зеленого цвета
+    green_thresholds = [21, 91, -128, -7, -128, 127] #порог зеленого цвета
     black_thresholds = [0, 25, -128, 34, -128, 41] #порог черного цвета
     min_area = 1200    #минимальная площадь квадратов
     min_pixels = 1200
@@ -542,14 +542,18 @@ while(True):
         gS.convert_vertices_order()
         #print("m_array_converted =", gS.m_array_converted)
         gS.count_angles()
+        if(len(gS.angles_array)!=0):
+            if((gS.angles_array[0])>=0):
+                new_img = img.rotation_corr(z_rotation=gS.angles_array[0])
 
         gS.perimeter_colors()
         #print("perimeter_colors =", gS.perimeter_array)
         #print("perimeter_array =", gS.perimeter_array)
         direction = gS.turn_direction()
+        sensor.flush()
 
         #print("direction =", direction)
-        lines = Line(img)
+        '''lines = Line(img)
         lines.approx_line()
 
 
@@ -572,7 +576,8 @@ while(True):
 
 
     else:
-        balls = Balls(img)
+        balls = Balls(img)'''
+
 
 
 
