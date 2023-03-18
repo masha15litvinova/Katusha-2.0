@@ -27,5 +27,5 @@ while(True):
         img = sensor.snapshot()
         img.draw_rectangle(roi_image[0], roi_image[1], roi_image[2], roi_image[3], (255,0,0), 2)
         img.save('pictures/'+str(i),roi_image,quality=100)
-        time.sleep_ms(100)
+        time.sleep_ms(150)
     machine.deepsleep()
