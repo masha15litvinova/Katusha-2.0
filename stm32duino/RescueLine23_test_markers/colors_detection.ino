@@ -8,8 +8,9 @@ int direction_color() {
 
 
   vyravn();
-  move_backward(35, 50);
-vyravn();
+  //move_forward(10, 50);
+  move_backward(5, 50);
+  //vyravn();
   //0 - разворот на 180
   //1 - направо
   //2 - налево
@@ -25,53 +26,73 @@ vyravn();
   delay(154);  // Delay for one new integ. time period (to allow new reading)
   tcs1.getRawData(&r1, &g1, &b1, &c1);
   digitalWrite(LED2, LOW);
+  uint32_t sum1 = r1 + g1 + b1;
+
+  /*r1 = (100 * r1) / sum1;
+  g1 = (100 * g1) / sum1;
+  b1 = (100 * b1) / sum1;*/
+
   display.setCursor(0, 20);
-  display.print("Right: " + String(g1));
+  display.print("Right: " + String(r1) + " " + String(g1) + " " + String(b1));
   tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_154MS);
   delay(300);  // Delay for one old integ. time period (to finish old reading)
   delay(154);  // Delay for one new integ. time period (to allow new reading)
   tcs2.getRawData(&r2, &g2, &b2, &c2);
   digitalWrite(LED2, HIGH);
+  uint32_t sum2 = r2 + g2 + b2;
+  /*r2 = (100 * r2) / sum2;
+  g2 = (100 * g2) / sum2;
+  b2 = (100 * b2) / sum2;*/
+
   display.setCursor(0, 30);
-  display.print("Left: " + String(g2));
+  display.print("Left: " + String(r2) + " " + String(g2) + " " + String(b2));
   display.display();
   display.setTextSize(2);
   display.setCursor(0, 50);
-  if ((g1 < GREEN_HIGH_R) and (g1 > GREEN_LOW_R) and (g2 < GREEN_HIGH_L) and (g2 > GREEN_LOW_L) and (r2 < BLUE_RED_HIGH) and (r1 < BLUE_RED_HIGH) and (b2 < BLUE_RED_HIGH) and (b1 < BLUE_RED_HIGH)) {
+  if ((g2 > 160) and (g1 > 160)) {
+    dir1 = 3;
+  } else if ((g1 < GREEN_HIGH_R) and (g1 > GREEN_LOW_R) and (g2 < GREEN_HIGH_L) and (g2 > GREEN_LOW_L) and (r2 < BLUE_RED_HIGH) and (r1 < BLUE_RED_HIGH)) {
     dir1 = 0;
-
-
-
-  } else if ((g1 < GREEN_HIGH_R) and (g1 > GREEN_LOW_R) and (r1 < BLUE_RED_HIGH) and (b1 < BLUE_RED_HIGH)) {
+  } else if ((g1 < GREEN_HIGH_R) and (g1 > GREEN_LOW_R) and (r1 < BLUE_RED_HIGH)) {
     dir1 = 1;
-
-  } else if ((g2 < GREEN_HIGH_L) and (g2 > GREEN_LOW_L) and (r2 < BLUE_RED_HIGH) and (b2 < BLUE_RED_HIGH)) {
+  } else if ((g2 < GREEN_HIGH_L) and (g2 > GREEN_LOW_L) and (r2 < BLUE_RED_HIGH)) {
     dir1 = 2;
-
   } else {
     dir1 = 3;
   }
+
+  /*if ((g1 > 60) and (g2 > 60)) {
+    dir1 = 0;
+  } else if ((g1 > 60)) {
+    dir1 = 1;
+  } else if ((g2 > 60)) {
+    dir1 = 2;
+  }*/
+
+  delay(1000);
   display.display();
-
-
-
   motors(0, 0);
-
-  move_backward(400, 60);
-
+  /*move_backward(400, 60);
   delay(500);
   CamUARTClear();
   while (!parsingCam()) {}
+  for (int i = 0; i < 5; i++) {
+    while (1) {
+      if (parsingCam()) {
+        break;
+      }
+    }
+  }
   robot.camDir = bufferCam[1];
-  //if (robot.camDir != 3) dir = robot.camDir;
-  robot.camDir = 3;
+  //if (robot.camDir != 3) dir1 = robot.camDir;
+  robot.camDir = 3;*/
 
   if (dir1 == 0) display.print("BACK");
   else if (dir1 == 1) display.print("RIGHT");
   else if (dir1 = 2) display.print("LEFT");
   else display.print("NO");
   display.display();
-  move_forward(530, 60);
+  move_forward(130, 60);
   vyravn();
   delay(500);
   return dir1;
@@ -154,7 +175,7 @@ void vyravn() {
   else if ((yaw_now >= 0) and (yaw_now <= 90)) turnAngle(90 - yaw_now, 35, 25);
   else if ((yaw_now >= 0) and (yaw_now <= 135)) turnAngle(90 - yaw_now, 35, 25);
   else if ((yaw_now >= 0) and (yaw_now <= 180)) turnAngle(180 - yaw_now, 35, 25);
-  else if ((yaw_now <  0) and (yaw_now >= -45)) turnAngle(-yaw_now, 35, 25);
+  else if ((yaw_now < 0) and (yaw_now >= -45)) turnAngle(-yaw_now, 35, 25);
   else if ((yaw_now < 0) and (yaw_now >= -90)) turnAngle(-90 - yaw_now, 35, 25);
   else if ((yaw_now < 0) and (yaw_now >= -135)) turnAngle(-90 - yaw_now, 35, 25);
   else if ((yaw_now < 0) and (yaw_now >= -180)) turnAngle(-180 - yaw_now, 35, 25);

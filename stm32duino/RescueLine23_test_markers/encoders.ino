@@ -1,6 +1,6 @@
-#define SPEED_COEFF_P 2.4//4.5   //1.0
+#define SPEED_COEFF_P 2.5//4.5   //1.0
 #define SPEED_COEFF_D 0.09//0.5   //0.8//0.8//0.8//0.3  //13
-#define SPEED_COEFF_I 0.35//0.08//0.043  //0.06
+#define SPEED_COEFF_I 0.39//0.08//0.043  //0.06
 #define SPEED_COEFF_CUBE 0
 
 #define CPR 1050

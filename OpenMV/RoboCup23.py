@@ -15,11 +15,11 @@ clock = time.clock()
 uart = UART(3, 9600)
 last_clock = 0
 
-green_thresholds = [52, 91, -128, -7, -128, 127] #порог зеленого цвета
-black_thresholds = [0, 18, -128, 127, -128, 127] #порог черного цвета
+green_thresholds = [40, 92, -128, -15, -128, 127] #порог зеленого цвета
+black_thresholds = [0, 28, -119, 127, -128, 127] #порог черного цвета
 yellow_thresholds = [0, 100, -128, 127, -128, 67]
 line_count = 25
-
+segments_count = 30
 
 x_size = 160
 y_size = 120
@@ -31,8 +31,8 @@ delta_y = 5
 ky_regression = 0.4
 kx_regression =0.15
 
-min_area = 80
-min_pixels = 80
+min_area = 160
+min_pixels = 160
 ky_green = 0.5
 kx_green = 0.4
 
@@ -46,6 +46,7 @@ dir_turn = 0
 '''
 
 line_rois = []
+segments_rois = []
 center_blob_pos = [round(x_size/2), y_size]
 angle = 0
 linear_dev = 0
@@ -73,20 +74,28 @@ for i in range(line_count-1,-1,-1):
     w =  1
     line_rois.append((round(x_size*k_line), round(i*y_size/line_count), round(x_size*(1-2*k_line)), round(y_size/line_count),w))
     weight_sum+=w
+for i in range(segments_count):
+
+    segments_rois.append((0, round(i*y_size/line_count), x_size, round(y_size/line_count)))
+
 while(True):
     clock.tick()
 
     # Gamma, contrast, and brightness correction are applied to each color channel. The
     # values are scaled to the range per color channel per image type...
-    img = sensor.snapshot().gamma_corr(gamma = 0.7, contrast = 3.0, brightness = 0.1)#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
+    img = sensor.snapshot().gamma_corr(gamma = 0.7, contrast = 3.0, brightness = 0.0)#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
     #img.mean(4)
     left_roi = (round(x_size*x_k), round(y_size*y_k)-delta_y, round(x_size/2-x_size*x_k-delta_x), round(y_size*(1-y_k)))
     right_roi = (round(x_size/2+delta_x), round(y_size*y_k)-delta_y, round(x_size/2-x_size*x_k-delta_x), round(y_size*(1-y_k)))
-    img.draw_rectangle(left_roi[0], left_roi[1], left_roi[2], left_roi[3], (0,0,0),2,False)
-    img.draw_rectangle(right_roi[0], right_roi[1], right_roi[2], right_roi[3], (0,0,0),2,False)
+    #img.draw_rectangle(left_roi[0], left_roi[1], left_roi[2], left_roi[3], (0,0,0),2,False)
+    #img.draw_rectangle(right_roi[0], right_roi[1], right_roi[2], right_roi[3], (0,0,0),2,False)
 
     green_marker_left = img.find_blobs([green_thresholds], area_threshold = min_area, pixels_threshold = min_pixels, roi=left_roi)
     green_marker_right = img.find_blobs([green_thresholds], area_threshold = min_area, pixels_threshold = min_pixels, roi=right_roi)
+
+    #if(len(green_markers_coords)!=0):
+        #green_markers_coords_converted = list(green_markers[i].corners()))
+
 
     left = 0
     right = 0
@@ -114,7 +123,7 @@ while(True):
          for gr in green_marker_right:
              img.draw_edges(gr.min_corners(), color=(255,0,0))
              img.draw_circle(gr.cx(), gl.cy(), 3, (255,0,0),2,True)'''
-    if(left>0)and(right>0):
+    '''if(left>0)and(right>0):
         dir_turn = 0
         img.draw_string(10, 10, "backward",(255,0,0),2)
     elif(left==0)and(right>0):
@@ -125,12 +134,15 @@ while(True):
         img.draw_string(10, 10, "left",(255,0,0),2)
     elif(left==0)and(right==0):
         dir_turn = 3
-        img.draw_string(10, 10, "no",(255,0,0),2)
+        img.draw_string(10, 10, "no",(255,0,0),2)'''
 
     centroid_sum = 0
 
     line_blobs = []
     count_line_blobs = 0
+
+    global_max = -1
+    y_max = -1
 
     for r in line_rois:
         blobs = img.find_blobs([black_thresholds], roi=r[0:4], merge=True, area_threshold=min_area, pixels_threshold=min_pixels) # r[0:4] is roi tuple.
@@ -140,9 +152,11 @@ while(True):
             largest_blob = min(blobs, key=lambda b: (b.cx()-center_blob_pos[0])**2+(b.cy()-center_blob_pos[1])**2)
             center_blob_pos [0]= largest_blob.cx()
             center_blob_pos [1]= largest_blob.cy()
-
+            if(largest_blob.pixels()>global_max):
+                global_max = largest_blob.pixels()
+                y_max = center_blob_pos[1]
             # Draw a rect around the blob.
-            img.draw_rectangle(largest_blob.rect())
+            #img.draw_rectangle(largest_blob.rect())
             img.draw_circle(largest_blob.cx(),
                            largest_blob.cy(),3,(255, 255, 0),3,True)
 
@@ -154,16 +168,52 @@ while(True):
             centroid_sum += (largest_blob.cx()-round(x_size/2)) * r[4] # r[4] is the roi weight.
             count_line_blobs+=1
 
+    if(global_max>-1):
+        green_roi = (0, y_max, x_size, y_size-y_max)
+    else:
+        green_roi = (0,0,x_size, y_size)
+    delta_x_roi = 15
+    delta_y_up_roi = 30
+    delta_y_down_roi = 20
+    green_roi = (delta_x_roi,delta_y_up_roi,x_size-2*delta_x_roi, y_size-delta_y_up_roi-delta_y_down_roi)
+    green_markers = img.find_blobs([green_thresholds], area_threshold = min_area, pixels_threshold = min_pixels, roi = green_roi)
+
+
+    green_markers_centers = []
+    if(len(green_markers)!=0):
+        for grM in green_markers:
+            green_markers_centers.append(grM.cx())
+            #img.draw_circle(grM.cx(),grM.cy(),2,(255,0,0),2)
+    if(len(green_markers_centers)==0):
+        dir_turn = 3
+        #img.draw_string(10, 10, "no",(255,0,0),2)
+    elif (len(green_markers_centers)==2):
+        dir_turn = 0
+        #img.draw_string(10, 10, "back",(255,0,0),2)
+    elif(len(green_markers_centers)==1):
+        if(green_markers_centers[0]>round(x_size/2)+10):
+            dir_turn = 1
+            #img.draw_string(10, 10, "right",(255,0,0),2)
+        elif(green_markers_centers[0]<round(x_size/2)-10):
+            dir_turn = 1
+            #img.draw_string(10, 10, "right",(255,0,0),2)
+        else:
+            dir_turn = 3
+            #img.draw_string(10, 10, "no",(255,0,0),2)
+    else:
+        dir_turn = 3
+        #img.draw_string(10, 10, "no",(255,0,0),2)
+
 
 
     new_img = img
-    #new_img.binary([yellow_thresholds])
+    new_img.binary([yellow_thresholds])
     line_get = new_img.get_regression([(0,0)], robust=True,roi=regression_roi, x_stride=1, y_stride = 1)
 
     if (line_get):
         img.draw_line(line_get[0],line_get[1],line_get[2],line_get[3],255,1)
         #img.draw_string(10, 10, str(linear_dev), 127, 2)
-    img.draw_rectangle(regression_roi[0],regression_roi[1],regression_roi[2], regression_roi[3],127,1)
+    #img.draw_rectangle(regression_roi[0],regression_roi[1],regression_roi[2], regression_roi[3],127,1)
 
     # The 80 is from half the X res, the 60 is from half the Y res. The
     # equation below is just computing the angle of a triangle where the
@@ -209,7 +259,9 @@ while(True):
     transmitted_line_dev = map(linear_dev, -round(x_size/2), round(x_size/2), 0, 255)
     transmitted_sum = map(centroid_sum, -line_count*round(x_size/2), line_count*round(x_size/2), 0, 255)
     img.draw_string(10, 30, str(angle),(255,0,0),2)
-
+    img.draw_string(10, 15, str(dir_turn),(255,0,0),2)
+    if(len(green_markers)>0):
+        dir_turn = 0
     #print(angle)
 
 
@@ -219,26 +271,27 @@ while(True):
 
 
     #uart.writechar(3)
-
-    #uart.write(":%d/%d/%d/;" %(transmitted_val, 3,transmitted_line_dev))
+    #img.draw_rectangle(green_roi[0], green_roi[1], green_roi[2], green_roi[3], (0,0,255),2,False)
+    uart.write(":%d/%d/%d/;" %(transmitted_val, dir_turn,transmitted_line_dev))
+    time.sleep_ms(10)
     #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(transmitted_line_dev)+"/;")
-    uart.write(":")
-    time.sleep_ms(10)
+    '''uart.write(":")
+    time.sleep_ms(5)
     uart.write(str(transmitted_val))
-    time.sleep_ms(10)
+    time.sleep_ms(5)
     uart.write("/")
-    time.sleep_ms(10)
+    time.sleep_ms(5)
     uart.write(str(dir_turn))
-    time.sleep_ms(10)
+    time.sleep_ms(5)
     uart.write("/")
-    time.sleep_ms(10)
+    time.sleep_ms(5)
     uart.write(str(transmitted_sum))
-    time.sleep_ms(10)
+    time.sleep_ms(5)
     uart.write("/")
-    time.sleep_ms(10)
+    time.sleep_ms(5)
     uart.write(";")
-    time.sleep_ms(10)
-    print(dir_turn)
+    time.sleep_ms(5)'''
+    #print(dir_turn)
     #time.sleep_ms(5)
     #uart.sendbreak()
     #uart.write(":"+str(transmitted_val)+"/"+str(3)+"/"+str(126)+"/;")
