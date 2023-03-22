@@ -9,8 +9,8 @@ HardwareTimer *Time = new HardwareTimer(Instance);
 
 
 Adafruit_SH1106G display = Adafruit_SH1106G(128, 64, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RST, OLED_CS);
-Adafruit_TCS34725 tcs1 = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_24MS, TCS34725_GAIN_4X);
-Adafruit_TCS34725 tcs2 = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_24MS, TCS34725_GAIN_4X);
+Adafruit_TCS34725 tcs1 = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_614MS, TCS34725_GAIN_1X);
+Adafruit_TCS34725 tcs2 = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_614MS, TCS34725_GAIN_1X);
 
 TwoWire WIRE1(SDA1, SCL1);
 TwoWire WIRE2(SDA2, SCL2);
@@ -35,7 +35,6 @@ int gyroData = 0;
 byte bufferCam[3];
 byte bufferGyro[3];
 
-int big_err_line_sens = 0.7;
 
 bool state = true;
 
@@ -44,7 +43,7 @@ uint32_t distance2 = 1000;
 uint32_t distance3;
 uint32_t distance4;
 
-float weights[6] = { -4.5, -3.3, -1.9, 1.9, 3.0, 4.5 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -4.5, -2.5, -1.5, 1.5, 2.5, 4.5 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 float weights_sum = 0;
 
 
@@ -53,7 +52,7 @@ float weights_sum = 0;
 //float kd_line[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};//{ -1.5, -1.3, -1.1, 1.1, 1.3, 1.5 };
 
 
-float min_err_i = 0.008;
+float min_err_i = 0.01;
 
 float err_line_sens = 0;
 float err_old_line_sens = 0;
@@ -236,8 +235,8 @@ void setup() {
   ledBlinking();
   analogWrite(PWM_LIGHTS, PWM_LEDS);
   //pwm_start(PWM_LIGHTS, 1000, 0, RESOLUTION_8B_COMPARE_FORMAT);
-  // initServos();
-  //calibration_grab();
+   initServos();
+  calibration_grab();
   sliders(0, 0);
   state_robot = CALIBRATION;
   robot.v = V_MAIN;
@@ -290,6 +289,29 @@ void loop() {
         display.display();
         delay(3000);
         state_robot = STOP_SCREEN0;
+         move_servos_180_up();
+        sliders_movement(15);
+        grab();
+        sliders_movement(15);
+        long int time_begin = millis();
+        while ((millis() - time_begin) < 2000) {
+          motors(V_GRAB_BALL, V_GRAB_BALL);
+        }
+        motors(0, 0);
+
+
+        open_iris();
+        delay(1000);
+        time_begin = millis();
+        while ((millis() - time_begin) < 1000) {
+          motors(-V_GRAB_BALL, -V_GRAB_BALL);
+        }
+        motors(0, 0);
+
+        move_servos_180_down();
+        close_iris();
+        delay(1000);
+
         break;
       }
     case (LINE):
@@ -337,7 +359,7 @@ void loop() {
         display.setCursor(0, 20);
 
 
-        display.println(String(robot.ui_line));
+        display.println(String(robot.camLineAngle));
         display.setCursor(0, 30);
         display.println(robot.angle_pitch);
         display.setCursor(0, 40);
@@ -346,17 +368,11 @@ void loop() {
         robot.up_line = 0;
         robot.ud_line = 0;
         err_line_sens = 0;
-        /*for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) {
           // err_line_sens = err_line_sens + robot.sensors[i] * weights[i];
 
           err_line_sens = err_line_sens + robot.sensors_analog[i] * weights[i] / abs(weights_sum);
-        }*/
-        err_line_sens = err_line_sens + robot.sensors_analog[0] * weights[0] / abs(weights_sum);
-        err_line_sens = err_line_sens + robot.sensors_analog[1] * weights[1] / abs(weights_sum);
-        err_line_sens = err_line_sens + (robot.sensors_analog[2] - 1) * weights[2] / abs(weights_sum);
-        err_line_sens = err_line_sens + (robot.sensors_analog[3] - 1) * weights[3] / abs(weights_sum);
-        err_line_sens = err_line_sens + robot.sensors_analog[4] * weights[4] / abs(weights_sum);
-        err_line_sens = err_line_sens + robot.sensors_analog[5] * weights[5] / abs(weights_sum);
+        }
 
         robot.up_line = err_line_sens * robot.kp_line + err_line_sens * err_line_sens * err_line_sens * robot.kcube_line;
         robot.ud_line = (err_line_sens - err_old_line_sens) * robot.kd_line;
@@ -422,23 +438,24 @@ void loop() {
           robot.angle_pitch = map(bufferGyro[1], 0, 255, -180, 180);
         }
 
-        /*if (abs(robot.angle_pitch) < 6) robot.v = V_MAIN;
+        if (abs(robot.angle_pitch) < 6) robot.v = V_MAIN;
         else if (robot.angle_pitch > ANGLE_GORKA) robot.v = V_GORKA_UP;
-        else if (robot.angle_pitch < -ANGLE_GORKA) robot.v = V_GORKA_DOWN;*/
+        else if (robot.angle_pitch < -ANGLE_GORKA) robot.v = V_GORKA_DOWN;
 
-        /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (robot.turn_detected) and (abs(Enc1() - robot.encoder_remember) < 1000) and (abs(robot.angle_pitch) < 10) and ((millis() - robot.time_remember) < 3500))  //условие перекрестка
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (robot.turn_detected) and (abs(Enc1() - robot.encoder_remember) < 1000) and (abs(robot.angle_pitch) < 6) and ((millis() - robot.time_remember) < 4000))  //условие перекрестка
         {
           motors(0, 0);
           delay(300);
           state_robot = COLOR_READ_DATA;
-        }*/
+        }
         /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
           robot.online = millis();
         }*/
-        /*if (err_line_sens>big_err_line_sens) {
-          move_backward(40, 50);
+        /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) == 0) {
+          move_backward(100, 50);
         }*/
-        /*if ((millis() - robot.online) > 400) {
+        /*if((millis()-robot.online)>400)
+        {
           fail_save();
           robot.online = millis();
         }*/
@@ -594,32 +611,30 @@ void loop() {
         display.println("Line sensors:");
         display.setCursor(0, 10);
         analogWrite(PWM_LIGHTS, PWM_LEDS);
-        robot.sensors[0] = map(analogRead(SENSOR1), white[0], black[0], 0, 100);
-        robot.sensors[1] = map(analogRead(SENSOR2), white[1], black[1], 0, 100);
-        robot.sensors[2] = map(analogRead(SENSOR3), white[2], black[2], 0, 100);
-        robot.sensors[3] = map(analogRead(SENSOR4), white[3], black[3], 0, 100);
-        robot.sensors[4] = map(analogRead(SENSOR5), white[4], black[4], 0, 100);
-        robot.sensors[5] = map(analogRead(SENSOR6), white[5], black[5], 0, 100);
+        robot.sensors[0] = analogRead(SENSOR1);
+        robot.sensors[1] = analogRead(SENSOR2);
+        robot.sensors[2] = analogRead(SENSOR3);
+        robot.sensors[3] = analogRead(SENSOR4);
+        robot.sensors[4] = analogRead(SENSOR5);
+        robot.sensors[5] = analogRead(SENSOR6);
         display.println(String(robot.sensors[0]) + "    " + String(robot.sensors[1]) + "    " + String(robot.sensors[2]));
         display.setCursor(0, 20);
         display.println(String(robot.sensors[3]) + "    " + String(robot.sensors[4]) + "    " + String(robot.sensors[5]));
         display.setCursor(0, 30);
         display.println("RGB Color sensors:");
         uint16_t r, g, b, c;
-        //float r, g, b, c;
-        tcs1.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
-        delay(300);  // Delay for one old integ. time period (to finish old reading)
+        tcs1.setIntegrationTime(TCS34725_INTEGRATIONTIME_154MS);
+        //delay(300); // Delay for one old integ. time period (to finish old reading)
         delay(154);  // Delay for one new integ. time period (to allow new reading)
         tcs1.getRawData(&r, &g, &b, &c);
-        //tcs1.getRGB(&r, &g, &b);
         display.setCursor(0, 40);
-        display.print("R: " + String(r) + " " + String(g) + " " + String(b) + " " + String(colorDistance(RED_R, GREEN_R, BLUE_R, r, g, b)));
-        tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
-        delay(300);  // Delay for one old integ. time period (to finish old reading)
-        delay(154);  // Delay for one new integ. time period (to allow new reading)
+        display.print("R: " + String(r) + " " + String(g) + " " + String(b) + " " + String(c));
+        tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_154MS);
+        //delay(300); // Delay for one old integ. time period (to finish old reading)
+        //delay(154);  // Delay for one new integ. time period (to allow new reading)
         tcs2.getRawData(&r, &g, &b, &c);
         display.setCursor(0, 50);
-        display.print("L: " + String(r) + " " + String(g) + " " + String(b) + " " + String(colorDistance(RED_L, GREEN_L, BLUE_L, r, g, b)));
+        display.print("L: " + String(r) + " " + String(g) + " " + String(b) + " " + String(c));
         display.display();
         break;
       }

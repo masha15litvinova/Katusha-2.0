@@ -126,7 +126,7 @@ void turnAngle(int target_angle, int max_v, int min_v) {
   display.setCursor(0, 30);
   display.println("yaw_angle: " + String(robot.angle_yaw));
   display.display();
-  delay(100);
+  delay(400);
   display.clearDisplay();
 
   while (abs(err_turn) > MAX_ERR_ANGLE) {
@@ -175,10 +175,10 @@ void turnAngle(int target_angle, int max_v, int min_v) {
   display.setCursor(0, 30);
   display.println("stop");
   display.display();
-  delay(300);
+  delay(1500);
   display.clearDisplay();
   display.display();
-  
+  StopGyro();
 }
 
 void turnAngle90Right(int max_v, int min_v) {  //поворот на данный угол относительно текущего

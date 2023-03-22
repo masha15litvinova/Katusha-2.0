@@ -24,29 +24,15 @@
 #define GREY_THRESHOLD 90
 
 #define GREEN_HIGH_R 147 //порог зеленого (может, другие цвета тоже нужны)
-#define GREEN_LOW_R 130
+#define GREEN_LOW_R 110
 
 #define GREEN_HIGH_L 147 //порог зеленого (может, другие цвета тоже нужны)
-#define GREEN_LOW_L 130
+#define GREEN_LOW_L 110
 
 #define BLUE_RED_HIGH 116
 
-
-
-
-
-#define RED_R 55
-#define GREEN_R 107
-#define BLUE_R 85
-#define RED_L 128
-#define GREEN_L 189
-#define BLUE_L 137
-
-#define COLOR_DIST_HIGH 33
-#define COLOR_DIST_LOW 18
-
 #define V_CALIBR 0//140
-#define V_MAIN 30
+#define V_MAIN 35
 #define V_GORKA_UP 65
 #define V_GORKA_DOWN 30
 #define V_OBSTACLE 90

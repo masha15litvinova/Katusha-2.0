@@ -25,9 +25,12 @@ int direction_color() {
   delay(300);  // Delay for one old integ. time period (to finish old reading)
   delay(154);  // Delay for one new integ. time period (to allow new reading)
   tcs1.getRawData(&r1, &g1, &b1, &c1);
-  
-    int dist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
- 
+  digitalWrite(LED2, LOW);
+  uint32_t sum1 = r1 + g1 + b1;
+
+  /*r1 = (100 * r1) / sum1;
+  g1 = (100 * g1) / sum1;
+  b1 = (100 * b1) / sum1;*/
 
   display.setCursor(0, 20);
   display.print("Right: " + String(r1) + " " + String(g1) + " " + String(b1));
@@ -35,15 +38,18 @@ int direction_color() {
   delay(300);  // Delay for one old integ. time period (to finish old reading)
   delay(154);  // Delay for one new integ. time period (to allow new reading)
   tcs2.getRawData(&r2, &g2, &b2, &c2);
- 
- int dist2 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
+  digitalWrite(LED2, HIGH);
+  uint32_t sum2 = r2 + g2 + b2;
+  /*r2 = (100 * r2) / sum2;
+  g2 = (100 * g2) / sum2;
+  b2 = (100 * b2) / sum2;*/
 
   display.setCursor(0, 30);
   display.print("Left: " + String(r2) + " " + String(g2) + " " + String(b2));
   display.display();
   display.setTextSize(2);
   display.setCursor(0, 50);
-  /*if ((g2 > 160) and (g1 > 160)) {
+  if ((g2 > 160) and (g1 > 160)) {
     dir1 = 3;
   } else if ((g1 < GREEN_HIGH_R) and (g1 > GREEN_LOW_R) and (g2 < GREEN_HIGH_L) and (g2 > GREEN_LOW_L) and (r2 < BLUE_RED_HIGH) and (r1 < BLUE_RED_HIGH)) {
     dir1 = 0;
@@ -52,22 +58,6 @@ int direction_color() {
   } else if ((g2 < GREEN_HIGH_L) and (g2 > GREEN_LOW_L) and (r2 < BLUE_RED_HIGH)) {
     dir1 = 2;
   } else {
-    dir1 = 3;
-  }*/
-
-  if((dist1<COLOR_DIST_LOW)and(dist2<COLOR_DIST_LOW)){
-    dir1 = 0;
-  }
-  else if((dist1<COLOR_DIST_LOW)and(dist2>COLOR_DIST_HIGH))
-  {
-    dir1 = 1;
-  }
-  else if((dist2<COLOR_DIST_LOW)and(dist1>COLOR_DIST_HIGH))
-  {
-    dir1 = 2;
-  }
-  else
-  {
     dir1 = 3;
   }
 
@@ -191,9 +181,4 @@ void vyravn() {
   else if ((yaw_now < 0) and (yaw_now >= -180)) turnAngle(-180 - yaw_now, 35, 25);
   else turnAngle(360 - yaw_now, 35, 25);
   StopGyro();
-}
-int colorDistance(int red, int green, int blue, int red_read, int green_read, int blue_read)
-{
-  int dist = sqrt((red-red_read)*(red-red_read)+(green-green_read)*(green-green_read)+(blue-blue_read)*(blue-blue_read));
-  return dist;
 }

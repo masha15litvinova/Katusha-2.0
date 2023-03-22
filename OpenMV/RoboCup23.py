@@ -15,8 +15,8 @@ clock = time.clock()
 uart = UART(3, 9600)
 last_clock = 0
 
-green_thresholds = [40, 92, -128, -15, -128, 127] #порог зеленого цвета
-black_thresholds = [0, 28, -119, 127, -128, 127] #порог черного цвета
+green_thresholds = [83, 92, -128, -35, -128, 127] #порог зеленого цвета
+black_thresholds = [0, 57, -128, 11, -128, 127] #порог черного цвета
 yellow_thresholds = [0, 100, -128, 127, -128, 67]
 line_count = 25
 segments_count = 30
@@ -31,13 +31,14 @@ delta_y = 5
 ky_regression = 0.4
 kx_regression =0.15
 
-min_area = 160
-min_pixels = 160
+min_area = 120
+min_pixels = 120
 ky_green = 0.5
 kx_green = 0.4
 
 
 dir_turn = 0
+
 '''
 0 - backward
 1 - right
@@ -83,7 +84,7 @@ while(True):
 
     # Gamma, contrast, and brightness correction are applied to each color channel. The
     # values are scaled to the range per color channel per image type...
-    img = sensor.snapshot().gamma_corr(gamma = 0.7, contrast = 3.0, brightness = 0.0)#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
+    img = sensor.snapshot().gamma_corr(gamma = 1.0, contrast = 3.0, brightness = 0.0)#.gamma_corr(gamma = 0.85, contrast = 1.3, brightness = 0.06)
     #img.mean(4)
     left_roi = (round(x_size*x_k), round(y_size*y_k)-delta_y, round(x_size/2-x_size*x_k-delta_x), round(y_size*(1-y_k)))
     right_roi = (round(x_size/2+delta_x), round(y_size*y_k)-delta_y, round(x_size/2-x_size*x_k-delta_x), round(y_size*(1-y_k)))
@@ -172,12 +173,14 @@ while(True):
         green_roi = (0, y_max, x_size, y_size-y_max)
     else:
         green_roi = (0,0,x_size, y_size)
-    delta_x_roi = 15
-    delta_y_up_roi = 30
-    delta_y_down_roi = 20
+    delta_x_roi = 10
+    delta_y_up_roi = 20
+    delta_y_down_roi = 10
     green_roi = (delta_x_roi,delta_y_up_roi,x_size-2*delta_x_roi, y_size-delta_y_up_roi-delta_y_down_roi)
     green_markers = img.find_blobs([green_thresholds], area_threshold = min_area, pixels_threshold = min_pixels, roi = green_roi)
 
+    for gm in green_markers:
+        img.draw_circle(gm.cx(), gm.cy(), 3, (255, 0, 0),2,True)
 
     green_markers_centers = []
     if(len(green_markers)!=0):
@@ -207,7 +210,7 @@ while(True):
 
 
     new_img = img
-    new_img.binary([yellow_thresholds])
+    #new_img.binary([yellow_thresholds])
     line_get = new_img.get_regression([(0,0)], robust=True,roi=regression_roi, x_stride=1, y_stride = 1)
 
     if (line_get):
