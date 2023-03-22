@@ -44,7 +44,7 @@ uint32_t distance2 = 1000;
 uint32_t distance3;
 uint32_t distance4;
 
-float weights[6] = { -4.6, -3.3, -2.0, 2.0, 3.0, 4.6};  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -4.6, -3.3, -2.5, 2.5, 3.0, 4.6};  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 float weights_sum = 0;
 
 
@@ -53,7 +53,7 @@ float weights_sum = 0;
 //float kd_line[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};//{ -1.5, -1.3, -1.1, 1.1, 1.3, 1.5 };
 
 
-float min_err_i = 0.025;
+float min_err_i = 0.014;
 
 float err_line_sens = 0;
 float err_old_line_sens = 0;
