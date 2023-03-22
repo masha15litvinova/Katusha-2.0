@@ -44,7 +44,7 @@ uint32_t distance2 = 1000;
 uint32_t distance3;
 uint32_t distance4;
 
-float weights[6] = { -4.5, -3.3, -2.0, 2.0, 3.0, 4.5 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -4.6, -3.3, -2.0, 2.0, 3.0, 4.6};  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 float weights_sum = 0;
 
 
