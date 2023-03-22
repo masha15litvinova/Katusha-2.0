@@ -44,7 +44,7 @@ uint32_t distance2 = 1000;
 uint32_t distance3;
 uint32_t distance4;
 
-float weights[6] = { -4.5, -3.3, -1.9, 1.9, 3.0, 4.5 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -4.5, -3.3, -2.0, 2.0, 3.0, 4.5 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 float weights_sum = 0;
 
 
@@ -53,7 +53,7 @@ float weights_sum = 0;
 //float kd_line[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};//{ -1.5, -1.3, -1.1, 1.1, 1.3, 1.5 };
 
 
-float min_err_i = 0.008;
+float min_err_i = 0.025;
 
 float err_line_sens = 0;
 float err_old_line_sens = 0;
@@ -395,6 +395,14 @@ void loop() {
         */
         robot.v1_target = robot.v + robot.u_line;
         robot.v2_target = robot.v - robot.u_line;
+        if (abs(robot.v1_target) > MAX_V) {
+          if (robot.v1_target > 0) robot.v1_target = MAX_V;
+          else if (robot.v1_target < 0) robot.v1_target = -MAX_V;
+        }
+        if (abs(robot.v2_target) > MAX_V) {
+          if (robot.v2_target > 0) robot.v2_target = MAX_V;
+          else if (robot.v2_target < 0) robot.v2_target = -MAX_V;
+        }
         motorsCorrectedSpeed();
         err_old_line_sens = err_line_sens;
         robot.camLineAngleOld = robot.camLineAngle;
@@ -421,17 +429,27 @@ void loop() {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
           robot.angle_pitch = map(bufferGyro[1], 0, 255, -180, 180);
         }
-
         /*if (abs(robot.angle_pitch) < 6) robot.v = V_MAIN;
         else if (robot.angle_pitch > ANGLE_GORKA) robot.v = V_GORKA_UP;
         else if (robot.angle_pitch < -ANGLE_GORKA) robot.v = V_GORKA_DOWN;*/
-
-        /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (robot.turn_detected) and (abs(Enc1() - robot.encoder_remember) < 1000) and (abs(robot.angle_pitch) < 10) and ((millis() - robot.time_remember) < 3500))  //условие перекрестка
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs(robot.angle_pitch) < 10) and (millis() - robot.timeColors) > COLORS_DELAY)  //условие перекрестка
         {
           motors(0, 0);
-          delay(300);
-          state_robot = COLOR_READ_DATA;
-        }*/
+          uint16_t r1, g1, b1, c1, r2, g2, b2, c2;
+          delay(150);
+          tcs1.getRawData(&r1, &g1, &b1, &c1);
+          robot.colorDist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
+          delay(150);
+          tcs2.getRawData(&r2, &g2, &b2, &c2);
+          robot.colorDist2 = colorDistance(RED_L, GREEN_L, BLUE_L, r2, g2, b2);
+          robot.timeColors = millis();
+
+          if (isCross()) {
+            state_robot = COLOR_READ_DATA;
+          }
+
+          robot.timeColors = millis();
+        }
         /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
           robot.online = millis();
         }*/
@@ -607,16 +625,15 @@ void loop() {
         display.println("RGB Color sensors:");
         uint16_t r, g, b, c;
         //float r, g, b, c;
-        tcs1.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
-        delay(300);  // Delay for one old integ. time period (to finish old reading)
-        delay(154);  // Delay for one new integ. time period (to allow new reading)
+
+        delay(25);
         tcs1.getRawData(&r, &g, &b, &c);
-        //tcs1.getRGB(&r, &g, &b);
+
         display.setCursor(0, 40);
         display.print("R: " + String(r) + " " + String(g) + " " + String(b) + " " + String(colorDistance(RED_R, GREEN_R, BLUE_R, r, g, b)));
-        tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
-        delay(300);  // Delay for one old integ. time period (to finish old reading)
-        delay(154);  // Delay for one new integ. time period (to allow new reading)
+
+        delay(25);  // Delay for one old integ. time period (to finish old reading)
+
         tcs2.getRawData(&r, &g, &b, &c);
         display.setCursor(0, 50);
         display.print("L: " + String(r) + " " + String(g) + " " + String(b) + " " + String(colorDistance(RED_L, GREEN_L, BLUE_L, r, g, b)));
@@ -844,6 +861,7 @@ void loop() {
             }
         }
         state_robot = LINE;
+        robot.timeColors = millis();
         robot.sensors[0] = 0;
         robot.sensors[1] = 0;
         robot.sensors[2] = 0;

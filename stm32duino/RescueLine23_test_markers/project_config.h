@@ -35,15 +35,16 @@
 
 
 
-#define RED_R 55
-#define GREEN_R 107
-#define BLUE_R 85
-#define RED_L 128
-#define GREEN_L 189
-#define BLUE_L 137
+#define RED_R 318 
+#define GREEN_R 686
+#define BLUE_R 648
 
-#define COLOR_DIST_HIGH 33
-#define COLOR_DIST_LOW 18
+#define RED_L 382
+#define GREEN_L 676
+#define BLUE_L 635
+
+#define COLOR_DIST_HIGH 30
+#define COLOR_DIST_LOW 15
 
 #define V_CALIBR 0//140
 #define V_MAIN 30
@@ -52,6 +53,8 @@
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
 #define V_MIN 20
+
+#define MAX_V 99
 
 #define ANGLE_GORKA 20
 
@@ -71,11 +74,11 @@
 
 #define DIST2_DELAY 650  //в миллисекундах
 #define MOTORS_DELAY 14
-#define CAMERA_DELAY 60
-#define GYRO_DELAY 8
+#define CAMERA_DELAY 60#define GYRO_DELAY 8
 #define GYRO_DELAY_LINE 12
 #define LINE_SENS_DELAY 6
 #define CURRENT_SENS_DELAY 600
+#define COLORS_DELAY 1500
 
 /**********STATES************************/
 #define LINE 0

@@ -9,7 +9,7 @@ public:
   int v = 0;
   int v1_target = 0;  //требуемая скорость
   int v2_target = 0;
-  long int encoder_remember = 0; //1 motor
+  long int encoder_remember = 0;  //1 motor
   long int time_remember = 0;
   int motor1 = 0;  //подаваемый шим по факту
   int motor2 = 0;
@@ -60,17 +60,17 @@ public:
   int ui_cam = 0;
   int ud_cam = 0;
   bool turn_detected = false;
-  float p_cam = 0;//-0.5;//-1.0;             //-2.0;//-1.8;//0.1;//-0.5;//-1.7;
-  float p_cube_cam = 0;//-0.0001;  //-0.00007;//-0.000002;  //-0.0002;
-  float p_cam_line = 0;        //0.2;//0.5;//0.5;      //0.03;//-0.03;//0.02;
-  float i_cam = 0;//-0.001;             //-0.0002;//-0.0001;
-  float d_cam = 0;             //-0.5;//-0.05;
+  float p_cam = 0;       //-0.5;//-1.0;             //-2.0;//-1.8;//0.1;//-0.5;//-1.7;
+  float p_cube_cam = 0;  //-0.0001;  //-0.00007;//-0.000002;  //-0.0002;
+  float p_cam_line = 0;  //0.2;//0.5;//0.5;      //0.03;//-0.03;//0.02;
+  float i_cam = 0;       //-0.001;             //-0.0002;//-0.0001;
+  float d_cam = 0;       //-0.5;//-0.05;
 
 
-  float kp_line = 140;     //1000;//300;//1.2;       //2.2
+  float kp_line = 120;     //1000;//300;//1.2;       //2.2
   float kcube_line = 0.1;  //3;//0.000001;//0.0045;  //0.04; //0.028
-  float kd_line = 0.002;   //0.01;     //1.0;//-1.5;
-  float ki_line = 1.3;     //0.1;//0.5;//0.00001;//0.003;//0.009;     //0.03;//2.0;//0.5;//0.012;//0.0005;//0.009;
+  float kd_line = 0.0005;//0.0015;   //0.01;     //1.0;//-1.5;
+  float ki_line = 2.4;     //0.1;//0.5;//0.00001;//0.003;//0.009;     //0.03;//2.0;//0.5;//0.012;//0.0005;//0.009;
 
   long int timeGyro = 0;
   long int timeCamera = 0;
@@ -81,8 +81,10 @@ public:
   long int timeCurrSens = 0;
   long int timeMotor1 = 0;
   long int timeMotor2 = 0;
+  long int timeColors = 0;
 
-
+  int colorDist1 = 1000;
+  int colorDist2 = 1000;
   float up1 = 0;
   float ud1 = 0;
   float ui1 = 0;

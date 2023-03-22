@@ -21,22 +21,22 @@ int direction_color() {
   display.display();
   uint16_t r1, g1, b1, c1;
   uint16_t r2, g2, b2, c2;
-  tcs1.setIntegrationTime(TCS34725_INTEGRATIONTIME_154MS);
+  tcs1.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
   delay(300);  // Delay for one old integ. time period (to finish old reading)
-  delay(154);  // Delay for one new integ. time period (to allow new reading)
+  // Delay for one new integ. time period (to allow new reading)
   tcs1.getRawData(&r1, &g1, &b1, &c1);
-  
-    int dist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
- 
+
+  int dist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
+
 
   display.setCursor(0, 20);
   display.print("Right: " + String(r1) + " " + String(g1) + " " + String(b1));
-  tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_154MS);
+  tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
   delay(300);  // Delay for one old integ. time period (to finish old reading)
-  delay(154);  // Delay for one new integ. time period (to allow new reading)
+    // Delay for one new integ. time period (to allow new reading)
   tcs2.getRawData(&r2, &g2, &b2, &c2);
- 
- int dist2 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
+
+  int dist2 = colorDistance(RED_R, GREEN_R, BLUE_R, r2, g2, b2);
 
   display.setCursor(0, 30);
   display.print("Left: " + String(r2) + " " + String(g2) + " " + String(b2));
@@ -55,19 +55,13 @@ int direction_color() {
     dir1 = 3;
   }*/
 
-  if((dist1<COLOR_DIST_LOW)and(dist2<COLOR_DIST_LOW)){
+  if ((dist1 < COLOR_DIST_LOW) and (dist2 < COLOR_DIST_LOW)) {
     dir1 = 0;
-  }
-  else if((dist1<COLOR_DIST_LOW)and(dist2>COLOR_DIST_HIGH))
-  {
+  } else if ((dist1 < COLOR_DIST_LOW) and (dist2 > COLOR_DIST_HIGH)) {
     dir1 = 1;
-  }
-  else if((dist2<COLOR_DIST_LOW)and(dist1>COLOR_DIST_HIGH))
-  {
+  } else if ((dist2 < COLOR_DIST_LOW) and (dist1 > COLOR_DIST_HIGH)) {
     dir1 = 2;
-  }
-  else
-  {
+  } else {
     dir1 = 3;
   }
 
@@ -192,8 +186,15 @@ void vyravn() {
   else turnAngle(360 - yaw_now, 35, 25);
   StopGyro();
 }
-int colorDistance(int red, int green, int blue, int red_read, int green_read, int blue_read)
-{
-  int dist = sqrt((red-red_read)*(red-red_read)+(green-green_read)*(green-green_read)+(blue-blue_read)*(blue-blue_read));
+int colorDistance(int red, int green, int blue, int red_read, int green_read, int blue_read) {
+  int dist = sqrt((red - red_read) * (red - red_read) + (green - green_read) * (green - green_read) + (blue - blue_read) * (blue - blue_read));
   return dist;
+}
+boolean isCross() {
+  
+  if ((robot.colorDist1 < COLOR_DIST_LOW) or (robot.colorDist2 < COLOR_DIST_LOW)) {
+    return true;
+  }
+
+  return false;
 }
