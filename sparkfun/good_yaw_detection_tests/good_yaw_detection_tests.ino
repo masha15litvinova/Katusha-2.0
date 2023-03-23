@@ -56,10 +56,6 @@ void setup() {
 byte angle_y = 0;
 byte angle_p = 0;
 byte angle_r = 0;
-float pitch_robot = 0.0;
-float old_pitch_robot = 0.0;
-float k_filter = 0.4;
-long int time_gorka_start = 0;
 void loop() {
   // Check for new data in the FIFO
   if (imu.fifoAvailable()) {
@@ -81,20 +77,10 @@ void loop() {
   float magX = imu.calcMag(imu.mx);
   float magY = imu.calcMag(imu.my);
   float magZ = imu.calcMag(imu.mz);
-  pitch_robot = (atan((accelY) / (accelZ)) * 180 / PI);
-  float p = 0;
-  p = pitch_robot * k_filter + old_pitch_robot * (1 - k_filter);
-
-  if (abs(p) > 7) {
-    if ((p < 20) and (p > 0)) p = 20;
-    else if ((p < -20) and (p < 0)) p = -20;
-  }
-
-  if (abs(gyroZ) > 60) p = 0;
-
-  byte send_pitch = map(round(p), -180, 180, 0, 255);
-
+  int pitch_robot = round(atan(accelY / accelZ) * 180 / PI);
+  /*byte send_pitch = map(pitch_robot, -90, 90, 0, 255);
   if ((millis() - time_begin) > 30000) calibrated = 1;
+
   if (Serial1.available()) {
     byte signal = Serial1.read();
     if (signal == 1) {
@@ -107,28 +93,43 @@ void loop() {
       send = true;
     }
   }
-  if (true) {
+  if (send) {
     digitalWrite(LEDPIN, HIGH);
     Serial1.print(':');
-    delay(8);
+    delay(7);
     Serial1.print(angle_y);
-    delay(8);
+    delay(7);
     Serial1.print('/');
-    delay(8);
+    delay(7);
     Serial1.print(send_pitch);
-    delay(8);
+    delay(7);
     Serial1.print('/');
-    delay(8);
+    delay(7);
     Serial1.print(calibrated);
-    delay(8);
+    delay(7);
     Serial1.print('/');
-    delay(8);
+    delay(7);
     Serial1.print(';');
-    delay(8);
+    delay(7);
     digitalWrite(LEDPIN, LOW);
-  }
-  SerialPort.println(p);
-  old_pitch_robot = pitch_robot;
+  }*/
+  SerialPort.println(pitch_robot);
+  /*Serial1.write(':');
+  delay(5);
+  Serial1.write((angle_y));
+  delay(5);
+  Serial1.write('/');
+  delay(5);
+  Serial1.write((angle_p));
+  delay(5);
+  Serial1.write('/');
+  delay(5);
+  Serial1.write((calibrated));
+  delay(5);
+  Serial1.write('/');
+  delay(5);
+  Serial1.write(';');
+  delay(5);*/
 }
 
 void printIMUData(void) {
@@ -149,7 +150,4 @@ void printIMUData(void) {
   angle_y = map(yaw1, 0, 360, 0, 255);
   angle_p = map(pitch1, 0, 360, 0, 255);
   angle_r = map(roll1, 0, 360, 0, 255);
-
-  
-  
 }

@@ -1,5 +1,4 @@
 #include <Adafruit_TCS34725.h>
-
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SH110X.h>
@@ -37,7 +36,7 @@
 
 #define RED_R 318 
 #define GREEN_R 686
-#define BLUE_R 648
+#define BLUE_R 638
 
 #define RED_L 382
 #define GREEN_L 676
@@ -49,11 +48,12 @@
 #define V_CALIBR 0//140
 #define V_MAIN 28
 #define V_GORKA_UP 65
-#define V_GORKA_DOWN 30
+#define V_GORKA_DOWN 24
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
 #define V_MIN 20
 
+#define GORKA_SCALE_U 5
 #define MAX_V 98
 
 #define ANGLE_GORKA 20
@@ -72,7 +72,7 @@
 #define GYRO_UART_TICK 4000
 #define LINE_SENS_TICK 4000
 
-#define DIST2_DELAY 650  //в миллисекундах
+#define DIST2_DELAY 200  //в миллисекундах
 #define MOTORS_DELAY 14
 #define CAMERA_DELAY 60
 #define GYRO_DELAY 8

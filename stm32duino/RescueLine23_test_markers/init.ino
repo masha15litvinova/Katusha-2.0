@@ -30,7 +30,7 @@ void initGyro() {
     // GyroUART.readBytes(bufferGyro, 8);
     if (parsingGyro()) {
       robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-      robot.angle_pitch = map(bufferGyro[1], 0, 255, -90, 90);
+      robot.angle_pitch = map(bufferGyro[1], 0, 255, -180, 180);
       
       robot.gyroStarted = bufferGyro[2];
       if (robot.gyroStarted == 1) {
