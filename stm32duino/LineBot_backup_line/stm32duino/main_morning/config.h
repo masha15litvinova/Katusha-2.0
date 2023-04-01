@@ -1,0 +1,67 @@
+#define LASER_XSHUT_1 PA0
+#define LASER_XSHUT_2 PA1
+#define LASER_XSHUT_3 PA2
+#define LASER_XSHUT_4 PA3
+
+#define LASER_I2C1_SCL PB6
+#define LASER_I2C1_SDA PB7
+
+#define I2C2_SCL_GYRO PB10
+#define I2C2_SDA_GYRO PB11
+
+#define OLED_MOSI     PC12
+#define OLED_CLK      PC10
+#define OLED_DC       PC13
+#define OLED_CS       PA11
+#define OLED_RST      PA12
+
+#define LED_1 PA4
+#define LED_2 PA5
+
+#define MOTOR1_CURRENT PA6
+#define MOTOR2_CURRENT PA7
+ 
+#define MOTOR1_IN1 PB8
+#define MOTOR1_IN2 PB9
+//#define MOTOR1_INV 
+//#define MOTOR1_EN 
+
+#define MOTOR2_IN1 PA8
+#define MOTOR2_IN2 PC8
+//#define MOTOR2_INV 
+//#define MOTOR2_EN 
+
+#define UART1_RX_DRIVER_MCU PA10
+#define UART1_TX_DRIVER_MCU PA9
+
+#define UART2_RX_CAMERA PA3
+#define UART2_TX_CAMERA PA2
+
+#define UART3_RX_GYRO PB11
+#define UART3_TX_GYRO PB10
+
+#define LIGHT_SENSOR_1 PF10
+#define LIGHT_SENSOR_2 PF9
+#define LIGHT_SENSOR_3 PF8
+#define LIGHT_SENSOR_4 PF7
+#define LIGHT_SENSOR_5 PF6
+#define LIGHT_SENSOR_6 PC3
+
+#define SERVO1 PB0
+#define SERVO2 PB1
+
+#define END_SWITCH_1 PC14
+#define END_SWITCH_2 PC15
+
+#define CAMERA_INTERRUPT PA15
+#define GYRO_INTERRUPT PB10
+
+#define UART2_CAMERA HWSerial2
+#define UART1_DRIVERBOARD Serial1
+#define UART3_GYRO Serial3
+
+#define MCU_BTN PC10
+
+//#define SWCLK 
+//#define SWDIO 
+//#define TRACESWO

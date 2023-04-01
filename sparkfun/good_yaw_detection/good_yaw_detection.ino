@@ -26,17 +26,23 @@ Supported Platforms:
 #define SerialPort SerialUSB
 #define LEDPIN 13
 
+#define TIME_DELAY 12
 
 void (*resetFunc)(void) = 0;
 
 MPU9250_DMP imu;
 
-long int time_begin = millis();
+bool state = 1;
+
+unsigned long time_begin = millis();
+unsigned long time_led = millis();
+unsigned long time_integrated = millis();
 byte calibrated = 0;
 bool send = true;
 void setup() {
-  SerialPort.begin(9600);
+  //SerialPort.begin(9600);
   Serial1.begin(9600);
+
   pinMode(LEDPIN, OUTPUT);
   // Call imu.begin() to verify communication and initialize
   if (imu.begin() != INV_SUCCESS) {
@@ -53,6 +59,8 @@ void setup() {
   // accelerometer in low-power mode to estimate quat's.
   // DMP_FEATURE_LP_QUAT and 6X_LP_QUAT are mutually exclusive
 }
+int count = 0;
+byte send_pitch = 0;
 byte angle_y = 0;
 byte angle_p = 0;
 byte angle_r = 0;
@@ -70,29 +78,30 @@ void loop() {
       imu.computeEulerAngles();
       imu.update(UPDATE_ACCEL | UPDATE_GYRO | UPDATE_COMPASS);
       printIMUData();
+      float accelX = imu.calcAccel(imu.ax);
+      float accelY = imu.calcAccel(imu.ay);
+      float accelZ = imu.calcAccel(imu.az);
+      float gyroX = imu.calcGyro(imu.gx);
+      float gyroY = imu.calcGyro(imu.gy);
+      float gyroZ = imu.calcGyro(imu.gz);
+      float magX = imu.calcMag(imu.mx);
+      float magY = imu.calcMag(imu.my);
+      float magZ = imu.calcMag(imu.mz);
+      pitch_robot = (atan((accelY) / (accelZ)) * 180 / PI);
+      float p = 0;
+      p = pitch_robot * k_filter + old_pitch_robot * (1 - k_filter);
+
+      if (abs(p) > 7) {
+        if ((p < 20) and (p > 0)) p = 20;
+        else if ((p < -20) and (p < 0)) p = -20;
+      }
+      if (abs(gyroZ) > 60) p = 0;
+
+      send_pitch = map(round(p), -180, 180, 0, 255);
     }
   }
-  float accelX = imu.calcAccel(imu.ax);
-  float accelY = imu.calcAccel(imu.ay);
-  float accelZ = imu.calcAccel(imu.az);
-  float gyroX = imu.calcGyro(imu.gx);
-  float gyroY = imu.calcGyro(imu.gy);
-  float gyroZ = imu.calcGyro(imu.gz);
-  float magX = imu.calcMag(imu.mx);
-  float magY = imu.calcMag(imu.my);
-  float magZ = imu.calcMag(imu.mz);
-  pitch_robot = (atan((accelY) / (accelZ)) * 180 / PI);
-  float p = 0;
-  p = pitch_robot * k_filter + old_pitch_robot * (1 - k_filter);
 
-  if (abs(p) > 7) {
-    if ((p < 20) and (p > 0)) p = 20;
-    else if ((p < -20) and (p < 0)) p = -20;
-  }
 
-  if (abs(gyroZ) > 60) p = 0;
-
-  byte send_pitch = map(round(p), -180, 180, 0, 255);
 
   if ((millis() - time_begin) > 30000) calibrated = 1;
   if (Serial1.available()) {
@@ -107,27 +116,32 @@ void loop() {
       send = true;
     }
   }
-  if (true) {
-    digitalWrite(LEDPIN, HIGH);
+
+  if (send) {
+    if ((millis() - time_led) > 90) {
+      digitalWrite(LEDPIN, !state);
+      time_led = millis();
+    }
     Serial1.print(':');
-    delay(8);
+    //delay(8);
+    delay(TIME_DELAY);
     Serial1.print(angle_y);
-    delay(8);
+    delay(TIME_DELAY);
     Serial1.print('/');
-    delay(8);
+    delay(TIME_DELAY);
     Serial1.print(send_pitch);
-    delay(8);
+    delay(TIME_DELAY);
     Serial1.print('/');
-    delay(8);
+    delay(TIME_DELAY);
     Serial1.print(calibrated);
-    delay(8);
+    delay(TIME_DELAY);
     Serial1.print('/');
-    delay(8);
+    delay(TIME_DELAY);
     Serial1.print(';');
-    delay(8);
+    delay(TIME_DELAY);
     digitalWrite(LEDPIN, LOW);
   }
-  SerialPort.println(p);
+  //SerialPort.println(p);
   old_pitch_robot = pitch_robot;
 }
 
@@ -149,7 +163,4 @@ void printIMUData(void) {
   angle_y = map(yaw1, 0, 360, 0, 255);
   angle_p = map(pitch1, 0, 360, 0, 255);
   angle_r = map(roll1, 0, 360, 0, 255);
-
-  
-  
 }

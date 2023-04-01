@@ -70,9 +70,9 @@ void loop() {
       yaw = imu.yaw;
     }
   }
-  SerialPort.println("start roll/pitch/yaw: " + String(roll_start) + " " + String(pitch_start) + " " + String(yaw_start));
+  //SerialPort.println("start roll/pitch/yaw: " + String(roll_start) + " " + String(pitch_start) + " " + String(yaw_start));
   SerialPort.println("roll/pitch/yaw: " + String(roll) + " " + String(pitch) + " " + String(yaw));
- SerialPort.println("correct roll/pitch/yaw: " + String(roll-roll_start) + " " + String(pitch-pitch_start) + " " + String(yaw-yaw_start));
+ //SerialPort.println("correct roll/pitch/yaw: " + String(roll-roll_start) + " " + String(pitch-pitch_start) + " " + String(yaw-yaw_start));
 
   if (SerialPort.available()) {
     char x = SerialPort.read();
