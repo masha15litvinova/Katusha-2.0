@@ -105,7 +105,7 @@ int conv_angle(int a, int start) {
 void GyroUARTClear() {
   display.clearDisplay();
   display.setTextSize(1);
-  display.setCursor(0,0);
+  display.setCursor(0, 0);
   display.println("UART clear...");
   display.display();
   StopGyro();
@@ -114,9 +114,15 @@ void GyroUARTClear() {
   StopGyro();
   StopGyro();
   StopGyro();
+  StopGyro();
+  StopGyro();
+  StopGyro();
+  StopGyro();
+  StopGyro();
+  StopGyro();
   while (GyroUART.available() > 0) {
     char t = GyroUART.read();
-   // StopGyro();
+    // StopGyro();
   }
   display.clearDisplay();
   StartGyro();

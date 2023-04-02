@@ -36,6 +36,7 @@
 #define LED1 PE_0
 #define LED2 PE_1
 #define BALL PA_2
+#define FRONT_DIST PG_15
 
 /******LASER DIST SENSORS******/
 #define XSHUT1 PG_10
@@ -85,9 +86,9 @@
 #define SCL3 PA_8
 /*********************************/
 /*****ENDSTOPS**************/
-#define ENDSTOP1 PD_11
+#define ENDSTOP1 PC_3
 #define ENDSTOP2 PB_15
-#define ENDSTOP3 PC_3
+#define ENDSTOP3 PD_11
 #define ENDSTOP4 PC_2
 /*********************************/
 /******ANALOG SENSORS******/

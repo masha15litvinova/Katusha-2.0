@@ -62,13 +62,16 @@ void setup() {
 int count = 0;
 
 float p = 0;
+float p1 = 0.0;
 byte send_pitch = 0;
 byte angle_y = 0;
 byte angle_p = 0;
 byte angle_r = 0;
 float pitch_robot = 0.0;
+float last_p = 0.0;
+float last_last_p = 0.0;
 float old_pitch_robot = 0.0;
-float k_filter = 0.3;
+float k_filter = 0.35;
 long int time_gorka_start = 0;
 void loop() {
   // Check for new data in the FIFO
@@ -108,14 +111,21 @@ void loop() {
       else if (p < -80) p = -80;
       //if (abs(gyroZ) > 60) p = 0;
 
-      send_pitch = map(round(p), -180, 180, 0, 255);
+      send_pitch = map(round(p1), -180, 180, 0, 255);
       if (count < 200) {
         drift = drift + gyroX * 0.005;
         count++;
       }
-      p = (((acos(accelY) * 180) / PI) - 90.0)*k_filter+p*(1.0-k_filter);
-      //SerialPort.println(p);
-     // SerialPort.println(accelY);
+      p = ((acos(accelY) * 180) / PI) - 90.0;
+
+      //float middle = (p < last_p) ? ((last_p < last_last_p) ? last_p : ((last_last_p < p) ? p : last_last_p)) : ((p < last_last_p) ? p : ((last_last_p < last_p) ? last_p : last_last_p));
+      p1 = (p)*k_filter + p1 * (1.0 - k_filter);
+      /*SerialPort.print(p);
+      SerialPort.print(",");
+      SerialPort.println(p1);*/
+      // SerialPort.println(accelY);
+      last_last_p = last_p;
+      last_p = p1;
     }
   }
 

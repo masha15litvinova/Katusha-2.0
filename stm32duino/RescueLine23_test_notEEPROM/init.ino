@@ -175,6 +175,8 @@ void initPins() {
   digitalWrite(SWITCH2, LOW);
   digitalWrite(SWITCH3, LOW);
   digitalWrite(SWITCH4, LOW);
+
+  pinMode(FRONT_DIST, INPUT);
 }
 
 

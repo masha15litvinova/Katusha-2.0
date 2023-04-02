@@ -36,9 +36,9 @@
 
 
 
-#define RED_R 320 
-#define GREEN_R 682
-#define BLUE_R 638
+#define RED_R 317
+#define GREEN_R 678
+#define BLUE_R 634
 
 #define RED_L 382
 #define GREEN_L 676
@@ -49,15 +49,15 @@
 
 #define V_CALIBR 0//140
 #define V_MAIN 28
-#define V_GORKA_UP 40
-#define V_GORKA_DOWN 22
+#define V_GORKA_UP 42
+#define V_GORKA_DOWN 50//22
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
 #define V_MIN 20
 
 #define MAX_V 98
 
-#define ANGLE_GORKA 20
+#define ANGLE_GORKA 16
 
 #define DELAY_CALIBR_4 4000
 #define PWM_LEDS 40
@@ -66,8 +66,8 @@
 
 #define BTN_DELAY 400
 
-#define DIST_THRESHOLD 90
-#define DIST_NO_OBJECT 200
+#define DIST_THRESHOLD 80
+#define DIST_NO_OBJECT 160
 
 #define TIMER_FREQ 500000  //в тиках таймера
 #define MOTORS_TICK 6000

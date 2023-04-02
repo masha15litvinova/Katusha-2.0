@@ -46,7 +46,7 @@ uint32_t distance4;
 
 uint32_t distance2_last = 1000;
 
-float weights[6] = { -4.6, -3.3, -2.5, 2.5, 3.0, 4.6 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -4.6, -3.3, -2.7, 2.7, 3.3, 4.6 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 float weights_sum = 0;
 
 
@@ -395,9 +395,6 @@ void loop() {
 
         //}
 
-
-
-
         if (abs(robot.u_line) > u_max) {
           if (robot.u_line > 0) robot.u_line = u_max;
           else robot.u_line = -u_max;
@@ -408,20 +405,8 @@ void loop() {
 
           else if ((((robot.angle_p - robot.start_angle_p) < -10) and ((robot.angle_p - robot.start_angle_p) > -65)) or (((robot.angle_p - robot.start_angle_p) > 310) and ((robot.angle_p - robot.start_angle_p) < 350))) robot.v = V_GORKA_DOWN;
         */
-        robot.v1_target = robot.v + robot.u_line;
-        robot.v2_target = robot.v - robot.u_line;
-        if (abs(robot.v1_target) > MAX_V) {
-          if (robot.v1_target > 0) robot.v1_target = MAX_V;
-          else if (robot.v1_target < 0) robot.v1_target = -MAX_V;
-        }
-        if (abs(robot.v2_target) > MAX_V) {
-          if (robot.v2_target > 0) robot.v2_target = MAX_V;
-          else if (robot.v2_target < 0) robot.v2_target = -MAX_V;
-        }
-        motorsCorrectedSpeed();
-        err_old_line_sens = err_line_sens;
-        robot.camLineAngleOld = robot.camLineAngle;
 
+        robot.camLineAngleOld = robot.camLineAngle;
 
         /*if ((millis() - robot.timeDist2) > DIST2_DELAY) {
           motors(0, 0);
@@ -432,7 +417,7 @@ void loop() {
             distance2_last = distance2;
           }
           robot.timeDist2 = millis();
-        }*/
+        }//*/
 
         //motors(robot.motor1, robot.motor2);
 
@@ -457,8 +442,12 @@ void loop() {
         }
         if (abs(robot.angle_pitch) < 6) robot.v = V_MAIN;
         else if (robot.angle_pitch > ANGLE_GORKA) robot.v = V_GORKA_UP;
-        else if (robot.angle_pitch < -ANGLE_GORKA) robot.v = V_GORKA_DOWN;
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs(robot.angle_pitch) < 22) and (millis() - robot.timeColors) > COLORS_DELAY)  //условие перекрестка
+        else if (robot.angle_pitch < -ANGLE_GORKA) {
+          robot.v = V_GORKA_DOWN;
+          if(robot.u_line>10) robot.u_line = 10;
+          else if(robot.u_line<-10) robot.u_line = -10;
+        }
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs(robot.angle_pitch) < 10) and (millis() - robot.timeColors) > COLORS_DELAY)  //условие перекрестка
         {
           ZeroGyro();
           ZeroGyro();
@@ -480,9 +469,16 @@ void loop() {
           robot.timeColors = millis();
         }
 
-        if (distance2 < DIST_THRESHOLD) {
+        /*if (distance2 < DIST_THRESHOLD) {
           if (is_obstacle()) state_robot = OBSTACLE;
-        }
+        }*/
+
+
+
+        //if(digitalRead(FRONT_DIST)==0) state_robot = OBSTACLE;
+
+
+
         /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
           robot.online = millis();
         }*/
@@ -493,7 +489,18 @@ void loop() {
           fail_save();
           robot.online = millis();
         }*/
-
+        robot.v1_target = robot.v + robot.u_line;
+        robot.v2_target = robot.v - robot.u_line;
+        if (abs(robot.v1_target) > MAX_V) {
+          if (robot.v1_target > 0) robot.v1_target = MAX_V;
+          else if (robot.v1_target < 0) robot.v1_target = -MAX_V;
+        }
+        if (abs(robot.v2_target) > MAX_V) {
+          if (robot.v2_target > 0) robot.v2_target = MAX_V;
+          else if (robot.v2_target < 0) robot.v2_target = -MAX_V;
+        }
+        motorsCorrectedSpeed();
+        err_old_line_sens = err_line_sens;
         break;
       }
     case (MOTORS_PWM_COMPUTE):
@@ -977,11 +984,11 @@ void loop() {
         vyravn();
         turnAngle(-90, 50, 32);
         while (distance3 > DIST_THRESHOLD) {
-          move_forward(300, 40);
+          move_forward(200, 40);
           status3_read = sensor3.GetDistance(&distance3);
         }
         while (distance3 < DIST_NO_OBJECT) {
-          move_forward(300, 40);
+          move_forward(200, 40);
           status3_read = sensor3.GetDistance(&distance3);
         }
         move_forward(400, 40);
