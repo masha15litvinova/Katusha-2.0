@@ -71,7 +71,7 @@ float pitch_robot = 0.0;
 float last_p = 0.0;
 float last_last_p = 0.0;
 float old_pitch_robot = 0.0;
-float k_filter = 0.35;
+float k_filter = 0.55;
 long int time_gorka_start = 0;
 void loop() {
   // Check for new data in the FIFO
