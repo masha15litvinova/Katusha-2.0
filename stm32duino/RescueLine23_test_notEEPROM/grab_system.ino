@@ -87,7 +87,7 @@ void move_servos_180_up()
   {
     servo2.write(i);
     servo3.write(180 - i);
-    delay(5);
+    delay(8);
   }
 }
 void move_servos_180_down()
@@ -112,7 +112,7 @@ void move_servos_angle()
 }
 void open_iris()
 {
-  for (int i = 50; i < 90; i++)
+  for (int i = 50; i < 100; i++)
   {
     servo1.write(i);
     delay(100);
@@ -121,12 +121,12 @@ void open_iris()
   }
   void close_iris()
 {
-  for (int i = 90; i > 50; i--)
+  for (int i = 90; i > 40; i--)
   {
     servo1.write(i);
-    delay(100);
+    delay(110);
   }
-    delay(300);
+    delay(600);
   }
 void grab()
 {
@@ -136,8 +136,8 @@ void grab()
 
 
   delay(2000);
-  while (digitalRead(BALL) == 0) {}
+  while (digitalRead(BALL) == 1) {}
 close_iris();
-  sliders_movement(0);
+  sliders_movement(10);
   move_servos_angle();
 }

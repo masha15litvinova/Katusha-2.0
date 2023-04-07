@@ -1,16 +1,16 @@
-#define SPEED_COEFF_P 3.2//4.5   //1.0
-#define SPEED_COEFF_D 0.09//0.5   //0.8//0.8//0.8//0.3  //13
-#define SPEED_COEFF_I 0.46//0.08//0.043  //0.06
+#define SPEED_COEFF_P 3.2   //4.5   //1.0
+#define SPEED_COEFF_D 0.09  //0.5   //0.8//0.8//0.8//0.3  //13
+#define SPEED_COEFF_I 0.46  //0.08//0.043  //0.06
 #define SPEED_COEFF_CUBE 0
 
 #define CPR 1050
-#define RPM1 132
+#define RPM1 150
 #define RPM2 155
 
 #define ERR_LIM 4
 #define U_MAX 2048
-unsigned long  encoder1 = 0;
-unsigned long encoder2 = 0;
+volatile long int encoder1 = 0;
+volatile long int encoder2 = 0;
 
 void initEncoderIRQs() {
   attachInterrupt(digitalPinToInterrupt(ENC_INT1), enc1, FALLING);

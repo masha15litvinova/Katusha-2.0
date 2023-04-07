@@ -20,7 +20,7 @@ sensor.reset()
 sensor.set_contrast(1)
 sensor.set_gainceiling(16)
 # Max resolution for template matching with SEARCH_EX is QQVGA
-sensor.set_framesize(sensor.QCIF)
+sensor.set_framesize(sensor.QQVGA)
 # You can set windowing to reduce the search image.
 #sensor.set_windowing(((640-80)//2, (480-60)//2, 80, 60))
 sensor.set_pixformat(sensor.GRAYSCALE)
@@ -28,8 +28,8 @@ sensor.set_pixformat(sensor.GRAYSCALE)
 # Load template.
 # Template should be a small (eg. 32x32 pixels) grayscale image.
 
-
-count = 41
+templates = ["0.pgm", "1.pgm", "2.pgm", "3.pgm"]
+count = 6
 
 clock = time.clock()
 
@@ -45,10 +45,10 @@ while (True):
     #
     # Note1: ROI has to be smaller than the image and bigger than the template.
     # Note2: In diamond search, step and ROI are both ignored.
-    for i in range(count):
+    for i in range(len(templates)):
         img = sensor.snapshot()
-        print("pgm/"+str(i)+".pgm")
-        templ = image.Image("pgm/"+str(i)+".pgm")
+
+        templ = image.Image(templates[i])
         r = img.find_template(templ, 0.30, step=4, search=SEARCH_EX) #, roi=(10, 0, 60, 60))
     #find_template(template, threshold, [roi, step, search]) The 0.7 I the threshold is the similarity threshold and  ROI is the region to be matched(its upper left vertex is （10，0）), a rectangular of 60 by 80.
     # Note: The size of the ROI should be larger than the template images and smaller than frame butter.
@@ -57,4 +57,4 @@ while (True):
         if r:
             img.draw_rectangle(r)
 
-    print(clock.fps())
+

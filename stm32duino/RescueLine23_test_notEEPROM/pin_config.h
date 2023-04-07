@@ -15,12 +15,16 @@
 /*********UART PINS************/
 #define USART3
 #define USART6
+#define USART2
 
 #define RX3 PD_9  //GYRO
 #define TX3 PD_8
 
 #define RX6 PG_9  //CAMERA
 #define TX6 PG_14
+
+#define RX2 PD_6  //STLINK
+#define TX2 PD_5
 /*********************************/
 
 #define BUTTON1 PC_6  //102
@@ -36,7 +40,7 @@
 #define LED1 PE_0
 #define LED2 PE_1
 #define BALL PA_2
-#define FRONT_DIST PG_15
+#define FRONT_DIST PA_7
 
 /******LASER DIST SENSORS******/
 #define XSHUT1 PG_10

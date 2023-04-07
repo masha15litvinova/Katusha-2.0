@@ -75,6 +75,7 @@ public:
   long int timeGyro = 0;
   long int timeCamera = 0;
   long int timeDist2 = 0;  //передний дальномер снизу (опрашивается, когда робот следует по линии)
+   long int timeDist3 = 0;
   long int timeMotors = 0;
   long int timeLED = 0;
   long int timeLineSens = 0;

@@ -3,6 +3,7 @@
 
 HardwareSerial GyroUART(RX3, TX3);
 HardwareSerial CamUART(RX6, TX6);
+HardwareSerial STlinkUART(RX2, TX2);
 
 TIM_TypeDef *Instance = TIM14;
 HardwareTimer *Time = new HardwareTimer(Instance);
@@ -24,6 +25,8 @@ VL53L0X sensor4(&WIRE1, XSHUT4);
 Servo servo1;
 Servo servo2;
 Servo servo3;
+
+bool obj = 0;
 
 int black[6] = { 0, 0, 0, 0, 0, 0 };
 int white[6] = { 1023, 1023, 1023, 1023, 1023, 1023 };
@@ -189,6 +192,10 @@ void setup() {
   motors(0, 0);
   ledBlinking();
 
+  GyroUART.begin(115200);
+  CamUART.begin(UART_BAUDRATE);
+  //STlinkUART.begin(UART_BAUDRATE);
+  delay(300);
   /*Time->setOverflow(TIMER_FREQ, HERTZ_FORMAT);
     Time->attachInterrupt(time);
     Time->resume();*/
@@ -200,6 +207,7 @@ void setup() {
 
   weights_sum = abs(weights[0] + weights[1] + weights[2]);
 
+
   resetCamera();
   //resetGyro();
 
@@ -207,13 +215,13 @@ void setup() {
   WIRE2.begin();
   WIRE3.begin();
 
-  GyroUART.setRx(RX3);
+  /*GyroUART.setRx(RX3);
   GyroUART.setTx(TX3);
   CamUART.setRx(RX6);
   CamUART.setTx(TX6);
+  STlinkUART.setRx(RX2);
+  STlinkUART.setTx(TX2);*/
 
-  GyroUART.begin(UART_BAUDRATE);
-  CamUART.begin(UART_BAUDRATE);
 
   display.begin(0, true);
   display.display();
@@ -229,7 +237,6 @@ void setup() {
 
   StartGyro();
   StartGyro();
-
   //if (digitalRead(BUTTON2) == 0) {
   initGyro();
   //} else {
@@ -242,16 +249,18 @@ void setup() {
   analogWrite(PWM_LIGHTS, PWM_LEDS);
 
   //pwm_start(PWM_LIGHTS, 1000, 0, RESOLUTION_8B_COMPARE_FORMAT);
-  // initServos();
-  //calibration_grab();
+  /*initServos();
+  calibration_grab();
+  close_iris();*/
   sliders(0, 0);
-  //if (digitalRead(BUTTON2) == 0) {
-  state_robot = CALIBRATION;
-  // } else {
-  // state_robot = LINE;
-  // eeprom_read_line();
-  //}
+  if (digitalRead(BUTTON2) == 0) {
+    state_robot = CALIBRATION;
+  } else {
+    state_robot = LINE;
+    eeprom_read_line();
+  }
   robot.v = V_MAIN;
+  state_robot = EVAC;
 }
 
 
@@ -300,8 +309,8 @@ void loop() {
         display.println(String(black[3]) + " " + String(black[4]) + " " + String(black[5]));
         display.display();
         delay(3000);
-        state_robot = STOP_SCREEN0;
-        //eeprom_write_line();
+        state_robot = LINE;
+        eeprom_write_line();
         break;
       }
     case (LINE):
@@ -353,7 +362,7 @@ void loop() {
         display.setCursor(0, 30);
         display.println(robot.angle_pitch);
         display.setCursor(0, 40);
-        display.println(robot.camDir);
+        display.println(obj);
         display.display();
         robot.up_line = 0;
         robot.ud_line = 0;
@@ -421,21 +430,19 @@ void loop() {
 
         //motors(robot.motor1, robot.motor2);
 
-        //if (millis() - robot.timeGyro > GYRO_DELAY_LINE) state_robot = GYRO_READ_DATA;
-        //if (millis() - robot.timeLineSens > LINE_SENS_DELAY) state_robot = LINE_READ_DATA;
-        //if (millis() - robot.timeMotors > MOTORS_DELAY) state_robot = MOTORS_PWM_COMPUTE;
-        //if (millis() - robot.timeDist2 > DIST2_DELAY) state_robot = DIST2_READ_DATA;
-        //if (millis() - robot.timeCamera > CAMERA_DELAY) state_robot = CAMERA_READ_DATA;
-        if (parsingCam()) {
-          robot.camLineAngle = map(bufferCam[0], 0, 255, -91, 91);
-          robot.camLineDev = map(bufferCam[2], 0, 255, -CAM_X_SIZE / 2, CAM_X_SIZE / 2);
-          if (bufferCam[1] != 3) {
-            robot.camDir = bufferCam[1];
-            robot.turn_detected = true;
-            robot.encoder_remember = Enc1();
-            robot.time_remember = millis();
+
+        CamUART.write(2);
+
+        /*if (CamUART.available()) {
+          byte cube = CamUART.read();
+          if (cube == 1) {
+            motors(0, 0);
+            if (!obj) {
+              state_robot = MOVE_SLIDERS;
+            }
           }
-        }
+        }*/
+
         if (parsingGyro()) {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
           robot.angle_pitch = map(bufferGyro[1], 0, 255, -180, 180);
@@ -444,13 +451,12 @@ void loop() {
         else if (robot.angle_pitch > ANGLE_GORKA) robot.v = V_GORKA_UP;
         else if (robot.angle_pitch < -ANGLE_GORKA) {
           robot.v = V_GORKA_DOWN;
-          if(robot.u_line>10) robot.u_line = 10;
-          else if(robot.u_line<-10) robot.u_line = -10;
+          if (robot.u_line > 10) robot.u_line = 10;
+          else if (robot.u_line < -10) robot.u_line = -10;
         }
         if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs(robot.angle_pitch) < 10) and (millis() - robot.timeColors) > COLORS_DELAY)  //условие перекрестка
         {
-          ZeroGyro();
-          ZeroGyro();
+
           ZeroGyro();
           motors(0, 0);
           uint16_t r1, g1, b1, c1, r2, g2, b2, c2;
@@ -475,7 +481,11 @@ void loop() {
 
 
 
-        //if(digitalRead(FRONT_DIST)==0) state_robot = OBSTACLE;
+        /*if (digitalRead(FRONT_DIST) == 0) {
+          if (check_object())
+            state_robot = OBSTACLE;
+        }*/
+
 
 
 
@@ -814,7 +824,9 @@ void loop() {
 
         snprintf(report, sizeof(report), "| Time : %ld |", period);
         display.setCursor(0, 50);
-        display.println(report);
+        // display.println(report);
+        // display.setCursor(0, 60);
+        display.println("analog: " + String(analogRead(FRONT_DIST)));
         display.display();
         break;
       }
@@ -933,11 +945,12 @@ void loop() {
       }
     case (MOVE_SLIDERS):
       {
+        motors(0, 0);
         move_servos_180_up();
-        sliders_movement(15);
+        sliders_movement(17);
         grab();
-        sliders_movement(15);
-        long int time_begin = millis();
+        sliders_movement(17);
+        /*long int time_begin = millis();
         while ((millis() - time_begin) < 2000) {
           motors(V_GRAB_BALL, V_GRAB_BALL);
         }
@@ -954,8 +967,10 @@ void loop() {
 
         move_servos_180_down();
         close_iris();
-        delay(1000);
-
+        delay(1000);*/
+        obj = true;
+        move_servos_180_down();
+        state_robot = LINE;
         break;
       }
     case (OBSTACLE):
@@ -1030,9 +1045,55 @@ void loop() {
         delay(2000);
         break;
       }
+    case (EVAC):
+      {
+        display.clearDisplay();
+        display.display();
+        display.setCursor(0, 10);
+        display.setTextSize(2);
+        display.println("EVAC ZONE");
+        display.display();
+        move_forward(850, 40);
+        turnAngle(-90, 45, 20);
+        move_forward(600, 40);
+        vyravn();
+        display.clearDisplay();
+        display.display();
+        display.setCursor(0, 0);
+        display.setTextSize(1);
+        while (1) {
+          /*move_forward(4000, 40);
+          turnAngle(-90, 50, 35);
+          move_backward(600, 40);*/
+          //if (analogRead(FRONT_DIST) < 70) break;
+          display.clearDisplay();
+          int d3 = analogRead(FRONT_DIST);
+          distance3 = 65 * pow(d3, -1.10);
+          display.println(String(d3));
+          display.display();
+          int err_w = (distance3 - 30);
+          float kp_w = 0.1;
+          int u_w = err_w * kp_w;
+          robot.v1_target = V_EVAC + u_w;
+          robot.v2_target = V_EVAC - u_w;
+          motorsCorrectedSpeed();
+        }
+        break;
+      }
   }
 }
 
 void fail_save() {
   move_backward(300, 50);
+}
+
+bool check_object() {
+  int sum = 0;
+  //move_forward(10, 40);
+  for (int i = 0; i < 100; i++) {
+
+    if (digitalRead(FRONT_DIST) == 0) sum++;
+  }
+  if (sum > 80) return true;
+  return false;
 }

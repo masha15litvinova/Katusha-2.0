@@ -14,13 +14,16 @@ void initGyro() {
   display.println("Init gyro...");
   display.display();
   long int time_uart_available = millis();
+   StartGyro();
   while (!GyroUART.available()) {
-    if ((millis() - time_uart_available) > 8000) {
+    /*if ((millis() - time_uart_available) > 8000) {
       robot.v1_target = 0;
       robot.v2_target = 0;
       resetGyro();
       time_uart_available = millis();
-    }
+    }*/
+   StartGyro();
+
   }
   long int gyro_test_start = millis();
   //int gyroData = 0;
