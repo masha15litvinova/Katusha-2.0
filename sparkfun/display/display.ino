@@ -32,7 +32,7 @@
 // On an arduino MEGA 2560: 20(SDA), 21(SCL)
 // On an arduino LEONARDO:   2(SDA),  3(SCL), ...
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x78 ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define SCREEN_ADDRESS 0x3D ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #define NUMFLAKES     10 // Number of snowflakes in the animation example
@@ -62,8 +62,8 @@ void setup() {
 Serial1.begin(9600);
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
+    /*Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever*/
   }
 
   // Show initial display buffer contents on the screen --
@@ -88,16 +88,31 @@ Serial1.begin(9600);
 
  
 }
- char ch='?';
+ int ch;
 void loop() {
 
   if(Serial1.available())
   {
-     ch = Serial1.read();
+     ch = Serial1.read()-'0';
 
   }
   display.clearDisplay();
-  display.println(String(ch));
+  if(ch==0)
+  {
+  display.println("zero");
+  }
+  if(ch==1)
+  {
+  display.println("one");
+  }
+  if(ch==2)
+  {
+  display.println("two");
+  }
+  if(ch==3)
+  {
+  display.println("three");
+  }
   display.display();
   delay(5);
 }

@@ -54,7 +54,7 @@
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
 #define V_MIN 20
-#define V_EVAC 34
+#define V_EVAC 37
 
 #define MAX_V 98
 

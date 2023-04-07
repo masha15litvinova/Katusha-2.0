@@ -192,8 +192,7 @@ void setup() {
   motors(0, 0);
   ledBlinking();
 
-  GyroUART.begin(115200);
-  CamUART.begin(UART_BAUDRATE);
+
   //STlinkUART.begin(UART_BAUDRATE);
   delay(300);
   /*Time->setOverflow(TIMER_FREQ, HERTZ_FORMAT);
@@ -206,7 +205,8 @@ void setup() {
   //initButtonsIRQs();
 
   weights_sum = abs(weights[0] + weights[1] + weights[2]);
-
+  GyroUART.begin(115200);
+  CamUART.begin(UART_BAUDRATE);
 
   resetCamera();
   //resetGyro();
@@ -235,10 +235,10 @@ void setup() {
 
   initColorSensors();
 
-  StartGyro();
-  StartGyro();
+  // StartGyro();
+  //StartGyro();
   //if (digitalRead(BUTTON2) == 0) {
-  initGyro();
+  //initGyro();
   //} else {
   //eeprom_read_gyro();
   //}
@@ -1053,30 +1053,79 @@ void loop() {
         display.setTextSize(2);
         display.println("EVAC ZONE");
         display.display();
-        move_forward(850, 40);
+        /*move_forward(850, 40);
         turnAngle(-90, 45, 20);
         move_forward(600, 40);
-        vyravn();
+        vyravn();*/
         display.clearDisplay();
         display.display();
         display.setCursor(0, 0);
         display.setTextSize(1);
+        int d3 = 20;
+        int d3_f = 20;
+        float k_filter = 0.5;
+        float kp_w = 1.0;
+        float kd_w = 0.6;
+        float ki_w = 0.07;
+        int err_w = 0;
+        int err_w_old = 0;
+        int ui_w = 0;
         while (1) {
           /*move_forward(4000, 40);
           turnAngle(-90, 50, 35);
           move_backward(600, 40);*/
           //if (analogRead(FRONT_DIST) < 70) break;
           display.clearDisplay();
-          int d3 = analogRead(FRONT_DIST);
-          distance3 = 65 * pow(d3, -1.10);
-          display.println(String(d3));
-          display.display();
-          int err_w = (distance3 - 30);
-          float kp_w = 0.1;
-          int u_w = err_w * kp_w;
+          display.setCursor(0, 0);
+          d3 = analogRead(FRONT_DIST);
+          d3_f = d3 * k_filter + d3_f * (1 - k_filter);
+          float d3_mm = 9000 * pow(d3_f, -1.1);
+          display.println(String(d3_mm));
+          err_w = d3_mm - 32;
+          ui_w = ui_w + err_w * ki_w;
+          if (abs(err_w) < 5) ui_w = 0;
+          int u_w = err_w * kp_w + (err_w - err_w_old) * kd_w + ui_w;
+          if (u_w > 90) u_w = 90;
+          if (u_w < -90) u_w = -90;
           robot.v1_target = V_EVAC + u_w;
           robot.v2_target = V_EVAC - u_w;
+          display.setCursor(0, 10);
+          display.println(String(u_w));
+          display.display();
           motorsCorrectedSpeed();
+          delay(1);
+          err_w_old = err_w;
+
+          analogWrite(PWM_LIGHTS, PWM_LEDS);
+          int s[6] = { 0, 0, 0, 0, 0, 0 };
+          s[0] = analogRead(SENSOR1);
+          s[1] = analogRead(SENSOR2);
+          s[2] = analogRead(SENSOR3);
+          s[3] = analogRead(SENSOR4);
+          s[4] = analogRead(SENSOR5);
+          s[5] = analogRead(SENSOR6);
+          for (int i = 0; i < 6; i++) {
+            robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
+          }
+          int grey_scaled = 24;
+
+          for (int i = 0; i < 6; i++) {
+            if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
+              robot.sensors[i] = 1;
+              //display.fillRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+            } else {
+              robot.sensors[i] = 0;
+              // display.drawRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+            }
+          }
+
+          if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) >= 2) {
+            motors(0, 0);
+            delay(1000);
+            //vyravn();
+            state_robot = STOP_SCREEN0;
+            break;
+          }
         }
         break;
       }
