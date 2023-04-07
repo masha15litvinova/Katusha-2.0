@@ -3,7 +3,7 @@
 
 HardwareSerial GyroUART(RX3, TX3);
 HardwareSerial CamUART(RX6, TX6);
-HardwareSerial STlinkUART(RX2, TX2);
+//HardwareSerial STlinkUART(RX2, TX2);
 
 TIM_TypeDef *Instance = TIM14;
 HardwareTimer *Time = new HardwareTimer(Instance);
@@ -65,6 +65,9 @@ float err_old_line_sens = 0;
 
 
 boolean grab_completed = 0;
+
+long int time_white = millis();
+
 
 class modeSmartButton1 : public SmartButton {
 public:
@@ -203,7 +206,10 @@ void setup() {
   initEncoderIRQs();
   initEndstopIRQs();
   //initButtonsIRQs();
-
+  GyroUART.setRx(RX3);
+  GyroUART.setTx(TX3);
+  CamUART.setRx(RX6);
+  CamUART.setTx(TX6);
   weights_sum = abs(weights[0] + weights[1] + weights[2]);
   GyroUART.begin(115200);
   CamUART.begin(UART_BAUDRATE);
@@ -215,11 +221,8 @@ void setup() {
   WIRE2.begin();
   WIRE3.begin();
 
-  /*GyroUART.setRx(RX3);
-  GyroUART.setTx(TX3);
-  CamUART.setRx(RX6);
-  CamUART.setTx(TX6);
-  STlinkUART.setRx(RX2);
+
+  /*STlinkUART.setRx(RX2);
   STlinkUART.setTx(TX2);*/
 
 
@@ -238,7 +241,7 @@ void setup() {
   // StartGyro();
   //StartGyro();
   //if (digitalRead(BUTTON2) == 0) {
-  //initGyro();
+  initGyro();
   //} else {
   //eeprom_read_gyro();
   //}
@@ -260,7 +263,8 @@ void setup() {
     eeprom_read_line();
   }
   robot.v = V_MAIN;
-  state_robot = EVAC;
+
+  time_white = millis();
 }
 
 
@@ -311,6 +315,7 @@ void loop() {
         delay(3000);
         state_robot = LINE;
         eeprom_write_line();
+        time_white = millis();
         break;
       }
     case (LINE):
@@ -331,7 +336,7 @@ void loop() {
         for (int i = 0; i < 6; i++) {
           robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
         }
-        int grey_scaled = 24;
+        int grey_scaled = 20;
 
         for (int i = 0; i < 6; i++) {
           if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
@@ -360,7 +365,7 @@ void loop() {
 
         display.println(String(distance2));
         display.setCursor(0, 30);
-        display.println(robot.angle_pitch);
+        display.println((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]));
         display.setCursor(0, 40);
         display.println(obj);
         display.display();
@@ -474,7 +479,14 @@ void loop() {
 
           robot.timeColors = millis();
         }
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
+          time_white = millis();
+        }
 
+        if ((millis() - time_white) > 7000) {
+          state_robot = EVAC;
+          break;
+        }
         /*if (distance2 < DIST_THRESHOLD) {
           if (is_obstacle()) state_robot = OBSTACLE;
         }*/
@@ -636,7 +648,7 @@ void loop() {
         if (last_state_robot == LINE) display.println("Do LINE");
         if (last_state_robot == ROTATING_GREEN) display.println("Do ROTATING_GREEN");
         display.display();
-
+        time_white = millis();
         break;
       }
     case (AFTER_STOP_SCREEN):
@@ -1057,6 +1069,10 @@ void loop() {
         turnAngle(-90, 45, 20);
         move_forward(600, 40);
         vyravn();*/
+        vyravn();
+        move_backward(300, 40);
+        turnAngle(-90, 40, 25);
+        move_forward(400, 40);
         display.clearDisplay();
         display.display();
         display.setCursor(0, 0);
@@ -1122,8 +1138,9 @@ void loop() {
           if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) >= 2) {
             motors(0, 0);
             delay(1000);
-            //vyravn();
-            state_robot = STOP_SCREEN0;
+            vyravn();
+            move_forward(100, 40);
+            state_robot = LINE;
             break;
           }
         }

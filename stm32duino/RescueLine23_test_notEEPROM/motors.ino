@@ -79,28 +79,40 @@ void sliders(int m1, int m2) {
   }
 }
 
-void move_forward(int enc, int v) {
+void move_forward(int enc_f, int v) {
+  encoder1 = 0;
+  encoder2 = 0;
   robot.motor1 = 0;
   robot.motor2 = 0;
   robot.ui1 = 0;
   robot.ui2 = 0;
+  display.clearDisplay();
+   display.setCursor(0, 0);
+  display.println("forward...");
+  display.display();
+  
+  display.display();
   int e1 = Enc1();
 
-  while ((Enc1() - e1) < enc) {
+  while ((Enc1() - e1) < enc_f) {
     robot.v1_target = v;
     robot.v2_target = v;
     motorsCorrectedSpeed();
     delay(5);
   }
+   display.clearDisplay();
+     display.display();
   motors(0, 0);
 }
-void move_backward(int enc, int v) {
+void move_backward(int enc_f, int v) {
+  encoder1 = 0;
+  encoder2 = 0;
   robot.motor1 = 0;
   robot.motor2 = 0;
   robot.ui1 = 0;
   robot.ui2 = 0;
   int e1 = Enc1();
-  while ((Enc1() - e1) > -enc) {
+  while ((Enc1() - e1) > -enc_f) {
     robot.v1_target = -v;
     robot.v2_target = -v;
     motorsCorrectedSpeed();

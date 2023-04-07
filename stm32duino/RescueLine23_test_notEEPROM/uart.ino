@@ -112,14 +112,16 @@ void GyroUARTClear() {
 
 
   while (GyroUART.available()) {
-    char t = GyroUART.read();
+  //for (int i = 0; i < 10000; i++) {
+    int t = GyroUART.read();
 
     //STlinkUART.print(t);
     //StopGyro();
   }
   //display.clearDisplay();
 
-
+display.clearDisplay();
+display.display();
   StartGyro();
 }
 
@@ -129,19 +131,18 @@ void CamUARTClear() {
   }
 }
 void StopGyro() {
-  
-  GyroUART.print('2');
+
+  //GyroUART.print('2');
   digitalWrite(LED2, LOW);
 }
 void StartGyro() {
   digitalWrite(LED2, HIGH);
-  GyroUART.print('3');
- 
+  //GyroUART.print('3');
 }
 void resetGyro() {
 
-  GyroUART.print('1');
+  //GyroUART.print('1');
 }
 void ZeroGyro() {
-  GyroUART.print('4');
+  //GyroUART.print('4');
 }

@@ -20,6 +20,7 @@ void initEncoderIRQs() {
 void enc1() {
   if (digitalRead(ENC1) == HIGH) encoder1--;
   else encoder1++;
+  if(abs(encoder1)>65535) encoder1=0;
 }
 int Enc1() {
   return encoder1;
@@ -27,6 +28,7 @@ int Enc1() {
 void enc2() {
   if (digitalRead(ENC2) == HIGH) encoder2++;
   else encoder2--;
+  if(abs(encoder2)>65535) encoder2=0;
 }
 int Enc2() {
   return encoder2;

@@ -96,7 +96,9 @@ void turnAngle(int target_angle, int max_v, int min_v) {
   GyroUARTClear();
   if (target_angle < -180) target_angle = -180;
   if (target_angle > 180) target_angle = 180;
-  for (int i = 0; i < 5; i++) {
+  GyroUART.end();
+   GyroUART.begin(9600);
+  for (int i = 0; i < 2; i++) {
     while (1) {
       if (parsingGyro()) {
         robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);

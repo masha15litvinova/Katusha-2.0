@@ -26,7 +26,7 @@ Supported Platforms:
 #define SerialPort SerialUSB
 #define LEDPIN 13
 
-#define TIME_DELAY 12
+#define TIME_DELAY 10
 
 void (*resetFunc)(void) = 0;
 
@@ -40,8 +40,8 @@ unsigned long time_integrated = millis();
 byte calibrated = 0;
 bool send = true;
 void setup() {
- // SerialPort.begin(9600);
-  Serial1.begin(9600);
+  //SerialPort.begin(9600);
+  Serial1.begin(115200);
 
   pinMode(LEDPIN, OUTPUT);
   // Call imu.begin() to verify communication and initialize
@@ -133,9 +133,7 @@ void loop() {
 
   if ((millis() - time_begin) > 30000) calibrated = 1;
   if (Serial1.available()) {
-
-    int signal = Serial1.read()-'0';
-    //Serial.println(signal);
+    byte signal = Serial1.read();
     if (signal == 1) {
       resetFunc();
     }

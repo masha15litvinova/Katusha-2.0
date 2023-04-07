@@ -9,6 +9,7 @@ int direction_color() {
 
   vyravn();
   //move_forward(10, 50);
+
   move_forward(5, 50);
   //vyravn();
   //0 - разворот на 180
@@ -163,7 +164,12 @@ void vyravnLine() {
 void vyravn() {
   
   GyroUARTClear();
-  for (int i = 0; i < 5; i++) {
+   display.clearDisplay();
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.println("align...");
+  display.display();
+  for (int i = 0; i < 2; i++) {
     while (1) {
       if (parsingGyro()) {
         robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
@@ -184,6 +190,11 @@ void vyravn() {
   else if ((yaw_now < 0) and (yaw_now >= -135)) turnAngle(-90 - yaw_now, 35, 25);
   else if ((yaw_now < 0) and (yaw_now >= -180)) turnAngle(-180 - yaw_now, 35, 25);
   else turnAngle(360 - yaw_now, 35, 25);
+   display.setCursor(0, 10);
+  display.println("align end...");
+  display.display();
+  display.clearDisplay();
+  display.display();
   
 }
 int colorDistance(int red, int green, int blue, int red_read, int green_read, int blue_read) {
