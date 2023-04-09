@@ -101,6 +101,9 @@ void resetLaserDist() {
   digitalWrite(XSHUT4, LOW);
 }
 void initPins() {
+  
+   pinMode(RST, OUTPUT);
+digitalWrite(RST, HIGH);
   pinMode(GYRO_RST, OUTPUT);
   pinMode(CAMERA_RST, OUTPUT);
   pinMode(RX3, INPUT_PULLDOWN);

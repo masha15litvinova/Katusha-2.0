@@ -1,0 +1,68 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.33.0.0
+Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: maria litvinova, 1, LIC=2TTQ1-C5DIT-AW42F-6W48K-KQD68-N10FH
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Professional  Version: 5.33.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 7 (build 960)
+Assembler:       Armasm.exe V5.06 update 7 (build 960)
+Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
+Library Manager: ArmAr.exe V5.06 update 7 (build 960)
+Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
+CPU DLL:         SARMCM3.DLL V5.33.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
+Dialog DLL:      TCM.DLL V1.48.0.0
+ 
+<h2>Project:</h2>
+C:\Users\masha\Documents\GitHub\LineBot\MazeBot\MazeBot.uvprojx
+Project File Date:  01/09/2023
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'Target 1'
+compiling main.cpp...
+.\src\librares\display\ssd1351\OLED_Driver.h(69): warning:  #47-D: incompatible redefinition of macro "BLACK"  (declared at line 18 of ".\src\librares\ssd1306\SSD1306\inc\SSD1306.h")
+  #define BLACK   0x0000
+.\src\librares\display\ssd1351\OLED_Driver.h(76): warning:  #47-D: incompatible redefinition of macro "WHITE"  (declared at line 19 of ".\src\librares\ssd1306\SSD1306\inc\SSD1306.h")
+  #define WHITE   0xFFFF
+.\src\librares\pwm\pwm.h(20): warning:  #1-D: last line of file ends without a newline
+  #endif
+.\src\librares\irqs\irqs.h(24): warning:  #1-D: last line of file ends without a newline
+  #endif
+.\src\librares\uart\uart.h(16): warning:  #1-D: last line of file ends without a newline
+  #endif
+src\main\main.cpp(22): warning:  #177-D: variable "distFrontAdress"  was declared but never referenced
+  static const uint8_t distFrontAdress = 20;
+src\main\main.cpp(23): warning:  #177-D: variable "distBackAdress"  was declared but never referenced
+  static const uint8_t distBackAdress = 18;
+src\main\main.cpp(24): warning:  #177-D: variable "distRightFrontAdress"  was declared but never referenced
+  static const uint8_t distRightFrontAdress = 12;
+src\main\main.cpp(25): warning:  #177-D: variable "distLeftFrontAdress"  was declared but never referenced
+  static const uint8_t distLeftFrontAdress = 10;
+src\main\main.cpp: 9 warnings, 0 errors
+linking...
+Program Size: Code=5870 RO-data=486 RW-data=72 ZI-data=1632  
+".\Object\MazeBot.axf" - 0 Error(s), 9 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.16.0.pack
+                Keil.STM32F4xx_DFP.2.16.0
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  C:\Users\masha\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.16.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>

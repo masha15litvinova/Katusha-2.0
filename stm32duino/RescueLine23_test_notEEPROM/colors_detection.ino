@@ -6,15 +6,18 @@ int direction_color() {
   display.clearDisplay();
   display.display();
 
-
+  ledBlinking();
   vyravn();
-  //move_forward(10, 50);
-
+  
+  ledBlinking();
   move_forward(5, 50);
+  
+  ledBlinking();
   //vyravn();
   //0 - разворот на 180
   //1 - направо
   //2 - налево
+  digitalWrite(LED1, HIGH);
   display.clearDisplay();
   display.setTextSize(1);
   display.setCursor(0, 0);
@@ -31,7 +34,7 @@ int direction_color() {
 
 
   display.setCursor(0, 20);
-  display.print("Right: " + String(r1) + " " + String(g1) + " " + String(b1)+" "+String(dist1));
+  display.print("Right: " + String(r1) + " " + String(g1) + " " + String(b1) + " " + String(dist1));
   tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
   delay(300);  // Delay for one old integ. time period (to finish old reading)
     // Delay for one new integ. time period (to allow new reading)
@@ -40,7 +43,7 @@ int direction_color() {
   int dist2 = colorDistance(RED_L, GREEN_L, BLUE_L, r2, g2, b2);
 
   display.setCursor(0, 30);
-  display.print("Left: " + String(r2) + " " + String(g2) + " " + String(b2)+" "+String(dist2));
+  display.print("Left: " + String(r2) + " " + String(g2) + " " + String(b2) + " " + String(dist2));
   display.display();
   display.setTextSize(2);
   display.setCursor(0, 50);
@@ -74,7 +77,7 @@ int direction_color() {
     dir1 = 2;
   }*/
 
-  
+
   display.display();
   motors(0, 0);
   /*move_backward(400, 60);
@@ -162,9 +165,9 @@ void vyravnLine() {
 }
 
 void vyravn() {
-  
+
   GyroUARTClear();
-   display.clearDisplay();
+  display.clearDisplay();
   display.setTextSize(1);
   display.setCursor(0, 0);
   display.println("align...");
@@ -190,19 +193,18 @@ void vyravn() {
   else if ((yaw_now < 0) and (yaw_now >= -135)) turnAngle(-90 - yaw_now, 35, 25);
   else if ((yaw_now < 0) and (yaw_now >= -180)) turnAngle(-180 - yaw_now, 35, 25);
   else turnAngle(360 - yaw_now, 35, 25);
-   display.setCursor(0, 10);
+  display.setCursor(0, 10);
   display.println("align end...");
   display.display();
   display.clearDisplay();
-  display.display();
-  
+ 
 }
 int colorDistance(int red, int green, int blue, int red_read, int green_read, int blue_read) {
   int dist = sqrt((red - red_read) * (red - red_read) + (green - green_read) * (green - green_read) + (blue - blue_read) * (blue - blue_read));
   return dist;
 }
 boolean isCross() {
-  
+
   if ((robot.colorDist1 < COLOR_DIST_LOW) or (robot.colorDist2 < COLOR_DIST_LOW)) {
     return true;
   }
