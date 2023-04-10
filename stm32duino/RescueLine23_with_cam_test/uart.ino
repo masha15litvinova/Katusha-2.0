@@ -146,15 +146,15 @@ void CamUARTClear() {
   }
 }
 void StopGyro() {
-  GyroUART.write(2);
+  //GyroUART.write(2);
 }
 void StartGyro() {
-  GyroUART.write(3);
+ // GyroUART.write(3);
 }
 void resetGyro() {
 
-  GyroUART.write(1);
+  //GyroUART.write(1);
 }
 void ZeroGyro() {
-  GyroUART.write(4);
+  //GyroUART.write(4);
 }

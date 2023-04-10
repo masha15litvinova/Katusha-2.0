@@ -1,4 +1,4 @@
-#include "project_config.h"
+D#include "project_config.h"
 #include "pin_config.h"
 
 HardwareSerial GyroUART(RX3, TX3);
@@ -38,8 +38,6 @@ byte bufferGyro[3];
 int big_err_line_sens = 0.7;
 
 bool state = true;
-
-long int time_white = millis();
 
 uint32_t distance1;
 uint32_t distance2 = 1000;
@@ -248,13 +246,12 @@ void setup() {
   //calibration_grab();
   sliders(0, 0);
   if (digitalRead(BUTTON2) == 0) {
-    state_robot = CALIBRATION;
-  } else {
-    state_robot = LINE;
-    eeprom_read_line();
+  state_robot = CALIBRATION;
+   } else {
+   state_robot = LINE;
+   eeprom_read_line();
   }
   robot.v = V_MAIN;
-  time_white = millis();
 }
 
 
@@ -447,10 +444,10 @@ void loop() {
         else if (((robot.angle_pitch)) > ANGLE_GORKA) robot.v = V_GORKA_UP;
         else if (((robot.angle_pitch)) < -ANGLE_GORKA) {
           robot.v = V_GORKA_DOWN;
-          if (robot.u_line > 10) robot.u_line = 10;
-          else if (robot.u_line < -10) robot.u_line = -10;
+          if(robot.u_line>10) robot.u_line = 10;
+          else if(robot.u_line<-10) robot.u_line = -10;
         }
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs((robot.angle_pitch) < 10) and (millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs((robot.angle_pitch) < 10) and (millis() - robot.timeColors) > COLORS_DELAY) ) //условие перекрестка
         {
           ZeroGyro();
           ZeroGyro();
@@ -504,16 +501,6 @@ void loop() {
         }
         motorsCorrectedSpeed();
         err_old_line_sens = err_line_sens;
-
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
-          time_white = millis();
-        }
-
-        if ((millis() - time_white) > 5000) {
-          state_robot = EVAC;
-          break;
-        }
-
         break;
       }
     case (MOTORS_PWM_COMPUTE):
@@ -639,7 +626,7 @@ void loop() {
         if (last_state_robot == LINE) display.println("Do LINE");
         if (last_state_robot == ROTATING_GREEN) display.println("Do ROTATING_GREEN");
         display.display();
-        time_white = millis();
+
         break;
       }
     case (AFTER_STOP_SCREEN):
@@ -1043,102 +1030,7 @@ void loop() {
         delay(2000);
         break;
       }
-    case (EVAC):
-      {
-        display.clearDisplay();
-        display.display();
-        display.setCursor(0, 10);
-        display.setTextSize(2);
-        display.println("EVAC ZONE");
-        display.display();
-        /*move_forward(850, 40);
-        turnAngle(-90, 45, 20);
-        move_forward(600, 40);
-        vyravn();*/
-        motors(0, 0);
-        vyravn();
-        //move_backward(200, 40);
-        turnAngle(-90, 35, 25);
-        move_forward(650, 40);
-        display.clearDisplay();
-        display.display();
-        display.setCursor(0, 0);
-        display.setTextSize(1);
-        int d3 = 20;
-        int d3_f = 20;
-        float k_filter = 0.5;
-        float kp_w = 1.0;
-        float kd_w = 0.6;
-        float ki_w = 0.07;
-        int err_w = 0;
-        int err_w_old = 0;
-        int ui_w = 0;
-        while (1) {
-          /*move_forward(4000, 40);
-          turnAngle(-90, 50, 35);
-          move_backward(600, 40);*/
-          //if (analogRead(FRONT_DIST) < 70) break;
-          display.clearDisplay();
-          display.setCursor(0, 0);
-          d3 = analogRead(FRONT_DIST);
-          d3_f = d3 * k_filter + d3_f * (1 - k_filter);
-          float d3_mm = 9000 * pow(d3_f, -1.1);
-          display.println(String(d3_mm));
-          err_w = d3_mm - 32;
-          ui_w = ui_w + err_w * ki_w;
-          if (abs(err_w) < 5) ui_w = 0;
-          int u_w = err_w * kp_w + (err_w - err_w_old) * kd_w + ui_w;
-          if (u_w > 90) u_w = 90;
-          if (u_w < -90) u_w = -90;
-          robot.v1_target = V_EVAC + u_w;
-          robot.v2_target = V_EVAC - u_w;
-          display.setCursor(0, 10);
-          display.println(String(u_w));
-          display.display();
-          motorsCorrectedSpeed();
-          delay(1);
-          err_w_old = err_w;
-
-          analogWrite(PWM_LIGHTS, PWM_LEDS);
-          int s[6] = { 0, 0, 0, 0, 0, 0 };
-          s[0] = analogRead(SENSOR1);
-          s[1] = analogRead(SENSOR2);
-          s[2] = analogRead(SENSOR3);
-          s[3] = analogRead(SENSOR4);
-          s[4] = analogRead(SENSOR5);
-          s[5] = analogRead(SENSOR6);
-          for (int i = 0; i < 6; i++) {
-            robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
-          }
-          int grey_scaled = 24;
-
-          for (int i = 0; i < 6; i++) {
-            if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
-              robot.sensors[i] = 1;
-              //display.fillRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
-            } else {
-              robot.sensors[i] = 0;
-              // display.drawRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
-            }
-          }
-
-          if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) >= 2) {
-            motors(0, 0);
-            delay(1000);
-            vyravn();
-            move_forward(250, 40);
-            robot.sensors[0] = 0;
-            robot.sensors[1] = 0;
-            robot.sensors[2] = 0;
-            robot.sensors[3] = 0;
-            robot.sensors[4] = 0;
-            robot.sensors[5] = 0;
-            state_robot = LINE;
-            break;
-          }
-        }
-        break;
-      }
+      
   }
 }
 

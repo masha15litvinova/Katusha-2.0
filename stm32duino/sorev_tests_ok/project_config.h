@@ -54,7 +54,6 @@
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
 #define V_MIN 20
-#define V_EVAC 40
 
 #define MAX_V 98
 
@@ -106,7 +105,6 @@
 #define COLOR_READ_DATA 15
 #define MOVE_SLIDERS 16
 #define OBSTACLE 17
-#define EVAC 18
 /*****************************************/
 
 int slider_pwm_safety_treshold = 255;

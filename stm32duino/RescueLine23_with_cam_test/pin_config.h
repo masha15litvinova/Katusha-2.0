@@ -36,7 +36,7 @@
 #define LED1 PE_0
 #define LED2 PE_1
 #define BALL PA_2
-#define FRONT_DIST PA_7
+#define FRONT_DIST PG_15
 
 /******LASER DIST SENSORS******/
 #define XSHUT1 PG_10
