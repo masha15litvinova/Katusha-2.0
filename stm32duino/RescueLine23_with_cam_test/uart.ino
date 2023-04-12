@@ -36,7 +36,7 @@ int parsingGyro() { /* :yaw/pitch/started/;   */
   static bool parseStartg = false;
   static byte counterg = 0;
   static String numberg = "";
-  /*if (GyroUART.available()) {
+  if (GyroUART.available()) {
     char ing;
     ing = GyroUART.read();
 
@@ -60,18 +60,8 @@ int parsingGyro() { /* :yaw/pitch/started/;   */
       // - '0' это перевод в число (если отправитель print)
       numberg = numberg + (ing - ASCII_CONVERT);
     }
-  }*/
-  char str[30];
-  int amount = GyroUART.readBytesUntil(';', str, 30);
-  str[amount] = NULL;
-  GParser imu_data(str, ',');
-  imu_data.split();
-
-  bufferGyro[0] = imu_data.getInt(0);
-  bufferGyro[1] = imu_data.getInt(1);
-  bufferGyro[2] = imu_data.getInt(2);
-  imu_data.clear();
-  return 1;
+  }
+  return 0;
 }
 
 void GyroUpdate() {
@@ -113,7 +103,7 @@ int conv_angle(int a, int start) {
 }
 
 void GyroUARTClear() {
-  display.clearDisplay();
+  /*display.clearDisplay();
   display.setTextSize(1);
   display.setCursor(0, 0);
   display.println("UART clear...");
@@ -129,15 +119,15 @@ void GyroUARTClear() {
   StopGyro();
   StopGyro();
   StopGyro();
-  StopGyro();
+  StopGyro();*/
   while (GyroUART.available() > 0) {
     char t = GyroUART.read();
     // StopGyro();
-  }
+  }/*
   display.clearDisplay();
   StartGyro();
   StartGyro();
-  StartGyro();
+  StartGyro();*/
 }
 
 void CamUARTClear() {

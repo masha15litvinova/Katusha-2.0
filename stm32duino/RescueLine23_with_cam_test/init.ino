@@ -13,6 +13,7 @@ void initGyro() {
   display.setCursor(0, 0);
   display.println("Init gyro...");
   display.display();
+  GyroUARTClear();
   long int time_uart_available = millis();
   while (!GyroUART.available()) {
     if ((millis() - time_uart_available) > 8000) {

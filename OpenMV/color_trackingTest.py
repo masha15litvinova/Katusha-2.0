@@ -1,5 +1,6 @@
 import sensor, image, time
 from pyb import UART
+from pyb import Pin
 import pyb
  #red_threshold_01 = (45, 100, -60, 80, 34, 91)
 red_threshold_01 = (0, 25, -7, 127, -128, -20)
