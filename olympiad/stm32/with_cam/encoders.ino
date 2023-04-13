@@ -1,13 +1,13 @@
-#define SPEED_COEFF_P 4.0//4.5   //1.0
-#define SPEED_COEFF_D 0.06//0.5   //0.8//0.8//0.8//0.3  //13
-#define SPEED_COEFF_I 0.6//0.08//0.043  //0.06
+#define SPEED_COEFF_P 10.5//4.5   //1.0
+#define SPEED_COEFF_D 0.0//0.02//0.5   //0.8//0.8//0.8//0.3  //13
+#define SPEED_COEFF_I 0.1//1.5//0.08//0.043  //0.06
 #define SPEED_COEFF_CUBE 0
 
 #define CPR 1050
 #define RPM1 132
 #define RPM2 155
 
-#define ERR_LIM 14
+#define ERR_LIM 8
 #define U_MAX 100
 volatile long int  encoder1 = 0;
 volatile long int encoder2 = 0;
@@ -20,6 +20,7 @@ void initEncoderIRQs() {
 void enc1() {
   if (digitalRead(ENC1) == HIGH) encoder1--;
   else encoder1++;
+  if(abs(encoder1)>650000) encoder1 = 0;
 }
 int Enc1() {
   return encoder1;
@@ -27,6 +28,7 @@ int Enc1() {
 void enc2() {
   if (digitalRead(ENC2) == HIGH) encoder2++;
   else encoder2--;
+  if(abs(encoder2)>650000) encoder2 = 0;
 }
 int Enc2() {
   return encoder2;

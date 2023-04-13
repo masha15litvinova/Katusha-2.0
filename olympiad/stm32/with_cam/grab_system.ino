@@ -126,7 +126,7 @@ void open_iris()
     servo1.write(i);
     delay(100);
   }
-    delay(300);
+    delay(1000);
   }
 void grab()
 {

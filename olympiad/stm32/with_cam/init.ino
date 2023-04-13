@@ -200,10 +200,10 @@ void initServos() {
   servo2.attach(SERVO2);
   servo3.attach(SERVO3);
 
-  servo1.write(90);
+  /*servo1.write(90);
   delay(1000);
   servo2.write(180);
-  servo3.write(0);
+  servo3.write(0);*/
 }
 void initColorSensors() {
   display.setTextColor(SH110X_WHITE);

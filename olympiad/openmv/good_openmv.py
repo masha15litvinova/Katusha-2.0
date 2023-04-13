@@ -3,7 +3,7 @@ from pyb import UART
 from pyb import Pin
 import pyb
  #red_threshold_01 = (45, 100, -60, 80, 34, 91)
-red_threshold_01 = (0, 33, -7, 127, -128, -20)
+red_threshold_01 = (0, 32, -56, 127, -128, -11)
 uart = UART(3, 9600)
 pin1 = Pin('P1', Pin.OUT_PP, Pin.PULL_NONE)
 blue_led = pyb.LED(3)
@@ -20,12 +20,12 @@ sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QVGA)
 sensor.skip_frames(20)
-sensor.set_auto_whitebal(False)
+sensor.set_auto_whitebal(True)
  #Turn off white balance. White balance is turned on by default. In color recognition, you need to turn off white balance
 clock = time.clock()
 img = sensor.snapshot()
 blobs = img.find_blobs([red_threshold_01],
-                         area_threshold=600)
+                         pixels_threshold=1700)
 last_blobs = blobs
 pin1.value(False)
 x_size = 320
@@ -44,27 +44,28 @@ while(True):
          print(roi2)
          blobs = img.find_blobs([red_threshold_01],
                                     roi = roi2,
-                                    area_threshold=2700)
+                                    pixels_threshold=1700)
          last_blobs = blobs
     else:
         blobs = img.find_blobs([red_threshold_01],
-                                    area_threshold=2700)
+                                    pixels_threshold=1700)
         last_blobs = blobs
     if last_blobs:
         #If the target color is found
         #  print(blobs)
         for b in last_blobs:#Iteratively find the target color area
-            img.draw_rectangle(b[0:4])
-            img.draw_cross(b[5], b[6])
-            cx = b[5]-round(x_size/2)
-            pixels_blue = b.pixels()
-            if(pixels_blue>3700):
-                pin1.value(True)
+            if(b.pixels()<10000)and(abs(b.cy()-round(y_size/2))<60):
+                img.draw_rectangle(b[0:4])
+                img.draw_cross(b[5], b[6])
+                cx = b[5]-round(x_size/2)
+                pixels_blue = b.pixels()
+                if(pixels_blue>3700):
+                    pin1.value(True)
 
-            print(pixels_blue)
-            data = map_value(cx, -round(x_size/2), round(x_size/2), 0,255)
-            uart.writechar(data)
-            blue_led .on()
+                print(pixels_blue)
+                data = map_value(cx, -round(x_size/2), round(x_size/2), 0,255)
+                uart.writechar(data)
+                blue_led .on()
 
     else:
         blue_led .off()

@@ -1043,8 +1043,8 @@ void loop() {
           display.display();
           ui_cube = ui_cube + err_cube * ki;
           int u_cube = err_cube * kp_cube + ui_cube;
-          if (u_cube > 40) u_cube = 40;
-          else if (u_cube < -40) u_cube = -40;
+          if (u_cube > 34) u_cube = 34;
+          else if (u_cube < -34) u_cube = -34;
           robot.v1_target = u_cube;
           robot.v2_target = -(u_cube);
           motorsCorrectedSpeed();
