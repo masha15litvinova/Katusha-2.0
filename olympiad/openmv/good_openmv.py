@@ -25,7 +25,7 @@ sensor.set_auto_whitebal(True)
 clock = time.clock()
 img = sensor.snapshot()
 blobs = img.find_blobs([red_threshold_01],
-                         pixels_threshold=1700)
+                         pixels_threshold=1200)
 last_blobs = blobs
 pin1.value(False)
 x_size = 320
@@ -44,22 +44,22 @@ while(True):
          print(roi2)
          blobs = img.find_blobs([red_threshold_01],
                                     roi = roi2,
-                                    pixels_threshold=1700)
+                                    pixels_threshold=1300)
          last_blobs = blobs
     else:
         blobs = img.find_blobs([red_threshold_01],
-                                    pixels_threshold=1700)
+                                    pixels_threshold=1300)
         last_blobs = blobs
     if last_blobs:
         #If the target color is found
         #  print(blobs)
         for b in last_blobs:#Iteratively find the target color area
-            if(b.pixels()<10000)and(abs(b.cy()-round(y_size/2))<60):
+            if(b.pixels()<10000)and(abs(b.cy()-round(y_size/2))<120):
                 img.draw_rectangle(b[0:4])
                 img.draw_cross(b[5], b[6])
                 cx = b[5]-round(x_size/2)
                 pixels_blue = b.pixels()
-                if(pixels_blue>3700):
+                if(pixels_blue>2350):
                     pin1.value(True)
 
                 print(pixels_blue)

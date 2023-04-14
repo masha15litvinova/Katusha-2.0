@@ -47,7 +47,7 @@
 #define COLOR_DIST_LOW 15
 
 #define V_CALIBR 0//140
-#define V_MAIN 28
+#define V_MAIN 25
 #define V_GORKA_UP 42
 #define V_GORKA_DOWN 50//22
 #define V_OBSTACLE 90
@@ -82,7 +82,7 @@
 #define GYRO_DELAY_LINE 12
 #define LINE_SENS_DELAY 6
 #define CURRENT_SENS_DELAY 600
-#define COLORS_DELAY 1500
+#define COLORS_DELAY 500
 
 /**********STATES************************/
 #define LINE 0
@@ -104,6 +104,7 @@
 #define COLOR_READ_DATA 15
 #define MOVE_SLIDERS 16
 #define OBSTACLE 17
+#define TAKE_CUBE 18
 /*****************************************/
 
 int slider_pwm_safety_treshold = 255;
