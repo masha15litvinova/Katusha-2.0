@@ -43,7 +43,7 @@
 #define GREEN_L 675
 #define BLUE_L 637
 
-#define COLOR_DIST_HIGH 24
+#define COLOR_DIST_HIGH 27
 #define COLOR_DIST_LOW 15
 
 #define V_CALIBR 0//140
