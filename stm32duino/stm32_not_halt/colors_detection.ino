@@ -8,8 +8,8 @@ int direction_color() {
 
 
   vyravn();
-  move_backward(20, 40);
-  //move_forward(5, 30);
+  //move_backward(20, 40);
+  //move_forward(10, 30);
   //vyravn();
   //0 - разворот на 180
   //1 - направо

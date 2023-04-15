@@ -882,7 +882,7 @@ void loop() {
         digitalWrite(LED1, LOW);
 
         // turnAngle(-179, 60, 40);
-
+move_backward(25, 40);
         switch (dir) {
           case (0):
             {
@@ -894,14 +894,14 @@ void loop() {
           case (1):
             {
               turnAngle(-90, 50, 35);
-              move_forward(40, 30);
+              move_forward(80, 30);
               robot.turn_detected = false;
               break;
             }
           case (2):
             {
               turnAngle(90, 50, 35);
-              move_forward(40, 30);
+              move_forward(80, 30);
               robot.turn_detected = false;
               break;
             }
@@ -1062,8 +1062,8 @@ void loop() {
         robot.ui1 = 0;
         robot.ui2 = 0;
         while (digitalRead(CAM_SIGNAL) == 0) {
-          robot.v1_target = 50;
-          robot.v2_target = 50;
+          robot.v1_target = 40;
+          robot.v2_target = 40;
           motorsCorrectedSpeed();
           delay(5);
         }

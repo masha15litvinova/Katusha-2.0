@@ -35,9 +35,9 @@
 
 
 
-#define RED_R 316
-#define GREEN_R 693
-#define BLUE_R 652
+#define RED_R 312
+#define GREEN_R 681
+#define BLUE_R 642
 
 #define RED_L 375
 #define GREEN_L 669
