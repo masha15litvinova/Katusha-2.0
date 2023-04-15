@@ -59,7 +59,7 @@ while(True):
                 img.draw_cross(b[5], b[6])
                 cx = b[5]-round(x_size/2)
                 pixels_blue = b.pixels()
-                if(pixels_blue>2350):
+                if(pixels_blue>1960):
                     pin1.value(True)
 
                 print(pixels_blue)

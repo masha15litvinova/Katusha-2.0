@@ -462,10 +462,10 @@ void loop() {
           ZeroGyro();
           motors(0, 0);
           uint16_t r1, g1, b1, c1, r2, g2, b2, c2;
-          delay(150);
+          delay(175);
           tcs1.getRawData(&r1, &g1, &b1, &c1);
           robot.colorDist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
-          delay(150);
+          delay(175);
           tcs2.getRawData(&r2, &g2, &b2, &c2);
           robot.colorDist2 = colorDistance(RED_L, GREEN_L, BLUE_L, r2, g2, b2);
           robot.timeColors = millis();

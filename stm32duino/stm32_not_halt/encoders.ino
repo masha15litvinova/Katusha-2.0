@@ -58,6 +58,7 @@ int vel1(float speed) {
   // state = !state;
   int sp_rpm = SpeedRPM1(speed);
   int delta_time = millis() - robot.timeMotor1;
+  if(delta_time==0) delta_time = 1;
   robot.current_speed1 = ((Enc1() - robot.prev_enc1) * 60000 / ((float)CPR * delta_time));
   robot.err1 = -robot.current_speed1 + (float)sp_rpm;
 
@@ -83,6 +84,7 @@ int vel2(float speed) {
   // state = !state;
   int sp_rpm = SpeedRPM2(speed);
   int delta_time = millis() - robot.timeMotor2;
+  if(delta_time==0) delta_time = 1;
   robot.current_speed2 = ((Enc2() - robot.prev_enc2) * 60000 / ((float)CPR * delta_time));
   robot.err2 = -robot.current_speed2 + (float)sp_rpm;
 
