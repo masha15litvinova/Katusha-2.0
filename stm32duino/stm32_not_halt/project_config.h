@@ -35,13 +35,13 @@
 
 
 
-#define RED_R 311
-#define GREEN_R 673
-#define BLUE_R 622
+#define RED_R 316
+#define GREEN_R 693
+#define BLUE_R 652
 
 #define RED_L 375
 #define GREEN_L 669
-#define BLUE_L 630
+#define BLUE_L 635
 
 #define COLOR_DIST_HIGH 25
 #define COLOR_DIST_LOW 15
@@ -85,7 +85,7 @@
 #define GYRO_DELAY_LINE 12
 #define LINE_SENS_DELAY 6
 #define CURRENT_SENS_DELAY 600
-#define COLORS_DELAY 600
+#define COLORS_DELAY 500
 
 /**********STATES************************/
 #define LINE 0

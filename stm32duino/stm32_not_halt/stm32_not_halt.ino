@@ -35,8 +35,8 @@ int grey[6] = { 0, 0, 0, 0, 0, 0 };
 //int dir = 3;
 int cameraData = 0;
 int gyroData = 0;
-byte bufferCam[3];
-byte bufferGyro[3];
+byte bufferCam[15];
+byte bufferGyro[15];
 
 int big_err_line_sens = 0.7;
 
@@ -328,7 +328,7 @@ void loop() {
         for (int i = 0; i < 6; i++) {
           robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
         }
-        int grey_scaled = 18;
+        int grey_scaled = 24;
 
         for (int i = 0; i < 6; i++) {
           if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
@@ -460,15 +460,13 @@ void loop() {
         }*/
         if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) /*and (abs(robot.angle_pitch) < 10) */ and (millis() - robot.timeColors) > COLORS_DELAY)  //условие перекрестка
         {
-          ZeroGyro();
-          ZeroGyro();
-          ZeroGyro();
+          
           motors(0, 0);
           uint16_t r1, g1, b1, c1, r2, g2, b2, c2;
-          delay(300);
+          delay(250);
           tcs1.getRawData(&r1, &g1, &b1, &c1);
           robot.colorDist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
-          delay(300);
+          delay(250);
           tcs2.getRawData(&r2, &g2, &b2, &c2);
           robot.colorDist2 = colorDistance(RED_L, GREEN_L, BLUE_L, r2, g2, b2);
           robot.timeColors = millis();
@@ -548,7 +546,7 @@ void loop() {
         for (int i = 0; i < 6; i++) {
           robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
         }
-        int grey_scaled = 24;
+        int grey_scaled = 20;
 
         for (int i = 0; i < 6; i++) {
           if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
@@ -657,6 +655,7 @@ void loop() {
         delay(200);
         state_robot = LINE;
         robot.online = millis();
+         CamUARTClear();
         break;
       }
     case (STOP_SCREEN1):
@@ -888,18 +887,21 @@ void loop() {
           case (0):
             {
               turnAngle(-178, 50, 35);
+              move_forward(140, 30);
               robot.turn_detected = false;
               break;
             }
           case (1):
             {
               turnAngle(-90, 50, 35);
+              move_forward(40, 30);
               robot.turn_detected = false;
               break;
             }
           case (2):
             {
               turnAngle(90, 50, 35);
+              move_forward(40, 30);
               robot.turn_detected = false;
               break;
             }

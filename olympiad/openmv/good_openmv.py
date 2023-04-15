@@ -3,7 +3,7 @@ from pyb import UART
 from pyb import Pin
 import pyb
  #red_threshold_01 = (45, 100, -60, 80, 34, 91)
-red_threshold_01 = (0, 32, -56, 127, -128, -11)
+red_threshold_01 = (0, 18, -25, 127, -128, -1)
 uart = UART(3, 9600)
 pin1 = Pin('P1', Pin.OUT_PP, Pin.PULL_NONE)
 blue_led = pyb.LED(3)
@@ -25,7 +25,7 @@ sensor.set_auto_whitebal(True)
 clock = time.clock()
 img = sensor.snapshot()
 blobs = img.find_blobs([red_threshold_01],
-                         pixels_threshold=1200)
+                         pixels_threshold=1700)
 last_blobs = blobs
 pin1.value(False)
 x_size = 320
@@ -44,11 +44,11 @@ while(True):
          print(roi2)
          blobs = img.find_blobs([red_threshold_01],
                                     roi = roi2,
-                                    pixels_threshold=1300)
+                                    pixels_threshold=1700)
          last_blobs = blobs
     else:
         blobs = img.find_blobs([red_threshold_01],
-                                    pixels_threshold=1300)
+                                    pixels_threshold=2200)
         last_blobs = blobs
     if last_blobs:
         #If the target color is found
@@ -59,7 +59,7 @@ while(True):
                 img.draw_cross(b[5], b[6])
                 cx = b[5]-round(x_size/2)
                 pixels_blue = b.pixels()
-                if(pixels_blue>1960):
+                if(pixels_blue>3700):
                     pin1.value(True)
 
                 print(pixels_blue)
