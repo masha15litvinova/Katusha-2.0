@@ -1,12 +1,12 @@
 void initEndstopIRQs()
 {
-  attachInterrupt(digitalPinToInterrupt(ENDSTOP1), endstop1, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENDSTOP2), endstop2, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENDSTOP3), endstop3, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENDSTOP4), endstop4, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENDSTOP1), endstop_1, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENDSTOP2), endstop_2, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENDSTOP3), endstop_3, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENDSTOP4), endstop_4, CHANGE);
 }
 
-void endstop1()
+void endstop_1()
 {
 
   motors(0, 0);
@@ -15,11 +15,11 @@ void endstop1()
   while ((millis() - time_begin) < 60) {}
   motors(0, 0);
 }
-void endstop2()
+void endstop_2()
 {
   state = !state;
 }
-void endstop3()
+void endstop_3()
 {
   motors(0, 0);
   motors(-30, -170);
@@ -27,7 +27,7 @@ void endstop3()
   while ((millis() - time_begin) < 60) {}
   motors(0, 0);
 }
-void endstop4()
+void endstop_4()
 {
   state = !state;
 }

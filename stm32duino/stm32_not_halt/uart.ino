@@ -108,26 +108,13 @@ void GyroUARTClear() {
   display.setCursor(0, 0);
   display.println("UART clear...");
   display.display();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
-  StopGyro();
+
   while (GyroUART.available() > 0) {
     char t = GyroUART.read();
     // StopGyro();
   }
   display.clearDisplay();
-  StartGyro();
-  StartGyro();
-  StartGyro();
+  display.display();
 }
 
 void CamUARTClear() {

@@ -1,11 +1,14 @@
 #include "project_config.h"
 #include "pin_config.h"
 
+#define USART3
+#define USART6
+
 HardwareSerial GyroUART(RX3, TX3);
 HardwareSerial CamUART(RX6, TX6);
 
-TIM_TypeDef *Instance = TIM14;
-HardwareTimer *Time = new HardwareTimer(Instance);
+/*TIM_TypeDef *Instance = TIM14;
+HardwareTimer *Time = new HardwareTimer(Instance);*/
 
 
 Adafruit_SH1106G display = Adafruit_SH1106G(128, 64, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RST, OLED_CS);
@@ -193,8 +196,8 @@ void setup() {
   /*Time->setOverflow(TIMER_FREQ, HERTZ_FORMAT);
     Time->attachInterrupt(time);
     Time->resume();*/
-  interrupts();
-  //__enable_irq();
+  //interrupts();
+
   initEncoderIRQs();
   initEndstopIRQs();
   //initButtonsIRQs();
@@ -208,10 +211,10 @@ void setup() {
   WIRE2.begin();
   WIRE3.begin();
 
-  GyroUART.setRx(RX3);
+  /*GyroUART.setRx(RX3);
   GyroUART.setTx(TX3);
   CamUART.setRx(RX6);
-  CamUART.setTx(TX6);
+  CamUART.setTx(TX6);*/
 
   GyroUART.begin(UART_BAUDRATE);
   CamUART.begin(UART_BAUDRATE);
@@ -325,7 +328,7 @@ void loop() {
         for (int i = 0; i < 6; i++) {
           robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
         }
-        int grey_scaled = 24;
+        int grey_scaled = 18;
 
         for (int i = 0; i < 6; i++) {
           if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
@@ -379,7 +382,7 @@ void loop() {
         if (abs(err_line_sens) < min_err_i) {
           robot.ui_line = 0;
         }
-        int delta_grey = 19;
+        int delta_grey = 20;
         int u_max = 108;
         //if (err_line_sens != 0)
         //{
@@ -462,10 +465,10 @@ void loop() {
           ZeroGyro();
           motors(0, 0);
           uint16_t r1, g1, b1, c1, r2, g2, b2, c2;
-          delay(175);
+          delay(300);
           tcs1.getRawData(&r1, &g1, &b1, &c1);
           robot.colorDist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
-          delay(175);
+          delay(300);
           tcs2.getRawData(&r2, &g2, &b2, &c2);
           robot.colorDist2 = colorDistance(RED_L, GREEN_L, BLUE_L, r2, g2, b2);
           robot.timeColors = millis();

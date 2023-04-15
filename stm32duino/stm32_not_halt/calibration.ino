@@ -4,7 +4,7 @@
 
 void calibration() {
   
-long int calibr_begin = millis();
+long calibr_begin = millis();
   motors(V_CALIBR, -V_CALIBR);
   
   while ((millis() - calibr_begin)<DELAY_CALIBR_4/4) {

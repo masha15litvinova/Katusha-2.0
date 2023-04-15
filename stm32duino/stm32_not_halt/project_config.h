@@ -44,7 +44,10 @@
 #define BLUE_L 630
 
 #define COLOR_DIST_HIGH 25
-#define COLOR_DIST_LOW 17
+#define COLOR_DIST_LOW 15
+
+
+#define COLOR_DIST_LOW_FAST 19
 
 #define V_CALIBR 0//140
 #define V_MAIN 25
@@ -82,7 +85,7 @@
 #define GYRO_DELAY_LINE 12
 #define LINE_SENS_DELAY 6
 #define CURRENT_SENS_DELAY 600
-#define COLORS_DELAY 700
+#define COLORS_DELAY 600
 
 /**********STATES************************/
 #define LINE 0

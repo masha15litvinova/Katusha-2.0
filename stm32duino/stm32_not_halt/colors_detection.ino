@@ -9,7 +9,7 @@ int direction_color() {
 
   vyravn();
   //move_forward(10, 50);
-  //move_forward(5, 35);
+  move_forward(5, 30);
   //vyravn();
   //0 - разворот на 180
   //1 - направо
@@ -192,7 +192,7 @@ int colorDistance(int red, int green, int blue, int red_read, int green_read, in
 }
 boolean isCross() {
   
-  if ((robot.colorDist1 < COLOR_DIST_LOW) or (robot.colorDist2 < COLOR_DIST_LOW)) {
+  if ((robot.colorDist1 < COLOR_DIST_LOW_FAST) or (robot.colorDist2 < COLOR_DIST_LOW_FAST)) {
     return true;
   }
 

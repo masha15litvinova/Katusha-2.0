@@ -9,14 +9,14 @@ public:
   int v = 0;
   int v1_target = 0;  //требуемая скорость
   int v2_target = 0;
-  long int encoder_remember = 0;  //1 motor
-  long int time_remember = 0;
+  long encoder_remember = 0;  //1 motor
+  long time_remember = 0;
   int motor1 = 0;  //подаваемый шим по факту
   int motor2 = 0;
 
   int sensors[6] = { 0, 0, 0, 0, 0, 0 };
   float sensors_analog[6] = { 0, 0, 0, 0, 0, 0 };
-  long int turnBegin = 0;
+  long turnBegin = 0;
   int startPosition = 10000;
   int targetAngle = 0;
   int errAngle = 0;
@@ -72,16 +72,16 @@ public:
   float kd_line = 0.01;//0.0015;   //0.01;     //1.0;//-1.5;
   float ki_line = 3.0;     //0.1;//0.5;//0.00001;//0.003;//0.009;     //0.03;//2.0;//0.5;//0.012;//0.0005;//0.009;
 
-  long int timeGyro = 0;
-  long int timeCamera = 0;
-  long int timeDist2 = 0;  //передний дальномер снизу (опрашивается, когда робот следует по линии)
-  long int timeMotors = 0;
-  long int timeLED = 0;
-  long int timeLineSens = 0;
-  long int timeCurrSens = 0;
-  long int timeMotor1 = 0;
-  long int timeMotor2 = 0;
-  long int timeColors = 0;
+  long timeGyro = 0;
+  long timeCamera = 0;
+  long timeDist2 = 0;  //передний дальномер снизу (опрашивается, когда робот следует по линии)
+  long timeMotors = 0;
+  long timeLED = 0;
+  long timeLineSens = 0;
+  long timeCurrSens = 0;
+  long timeMotor1 = 0;
+  long timeMotor2 = 0;
+  long timeColors = 0;
 
   int colorDist1 = 1000;
   int colorDist2 = 1000;
@@ -103,14 +103,14 @@ public:
 
   float err2_old = 0;
 
-  long int prev_enc1 = 0;
-  long int prev_enc2 = 0;
+  long prev_enc1 = 0;
+  long prev_enc2 = 0;
 
   float current_speed1 = 0;
 
   float current_speed2 = 0;
 
-  long int online = millis();
+  long online = millis();
 };
 
 Robot::Robot(){};
