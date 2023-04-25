@@ -8,8 +8,8 @@ int direction_color() {
 
 
   vyravn();
-  //move_backward(20, 40);
-  //move_forward(10, 30);
+  //move_forward(10, 50);
+  move_forward(5, 50);
   //vyravn();
   //0 - разворот на 180
   //1 - направо
@@ -96,7 +96,7 @@ int direction_color() {
   else if (dir1 = 2) display.print("LEFT");
   else display.print("NO");
   display.display();
-  move_forward(180, 60);
+  move_forward(130, 60);
   vyravn();
   delay(500);
   return dir1;
@@ -192,7 +192,7 @@ int colorDistance(int red, int green, int blue, int red_read, int green_read, in
 }
 boolean isCross() {
   
-  if ((robot.colorDist1 < COLOR_DIST_LOW_FAST) or (robot.colorDist2 < COLOR_DIST_LOW_FAST)) {
+  if ((robot.colorDist1 < COLOR_DIST_LOW) or (robot.colorDist2 < COLOR_DIST_LOW)) {
     return true;
   }
 
