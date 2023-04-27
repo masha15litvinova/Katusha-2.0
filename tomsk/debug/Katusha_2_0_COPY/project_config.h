@@ -43,12 +43,12 @@
 
 
 #define RED_R 317
-#define GREEN_R 685
-#define BLUE_R 644
+#define GREEN_R 681
+#define BLUE_R 636
 
-#define RED_L 380
-#define GREEN_L 677
-#define BLUE_L 643
+#define RED_L 379
+#define GREEN_L 675
+#define BLUE_L 637
 
 #define COLOR_DIST_HIGH 24
 #define COLOR_DIST_LOW 15

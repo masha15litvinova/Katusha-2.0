@@ -101,7 +101,7 @@ void SwitchOffOnLaserDist()
   digitalWrite(SWITCH2, HIGH);
   digitalWrite(SWITCH3, HIGH);
   digitalWrite(SWITCH4, HIGH);
-  //delay(100);
+  delay(100);
   digitalWrite(SWITCH1, LOW);
   digitalWrite(SWITCH2, LOW);
   digitalWrite(SWITCH3, LOW);

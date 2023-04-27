@@ -1,6 +1,6 @@
-#define SPEED_COEFF_P 3.5   //4.5   //1.0
-#define SPEED_COEFF_D 0.05  //0.02//0.5   //0.8//0.8//0.8//0.3  //13
-#define SPEED_COEFF_I 0.12  //1.5//0.08//0.043  //0.06
+#define SPEED_COEFF_P 3.5//4.5   //1.0
+#define SPEED_COEFF_D 0.05//0.02//0.5   //0.8//0.8//0.8//0.3  //13
+#define SPEED_COEFF_I 0.12//1.5//0.08//0.043  //0.06
 #define SPEED_COEFF_CUBE 0
 
 #define CPR 1050
@@ -9,7 +9,7 @@
 
 #define ERR_LIM 8
 #define U_MAX 100
-volatile long int encoder1 = 0;
+volatile long int  encoder1 = 0;
 volatile long int encoder2 = 0;
 
 void initEncoderIRQs() {
@@ -20,6 +20,7 @@ void initEncoderIRQs() {
 void enc1() {
   if (digitalRead(ENC1) == HIGH) encoder1--;
   else encoder1++;
+  if(abs(encoder1)>650000) encoder1 = 0;
 }
 int Enc1() {
   return encoder1;
@@ -27,6 +28,7 @@ int Enc1() {
 void enc2() {
   if (digitalRead(ENC2) == HIGH) encoder2++;
   else encoder2--;
+  if(abs(encoder2)>650000) encoder2 = 0;
 }
 int Enc2() {
   return encoder2;
@@ -58,7 +60,7 @@ int vel1(float speed) {
   // state = !state;
   int sp_rpm = SpeedRPM1(speed);
   int delta_time = millis() - robot.timeMotor1;
-  if (delta_time == 0) delta_time = 1;
+  if (delta_time==0) delta_time = 1;
   robot.current_speed1 = ((Enc1() - robot.prev_enc1) * 60000 / ((float)CPR * delta_time));
   robot.err1 = -robot.current_speed1 + (float)sp_rpm;
 
@@ -84,7 +86,7 @@ int vel2(float speed) {
   // state = !state;
   int sp_rpm = SpeedRPM2(speed);
   int delta_time = millis() - robot.timeMotor2;
-  if (delta_time == 0) delta_time = 1;
+   if (delta_time==0) delta_time = 1;
   robot.current_speed2 = ((Enc2() - robot.prev_enc2) * 60000 / ((float)CPR * delta_time));
   robot.err2 = -robot.current_speed2 + (float)sp_rpm;
 

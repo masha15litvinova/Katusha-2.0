@@ -94,7 +94,6 @@ void turnAngle(int target_angle, int max_v, int min_v) {
   robot.ui2 = 0;
  
   GyroUARTClear();
-  
   if (target_angle < -180) target_angle = -180;
   if (target_angle > 180) target_angle = 180;
   for (int i = 0; i < 5; i++) {
@@ -129,9 +128,8 @@ void turnAngle(int target_angle, int max_v, int min_v) {
   display.display();
   delay(100);
   display.clearDisplay();
-if (DEBUG) ST_Link.println("turn angle");
+
   while (abs(err_turn) > MAX_ERR_ANGLE) {
-    
     digitalWrite(LED1, LOW);
     if (parsingGyro()) {
       digitalWrite(LED1, HIGH);
@@ -180,7 +178,7 @@ if (DEBUG) ST_Link.println("turn angle");
   delay(300);
   display.clearDisplay();
   display.display();
-  if (DEBUG) ST_Link.println("end turn angle");
+  
 }
 
 void turnAngle90Right(int max_v, int min_v) {  //поворот на данный угол относительно текущего

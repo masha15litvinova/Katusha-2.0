@@ -1,11 +1,8 @@
 #include "project_config.h"
 #include "pin_config.h"
 
-#define DEBUG false
-
 HardwareSerial GyroUART(RX3, TX3);
 HardwareSerial CamUART(RX6, TX6);
-HardwareSerial ST_Link(RX2, TX2);
 
 VL53L0X sensor_rf;
 VL53L0X sensor_f;
@@ -37,8 +34,8 @@ int grey[6] = { 0, 0, 0, 0, 0, 0 };
 //int dir = 3;
 int cameraData = 0;
 int gyroData = 0;
-byte bufferCam[15];
-byte bufferGyro[15];
+byte bufferCam[3];
+byte bufferGyro[3];
 
 int big_err_line_sens = 0.7;
 
@@ -226,14 +223,13 @@ void setup() {
 
 
 
-  /*GyroUART.setRx(RX3);
+  GyroUART.setRx(RX3);
   GyroUART.setTx(TX3);
   CamUART.setRx(RX6);
-  CamUART.setTx(TX6);*/
+  CamUART.setTx(TX6);
 
   GyroUART.begin(UART_BAUDRATE);
   CamUART.begin(UART_BAUDRATE);
-  ST_Link.begin(UART_BAUDRATE);
 
   display.begin(0, true);
   display.display();
@@ -291,14 +287,13 @@ void loop() {
   btn1.run();
   btn2.run();
 
-
+  int time_now = millis();
   //motors(-180, -180);
-  /*if (state) {
+  if (state) {
     digitalWrite(LED2, HIGH);
   } else {
     digitalWrite(LED2, LOW);
   }
-*/
 
   switch (state_robot) {
     case (CALIBRATION):
@@ -446,7 +441,9 @@ void loop() {
         }
         if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs((robot.angle_pitch) < 10) and (millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
         {
-          if (DEBUG) ST_Link.println("check cross");
+          ZeroGyro();
+          ZeroGyro();
+          ZeroGyro();
           motors(0, 0);
           uint16_t r1, g1, b1, c1, r2, g2, b2, c2;
           delay(150);
@@ -472,7 +469,6 @@ void loop() {
           digitalWrite(SWITCH2, HIGH);
           delay(10);
           digitalWrite(SWITCH2, LOW);
-          Wire.begin();
         }
 
 
@@ -505,7 +501,93 @@ void loop() {
         err_old_line_sens = err_line_sens;
         break;
       }
+    case (MOTORS_PWM_COMPUTE):
+      {
+        if (abs(robot.v1_target) < min_pwm) {
+          if (robot.v1_target > 0) robot.v1_target = min_pwm;
+          else if (robot.v1_target < 0) robot.v1_target = -min_pwm;
+        }
+        if (abs(robot.v2_target) < min_pwm) {
+          if (robot.v2_target > 0) robot.v2_target = min_pwm;
+          else if (robot.v2_target < 0) robot.v2_target = -min_pwm;
+        }
+        robot.motor1 = vel1(round(robot.v1_target));
+        robot.motor2 = vel2(round(robot.v2_target));
+        robot.timeMotors = millis();
 
+        state_robot = last_state_robot;
+
+        break;
+      }
+    case (LINE_READ_DATA):
+      {
+        bool analog = true;
+        display.clearDisplay();
+
+        analogWrite(PWM_LIGHTS, PWM_LEDS);
+        int s[6] = { 0, 0, 0, 0, 0, 0 };
+        s[0] = analogRead(SENSOR1);
+        s[1] = analogRead(SENSOR2);
+        s[2] = analogRead(SENSOR3);
+        s[3] = analogRead(SENSOR4);
+        s[4] = analogRead(SENSOR5);
+        s[5] = analogRead(SENSOR6);
+        for (int i = 0; i < 6; i++) {
+          robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
+        }
+        int grey_scaled = 24;
+
+        for (int i = 0; i < 6; i++) {
+          if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
+            robot.sensors[i] = 1;
+            //display.fillRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+          } else {
+            robot.sensors[i] = 0;
+            // display.drawRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+          }
+          //display.drawRect(10 + i * 15, 30, 7, 15, SH110X_WHITE);
+          if (analog) {
+            for (int i = 0; i < 6; i++) {
+              int x = map(s[i], white[i], black[i], 0, 100);
+              //display.fillRect(10 + i * 15, 30, 7, map(x, 0, 100, 0, 15), SH110X_WHITE);
+            }
+          }
+          //robot.sensors[i] = map(s[i], white[i], black[i], 0, 100)/100.0;  //приведение к одному диапазону, т.к. разные поверхности по-разному отражают
+          //-->где-то ошибка больше, поэтому скорость больше
+        }
+
+        robot.timeLineSens = millis();
+
+        display.display();
+        state_robot = LINE;
+
+        break;
+      }
+    case (CAMERA_READ_DATA):
+
+      {
+        robot.timeCamera = millis();
+        state_robot = last_state_robot;
+        break;
+      }
+    case (GYRO_READ_DATA):
+      {
+        digitalWrite(LED1, HIGH);
+
+        if (GyroUART.available()) {
+          int uart_read = GyroUART.read();
+          robot.angle_uart = map(uart_read, 0, 255, 0, 360);
+        }
+        robot.timeGyro = millis();
+        state_robot = last_state_robot;
+        break;
+      }
+    case (DIST2_READ_DATA):
+      {
+
+
+        break;
+      }
     case (STOP_SCREEN0):
       {
         btn1.run();
@@ -698,11 +780,8 @@ void loop() {
         display.setCursor(0, 10);
         display.setTextSize(2);
         display.print("TURN...");
-
         display.display();
-        if (DEBUG) {
-          ST_Link.println("turn begin");
-        }
+
         digitalWrite(LED1, LOW);
 
         // turnAngle(-179, 60, 40);
@@ -716,8 +795,6 @@ void loop() {
             }
           case (1):
             {
-              if (DEBUG) ST_Link.println("right");
-
               turnAngle(-90, 50, 35);
               robot.turn_detected = false;
               break;
@@ -785,7 +862,7 @@ void loop() {
 
         float kp_obst = 0.15;
         float kd_obst = 0.03;
-        int ideal_dist = 140;
+        int ideal_dist = 120;
         int err_obst = 0;
         int err_old_obst = 0;
         int u_obst = 0;
@@ -796,8 +873,7 @@ void loop() {
         display.display();
         motors(0, 0);
         move_backward(140, 45);
-        turnAngle(60, 50, 35);
-        move_forward(150, 40);
+        turnAngle(45, 50, 35);
         for (int i = 0; i < 6; i++) robot.sensors[i] = 0;
         long int time_begin_obst = millis();
         while ((millis() - time_begin_obst) < 1000) {
@@ -833,8 +909,8 @@ void loop() {
             }
           }
 
-          robot.dist_right = get_distance(&sensor_r);
-          err_obst = robot.dist_right - ideal_dist;
+          robot.dist_right_front = get_distance(&sensor_rf);
+          err_obst = robot.dist_right_front - ideal_dist;
           u_obst = err_obst * kp_obst + (err_obst - err_old_obst) * kd_obst;
           robot.v1_target = V_OBST + u_obst;
           robot.v2_target = V_OBST - u_obst;
@@ -847,12 +923,9 @@ void loop() {
           err_old_obst = err_obst;
         }
         motors(0, 0);
-        move_forward(200, 40);
-        turnAngle(85, 50, 35);
+        turnAngle(45, 50, 35);
         state_robot = last_state_robot;
         robot.dist_front = -1;
-        robot.dist_right_front = -1;
-         robot.dist_right = -1;
         break;
       }
     case (TAKE_CUBE):
@@ -897,4 +970,8 @@ void loop() {
         break;
       }
   }
+}
+
+void fail_save() {
+  move_backward(300, 50);
 }

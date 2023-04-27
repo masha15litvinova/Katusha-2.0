@@ -1,4 +1,7 @@
 
+
+
+
 void resetCamera() {
   digitalWrite(CAMERA_RST, LOW);
   delay(500);
@@ -95,33 +98,7 @@ void resetLaserDist() {
   digitalWrite(XSHUT3, LOW);
   digitalWrite(XSHUT4, LOW);
 }
-void SwitchOffOnLaserDist()
-{
-  digitalWrite(SWITCH1, HIGH);
-  digitalWrite(SWITCH2, HIGH);
-  digitalWrite(SWITCH3, HIGH);
-  digitalWrite(SWITCH4, HIGH);
-  //delay(100);
-  digitalWrite(SWITCH1, LOW);
-  digitalWrite(SWITCH2, LOW);
-  digitalWrite(SWITCH3, LOW);
-  digitalWrite(SWITCH4, LOW);
-}
 void initPins() {
-  pinMode(XSHUT1, OUTPUT);
-  pinMode(XSHUT2, OUTPUT);
-  pinMode(XSHUT3, OUTPUT);
-  pinMode(XSHUT4, OUTPUT);
-
-  pinMode(SWITCH1, OUTPUT);
-  pinMode(SWITCH2, OUTPUT);
-  pinMode(SWITCH3, OUTPUT);
-  pinMode(SWITCH4, OUTPUT);
-
-  digitalWrite(SWITCH1, LOW);
-  digitalWrite(SWITCH2, LOW);
-  digitalWrite(SWITCH3, LOW);
-  digitalWrite(SWITCH4, LOW);
   pinMode(GYRO_RST, OUTPUT);
   pinMode(CAMERA_RST, OUTPUT);
   pinMode(RX3, INPUT_PULLDOWN);
@@ -185,7 +162,20 @@ void initPins() {
   digitalWrite(LED1, LOW);
   digitalWrite(LED2, LOW);
 
+  pinMode(XSHUT1, OUTPUT);
+  pinMode(XSHUT2, OUTPUT);
+  pinMode(XSHUT3, OUTPUT);
+  pinMode(XSHUT4, OUTPUT);
 
+  pinMode(SWITCH1, OUTPUT);
+  pinMode(SWITCH2, OUTPUT);
+  pinMode(SWITCH3, OUTPUT);
+  pinMode(SWITCH4, OUTPUT);
+
+  digitalWrite(SWITCH1, LOW);
+  digitalWrite(SWITCH2, LOW);
+  digitalWrite(SWITCH3, LOW);
+  digitalWrite(SWITCH4, LOW);
 
   pinMode(FRONT_DIST, INPUT);
   pinMode(CAM_SIGNAL, INPUT);
@@ -243,43 +233,66 @@ void initColorSensors() {
 
 void initLaserDists() {
   display.setTextColor(SH110X_WHITE);
-  digitalWrite(XSHUT1, 1);
-  delay(100);
-  //sensor_r.setBus(WIRE1);
-  sensor_rf.setAddress(sensor_lf_newAddress);
-  delay(10);
+  digitalWrite(XSHUT1, HIGH);
+  sensor1.begin();
+  int status1 = sensor1.InitSensor(0xC0);
 
-  digitalWrite(XSHUT2, 1);
-  delay(100);
-  sensor_f.setAddress(sensor_f_newAddress);
-  //sensor_u.setBus(WIRE1);
-  delay(10);
+  digitalWrite(XSHUT2, HIGH);
+  sensor2.begin();
+  int status2 = sensor2.InitSensor(0x31);
 
-  digitalWrite(XSHUT3, 1);
-  delay(100);
-  sensor_lf.setAddress(sensor_lf_newAddress);
-  delay(10);
+  digitalWrite(XSHUT3, HIGH);
+  sensor3.begin();
+  int status3 = sensor3.InitSensor(0x10);
 
-  digitalWrite(XSHUT4, 1);
-  delay(100);
-  sensor_r.setAddress(sensor_r_newAddress);
-  delay(10);
+  digitalWrite(XSHUT4, HIGH);
+  sensor4.begin();
+  int status4 = sensor4.InitSensor(0x3C);
 
-  sensor_lf.init();
-  sensor_f.init();
-  sensor_rf.init();
-  sensor_r.init();
+  if (status1) {
+    display.setCursor(0, 0);
+    display.println("Init sensor1 failed...");
+    display.display();
+    Serial.println("");
+  } else {
+    display.setCursor(0, 0);
+    display.println("Init sensor1 ok...");
+    display.display();
+    Serial.println("");
+  }
 
-  delay(2000);
-
-  sensor_lf.setTimeout(500);
-  sensor_f.setTimeout(500);
-  sensor_rf.setTimeout(500);
-  sensor_r.setTimeout(500);
-
-  sensor_lf.startContinuous(5);
-  sensor_f.startContinuous(5);
-  sensor_rf.startContinuous();
-  sensor_r.startContinuous();
+  if (status2) {
+    display.setCursor(0, 10);
+    display.println("Init sensor2 failed...");
+    display.display();
+    Serial.println("");
+  } else {
+    display.setCursor(0, 10);
+    display.println("Init sensor2 ok...");
+    display.display();
+    Serial.println("");
+  }
+  if (status3) {
+    display.setCursor(0, 20);
+    display.println("Init sensor3 failed...");
+    display.display();
+    Serial.println("");
+  } else {
+    display.setCursor(0, 20);
+    display.println("Init sensor3 ok...");
+    display.display();
+    Serial.println("");
+  }
+  if (status4) {
+    display.setCursor(0, 30);
+    display.println("Init sensor4 failed...");
+    display.display();
+    Serial.println("");
+  } else {
+    display.setCursor(0, 30);
+    display.println("Init sensor4 ok...");
+    display.display();
+    Serial.println("");
+  }
   delay(400);
 }

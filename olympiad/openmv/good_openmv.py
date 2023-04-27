@@ -3,7 +3,7 @@ from pyb import UART
 from pyb import Pin
 import pyb
  #red_threshold_01 = (45, 100, -60, 80, 34, 91)
-red_threshold_01 = (0, 44, -30, 17, -128, -3)
+red_threshold_01 = (0, 44, -33, 56, -128, -3)
 uart = UART(3, 9600)
 pin1 = Pin('P1', Pin.OUT_PP, Pin.PULL_NONE)
 blue_led = pyb.LED(3)

@@ -21,9 +21,6 @@
 
 #define RX6 PG_9  //CAMERA
 #define TX6 PG_14
-
-#define RX2 PD_6  //st link
-#define TX2 PD_5
 /*********************************/
 
 #define BUTTON1 PC_6  //102
