@@ -536,7 +536,7 @@ void loop() {
         display.setCursor(0, 0);
         display.println("Line sensors:");
         display.setCursor(0, 10);
-        analogWrite(PWM_LIGHTS, PWM_LEDS);
+        analogWrite(PWM_LIGHTS, 0);
         robot.sensors[0] = analogRead(SENSOR1);
         robot.sensors[1] = analogRead(SENSOR2);
         robot.sensors[2] = analogRead(SENSOR3);

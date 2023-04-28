@@ -274,6 +274,7 @@ void setup() {
   }
   robot.v = V_MAIN;
   CamUARTClear();
+  robot.timeWhite = millis();
 }
 
 
@@ -325,6 +326,7 @@ void loop() {
         delay(3000);
         state_robot = STOP_SCREEN0;
         eeprom_write_line();
+        robot.timeWhite = millis();
         break;
       }
     case (LINE):
@@ -444,6 +446,14 @@ void loop() {
           if (robot.u_line > 10) robot.u_line = 10;
           else if (robot.u_line < -10) robot.u_line = -10;
         }
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
+          robot.timeWhite = millis();
+        }
+        if ((millis() - robot.timeWhite) > 6000) {
+          state_robot = EVAC_ZONE;
+
+          break;
+        }
         if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs((robot.angle_pitch) < 10) and (millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
         {
           if (DEBUG) ST_Link.println("check cross");
@@ -537,6 +547,7 @@ void loop() {
         if (last_state_robot == ROTATING_GREEN) display.println("Do ROTATING_GREEN");
         display.display();
         CamUARTClear();
+        robot.timeWhite = millis();
         break;
       }
     case (AFTER_STOP_SCREEN):
@@ -566,7 +577,7 @@ void loop() {
         display.setCursor(0, 0);
         display.println("Line sensors:");
         display.setCursor(0, 10);
-        analogWrite(PWM_LIGHTS, PWM_LEDS);
+        analogWrite(PWM_LIGHTS, 0);
         robot.sensors[0] = map(analogRead(SENSOR1), white[0], black[0], 0, 100);
         robot.sensors[1] = map(analogRead(SENSOR2), white[1], black[1], 0, 100);
         robot.sensors[2] = map(analogRead(SENSOR3), white[2], black[2], 0, 100);
@@ -852,7 +863,7 @@ void loop() {
         state_robot = last_state_robot;
         robot.dist_front = -1;
         robot.dist_right_front = -1;
-         robot.dist_right = -1;
+        robot.dist_right = -1;
         break;
       }
     case (TAKE_CUBE):
@@ -894,6 +905,36 @@ void loop() {
         }
         motors(0, 0);
         state_robot = MOVE_SLIDERS;
+        break;
+      }
+    case (EVAC_ZONE):
+      {
+        vyravn();
+        turnAngle(-90, 28, 45);
+        move_forward(200, 50);
+        float kp_wall = 0.15;
+        float kd_wall = 0.03;
+        int ideal_dist = 80;
+        int err_wall = 0;
+        int err_old_wall = 0;
+        int u_wall = 0;
+        while (1) {
+          display.clearDisplay();
+          robot.dist_right_front = get_distance(&sensor_rf);
+          if (robot.dist_right_front < 0) robot.dist_right_front = ideal_dist;
+          err_wall = robot.dist_right_front - ideal_dist;
+          u_wall = err_wall * kp_wall + (err_wall - err_old_wall) * kd_wall;
+          robot.v1_target = V_WALL + u_wall;
+          robot.v2_target = V_WALL - u_wall;
+          motorsCorrectedSpeed();
+          display.setCursor(0, 0);
+          display.setTextSize(1);
+          display.println(robot.dist_right_front);
+          display.display();
+          //delay(5);
+          err_old_wall = err_wall;
+        }
+
         break;
       }
   }

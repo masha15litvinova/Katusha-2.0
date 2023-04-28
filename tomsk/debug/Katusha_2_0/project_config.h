@@ -42,15 +42,15 @@
 
 
 
-#define RED_R 317
-#define GREEN_R 685
-#define BLUE_R 644
+#define RED_R 315
+#define GREEN_R 679
+#define BLUE_R 632
 
 #define RED_L 380
 #define GREEN_L 677
 #define BLUE_L 643
 
-#define COLOR_DIST_HIGH 24
+#define COLOR_DIST_HIGH 23
 #define COLOR_DIST_LOW 15
 
 #define V_CALIBR 0//140
@@ -61,6 +61,7 @@
 #define V_GRAB_BALL 80
 #define V_MIN 20
 #define V_OBST 40
+#define V_WALL 45
 
 #define MAX_V 98
 
@@ -113,6 +114,7 @@
 #define MOVE_SLIDERS 16
 #define OBSTACLE 17
 #define TAKE_CUBE 18
+#define EVAC_ZONE 19
 /*****************************************/
 
 int slider_pwm_safety_treshold = 245;
