@@ -1,3 +1,5 @@
+#define WHEEL_RADIUS 75
+
 void motorsCorrectedSpeed() {
   robot.motor1 = vel1(round(robot.v1_target));
   robot.motor2 = vel2(round(robot.v2_target));
@@ -103,6 +105,22 @@ void move_backward(int enc, int v) {
   while ((Enc1() - e1) > -enc) {
     robot.v1_target = -v;
     robot.v2_target = -v;
+    motorsCorrectedSpeed();
+    delay(5);
+  }
+  motors(0, 0);
+}
+
+void move_forward_mm(int mm, int v) {
+  robot.motor1 = 0;
+  robot.motor2 = 0;
+  robot.ui1 = 0;
+  robot.ui2 = 0;
+  int e1 = Enc1();
+  int enc = ((mm * CPR) / (2 * PI * WHEEL_RADIUS));
+  while ((Enc1() - e1) < enc) {
+    robot.v1_target = v;
+    robot.v2_target = v;
     motorsCorrectedSpeed();
     delay(5);
   }

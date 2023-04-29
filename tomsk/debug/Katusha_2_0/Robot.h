@@ -35,6 +35,11 @@ int dist_left_front = -1;
 int dist_right_front = -1;
 int dist_right = -1;
 
+int dist_front_last = -1;
+int dist_left_front_last = -1;
+int dist_right_front_last = -1;
+int dist_right_last = -1;
+
 long int timeWhite = 0;
   byte gyroStarted = 0;
 

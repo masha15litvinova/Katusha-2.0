@@ -1,7 +1,7 @@
 #include "project_config.h"
 #include "pin_config.h"
 
-#define DEBUG false
+#define DEBUG true
 
 HardwareSerial GyroUART(RX3, TX3);
 HardwareSerial CamUART(RX6, TX6);
@@ -426,6 +426,11 @@ void loop() {
         }
 
         robot.dist_front = get_distance(&sensor_f);
+        if (robot.dist_front < 0) {
+          robot.dist_front = robot.dist_front_last;
+        } else {
+          robot.dist_front_last = robot.dist_front;
+        }
 
         robot.camLineAngleOld = robot.camLineAngle;
 
@@ -437,7 +442,8 @@ void loop() {
         }
         if (parsingGyro()) {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch = map(bufferGyro[1], 0, 255, -180, 180);
+          int x = map(bufferGyro[1], 0, 255, 0, 360);
+          robot.angle_pitch = (x - robot.start_angle_p) / 180 * 360;
         }
         if (abs((robot.angle_pitch) < 6)) robot.v = V_MAIN;
         else if (((robot.angle_pitch)) > ANGLE_GORKA) robot.v = V_GORKA_UP;
@@ -449,12 +455,12 @@ void loop() {
         if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
           robot.timeWhite = millis();
         }
-        if ((millis() - robot.timeWhite) > 6000) {
+        if ((millis() - robot.timeWhite) > 4200) {
           state_robot = EVAC_ZONE;
 
           break;
         }
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs((robot.angle_pitch) < 10) and (millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs((robot.angle_pitch) < 5) and (millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
         {
           if (DEBUG) ST_Link.println("check cross");
           motors(0, 0);
@@ -474,7 +480,7 @@ void loop() {
           robot.timeColors = millis();
         }
 
-        if ((robot.dist_front < DIST_THRESHOLD) and (robot.dist_front > 0)) {
+        if ((robot.dist_front < DIST_THRESHOLD) and (robot.dist_front > 0) and (abs(robot.angle_pitch) < 5)) {
           state_robot = OBSTACLE;
           break;
         }
@@ -486,21 +492,6 @@ void loop() {
         }
 
 
-
-        //if(digitalRead(FRONT_DIST)==0) state_robot = OBSTACLE;
-
-
-
-        /*if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
-          robot.online = millis();
-        }*/
-        /*if (err_line_sens>big_err_line_sens) {
-          move_backward(40, 50);
-        }*/
-        /*if ((millis() - robot.online) > 400) {
-          fail_save();
-          robot.online = millis();
-        }*/
         robot.v1_target = robot.v + robot.u_line;
         robot.v2_target = robot.v - robot.u_line;
         if (abs(robot.v1_target) > MAX_V) {
@@ -649,6 +640,7 @@ void loop() {
         int front_S = get_distance(&sensor_f);
         int right_front_S = get_distance(&sensor_rf);  //sensor_r.readRangeContinuousMillimeters()
         int right_S = get_distance(&sensor_r);
+
         display.setCursor(0, 0);
         display.print("left front: " + String(left_front_S));
         display.setCursor(0, 10);
@@ -909,31 +901,48 @@ void loop() {
       }
     case (EVAC_ZONE):
       {
-        vyravn();
+        /* vyravn();
         turnAngle(-90, 28, 45);
-        move_forward(200, 50);
+        move_forward(200, 50);*/
         float kp_wall = 0.15;
         float kd_wall = 0.03;
         int ideal_dist = 80;
         int err_wall = 0;
         int err_old_wall = 0;
         int u_wall = 0;
-        while (1) {
+        robot.dist_right_front = 0;
+        robot.dist_right_front_last = 0;
+        robot.dist_right = 0;
+        robot.dist_right_last = 0;
+        robot.dist_front = 0;
+        robot.dist_front_last = 0;
+        robot.dist_left_front = 0;
+        robot.dist_left_front_last = 0;
+        vyravn();
+        move_backward(250, 45);
+        vyravn();
+        move_center_zone();
+        rotate_find_balls();
+
+        /*while (1) {
           display.clearDisplay();
-          robot.dist_right_front = get_distance(&sensor_rf);
-          if (robot.dist_right_front < 0) robot.dist_right_front = ideal_dist;
-          err_wall = robot.dist_right_front - ideal_dist;
-          u_wall = err_wall * kp_wall + (err_wall - err_old_wall) * kd_wall;
-          robot.v1_target = V_WALL + u_wall;
-          robot.v2_target = V_WALL - u_wall;
-          motorsCorrectedSpeed();
-          display.setCursor(0, 0);
+          read_all_dist_meters();
+
+
+          // motorsCorrectedSpeed();
           display.setTextSize(1);
+          display.setCursor(0, 0);
+          display.println(robot.dist_front);
+          display.setCursor(0, 10);
           display.println(robot.dist_right_front);
+          display.setCursor(0, 20);
+          display.println(robot.dist_left_front);
+          display.setCursor(0, 30);
+          display.println(robot.dist_right);
           display.display();
           //delay(5);
           err_old_wall = err_wall;
-        }
+        }*/
 
         break;
       }

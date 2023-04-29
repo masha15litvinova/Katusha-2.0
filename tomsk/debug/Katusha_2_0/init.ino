@@ -73,6 +73,16 @@ void initGyro() {
 
     display.display();
   }
+  for (int i = 0; i < 5; i++) {
+    while (1) {
+      if (parsingGyro()) {
+        robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+        robot.angle_pitch = map(bufferGyro[1], 0, 255, -90, 90);
+
+        break;
+      }
+    }
+  }
   robot.start_angle_p = robot.angle_pitch;
   robot.start_angle_y = robot.angle_yaw;
   //eeprom_write_gyro();
@@ -95,8 +105,7 @@ void resetLaserDist() {
   digitalWrite(XSHUT3, LOW);
   digitalWrite(XSHUT4, LOW);
 }
-void SwitchOffOnLaserDist()
-{
+void SwitchOffOnLaserDist() {
   digitalWrite(SWITCH1, HIGH);
   digitalWrite(SWITCH2, HIGH);
   digitalWrite(SWITCH3, HIGH);
@@ -133,6 +142,9 @@ void initPins() {
   pinMode(ENC2, INPUT);
   pinMode(ENC3, INPUT);
   pinMode(ENC4, INPUT);
+
+  pinMode(ENDSTOP2, INPUT);
+  pinMode(ENDSTOP4, INPUT);
 
   pinMode(ENDSTOP1, INPUT);
   pinMode(ENDSTOP2, INPUT);

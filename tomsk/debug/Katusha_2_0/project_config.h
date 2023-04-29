@@ -30,10 +30,10 @@
 
 #define GREY_THRESHOLD 90
 
-#define GREEN_HIGH_R 147 //порог зеленого (может, другие цвета тоже нужны)
+#define GREEN_HIGH_R 147  //порог зеленого (может, другие цвета тоже нужны)
 #define GREEN_LOW_R 130
 
-#define GREEN_HIGH_L 147 //порог зеленого (может, другие цвета тоже нужны)
+#define GREEN_HIGH_L 147  //порог зеленого (может, другие цвета тоже нужны)
 #define GREEN_LOW_L 130
 
 #define BLUE_RED_HIGH 116
@@ -42,26 +42,28 @@
 
 
 
-#define RED_R 315
-#define GREEN_R 679
-#define BLUE_R 632
+#define RED_R 325
+#define GREEN_R 732
+#define BLUE_R 703
 
-#define RED_L 380
-#define GREEN_L 677
-#define BLUE_L 643
+#define RED_L 356
+#define GREEN_L 621
+#define BLUE_L 576
 
 #define COLOR_DIST_HIGH 23
 #define COLOR_DIST_LOW 15
 
-#define V_CALIBR 0//140
+#define V_CALIBR 0  //140
 #define V_MAIN 28
 #define V_GORKA_UP 42
-#define V_GORKA_DOWN 50//22
+#define V_GORKA_DOWN 50  //22
 #define V_OBSTACLE 90
 #define V_GRAB_BALL 80
 #define V_MIN 20
 #define V_OBST 40
 #define V_WALL 45
+#define V_ALIGN 40
+#define V_ROTATE_BALLS 45
 
 #define MAX_V 98
 
@@ -96,12 +98,12 @@
 /**********STATES************************/
 #define LINE 0
 #define MOTORS_PWM_COMPUTE 1
-#define STOP_SCREEN1 2       //line sensors, tcs sensors
-#define STOP_SCREEN2 3       //camera and sparkfun data
-#define STOP_SCREEN3 4       //laser dist sensors data
-#define STOP_SCREEN4 5       //current sensors and sliders position, ball sensor
-#define STOP_SCREEN5 6       //encoders
-#define STOP_SCREEN0 7       //STOP
+#define STOP_SCREEN1 2  //line sensors, tcs sensors
+#define STOP_SCREEN2 3  //camera and sparkfun data
+#define STOP_SCREEN3 4  //laser dist sensors data
+#define STOP_SCREEN4 5  //current sensors and sliders position, ball sensor
+#define STOP_SCREEN5 6  //encoders
+#define STOP_SCREEN0 7  //STOP
 #define AFTER_STOP_SCREEN 8
 
 #define CAMERA_READ_DATA 9
