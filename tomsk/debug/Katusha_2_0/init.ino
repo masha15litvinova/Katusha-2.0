@@ -73,6 +73,7 @@ void initGyro() {
 
     display.display();
   }
+  GyroUARTClear();
   for (int i = 0; i < 5; i++) {
     while (1) {
       if (parsingGyro()) {
@@ -121,6 +122,10 @@ void initPins() {
   pinMode(XSHUT2, OUTPUT);
   pinMode(XSHUT3, OUTPUT);
   pinMode(XSHUT4, OUTPUT);
+  digitalWrite(XSHUT1, LOW);
+  digitalWrite(XSHUT2, LOW);
+  digitalWrite(XSHUT3, LOW);
+  digitalWrite(XSHUT4, LOW);
 
   pinMode(SWITCH1, OUTPUT);
   pinMode(SWITCH2, OUTPUT);
@@ -258,7 +263,7 @@ void initLaserDists() {
   digitalWrite(XSHUT1, 1);
   delay(100);
   //sensor_r.setBus(WIRE1);
-  sensor_rf.setAddress(sensor_lf_newAddress);
+  sensor_rf.setAddress(sensor_rf_newAddress);
   delay(10);
 
   digitalWrite(XSHUT2, 1);
@@ -291,7 +296,7 @@ void initLaserDists() {
 
   sensor_lf.startContinuous(5);
   sensor_f.startContinuous(5);
-  sensor_rf.startContinuous();
-  sensor_r.startContinuous();
+  sensor_rf.startContinuous(5);
+  sensor_r.startContinuous(5);
   delay(400);
 }

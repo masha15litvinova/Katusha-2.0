@@ -484,12 +484,7 @@ void loop() {
           state_robot = OBSTACLE;
           break;
         }
-        if (robot.dist_front == -2) {
-          digitalWrite(SWITCH2, HIGH);
-          delay(10);
-          digitalWrite(SWITCH2, LOW);
-          Wire.begin();
-        }
+
 
 
         robot.v1_target = robot.v + robot.u_line;

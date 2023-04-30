@@ -235,7 +235,7 @@ void initLaserDists() {
   display.setTextColor(SH110X_WHITE);
   digitalWrite(XSHUT1, HIGH);
   sensor1.begin();
-  int status1 = sensor1.InitSensor(0xC0);
+  int status1 = sensor1.InitSensor();
 
   digitalWrite(XSHUT2, HIGH);
   sensor2.begin();

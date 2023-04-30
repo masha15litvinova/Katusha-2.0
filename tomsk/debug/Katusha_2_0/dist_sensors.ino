@@ -7,7 +7,7 @@ int get_distance(VL53L0X* sensor) {
   if (sensor_dis == 0) sensor_dis = -1;
   /* if (sensor_dis > 65000) sensor_dis = sensor_old_dis;
   else sensor_old_dis = sensor_dis;*/
-
+if (sensor_dis >= 8190) return 3000;
   if (sensor_dis > 65000) return -2;
   else return sensor_dis;
 }
