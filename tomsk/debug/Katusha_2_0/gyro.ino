@@ -177,7 +177,6 @@ if (DEBUG) ST_Link.println("turn angle");
   display.setCursor(0, 30);
   display.println("stop");
   display.display();
-  delay(300);
   display.clearDisplay();
   display.display();
   if (DEBUG) ST_Link.println("end turn angle");

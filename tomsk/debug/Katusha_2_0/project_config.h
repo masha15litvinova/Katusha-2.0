@@ -24,7 +24,7 @@
 
 #define GYRO_BYTE_SIGNAL 255
 #define GYRO_TIME_SIGNAL 254
-#define UART_BAUDRATE 9600
+#define UART_BAUDRATE 115200
 
 #define DEFAULT_START_POSITION 10000
 
@@ -44,11 +44,11 @@
 
 #define RED_R 325
 #define GREEN_R 732
-#define BLUE_R 703
+#define BLUE_R 700
 
-#define RED_L 356
-#define GREEN_L 621
-#define BLUE_L 576
+#define RED_L 352
+#define GREEN_L 614
+#define BLUE_L 567
 
 #define COLOR_DIST_HIGH 23
 #define COLOR_DIST_LOW 15
@@ -64,6 +64,7 @@
 #define V_WALL 45
 #define V_ALIGN 40
 #define V_ROTATE_BALLS 45
+#define V_EVAC 50
 
 #define MAX_V 98
 

@@ -22,7 +22,7 @@ int direction_color() {
   uint16_t r1, g1, b1, c1;
   uint16_t r2, g2, b2, c2;
   tcs1.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
-  delay(300);  // Delay for one old integ. time period (to finish old reading)
+  delay(150);  // Delay for one old integ. time period (to finish old reading)
   // Delay for one new integ. time period (to allow new reading)
   tcs1.getRawData(&r1, &g1, &b1, &c1);
 
@@ -30,16 +30,16 @@ int direction_color() {
 
 
   display.setCursor(0, 20);
-  display.print("Right: " + String(r1) + " " + String(g1) + " " + String(b1)+" "+String(dist1));
+  display.print("Right: " + String(r1) + " " + String(g1) + " " + String(b1) + " " + String(dist1));
   tcs2.setIntegrationTime(TCS34725_INTEGRATIONTIME_24MS);
-  delay(300);  // Delay for one old integ. time period (to finish old reading)
+  delay(150);  // Delay for one old integ. time period (to finish old reading)
     // Delay for one new integ. time period (to allow new reading)
   tcs2.getRawData(&r2, &g2, &b2, &c2);
 
   int dist2 = colorDistance(RED_L, GREEN_L, BLUE_L, r2, g2, b2);
 
   display.setCursor(0, 30);
-  display.print("Left: " + String(r2) + " " + String(g2) + " " + String(b2)+" "+String(dist2));
+  display.print("Left: " + String(r2) + " " + String(g2) + " " + String(b2) + " " + String(dist2));
   display.display();
   display.setTextSize(2);
   display.setCursor(0, 50);
@@ -54,51 +54,56 @@ int direction_color() {
   } else {
     dir1 = 3;
   }*/
-
-  if ((dist1 < COLOR_DIST_LOW) and (dist2 < COLOR_DIST_LOW)) {
+  if (DEBUG) ST_Link.println("dist1 = " + String(dist1) + " dist2 = " + String(dist2));
+  if (DEBUG) ST_Link.println("COLOR_DIST_LOW = " + String(COLOR_DIST_LOW) + " COLOR_DIST_HIGH = " + String(COLOR_DIST_HIGH));
+  if ((dist1 <= COLOR_DIST_LOW) and (dist2 <= COLOR_DIST_LOW)) {
     dir1 = 0;
-  } else if ((dist1 < COLOR_DIST_LOW) and (dist2 > COLOR_DIST_HIGH)) {
+    if (DEBUG) ST_Link.println(0);
+  } else if ((dist1 <= COLOR_DIST_LOW) and (dist2 >= COLOR_DIST_HIGH)) {
     dir1 = 1;
-  } else if ((dist2 < COLOR_DIST_LOW) and (dist1 > COLOR_DIST_HIGH)) {
+    if (DEBUG) ST_Link.println(1);
+  } else if ((dist2 <= COLOR_DIST_LOW) and (dist1 >= COLOR_DIST_HIGH)) {
     dir1 = 2;
+    if (DEBUG) ST_Link.println(2);
   } else {
     dir1 = 3;
+    if (DEBUG) ST_Link.println(3);
   }
 
-  /*if ((g1 > 60) and (g2 > 60)) {
-    dir1 = 0;
-  } else if ((g1 > 60)) {
-    dir1 = 1;
-  } else if ((g2 > 60)) {
-    dir1 = 2;
-  }*/
+  if (DEBUG) ST_Link.println(" dir1 = " + String(dir1));
 
-  
+
   display.display();
   motors(0, 0);
-  /*move_backward(400, 60);
-  delay(500);
-  CamUARTClear();
-  while (!parsingCam()) {}
-  for (int i = 0; i < 5; i++) {
-    while (1) {
-      if (parsingCam()) {
+
+  switch (dir1) {
+    case (0):
+      {
+        display.print("BACK");
         break;
       }
-    }
+    case (1):
+      {
+        display.print("RIGHT");
+        break;
+      }
+    case (2):
+      {
+        display.print("LEFT");
+        break;
+      }
+    case (3):
+      {
+        display.print("NO");
+        break;
+      }
   }
-  robot.camDir = bufferCam[1];
-  //if (robot.camDir != 3) dir1 = robot.camDir;
-  robot.camDir = 3;*/
-
-  if (dir1 == 0) display.print("BACK");
-  else if (dir1 == 1) display.print("RIGHT");
-  else if (dir1 = 2) display.print("LEFT");
-  else display.print("NO");
+  
   display.display();
   move_forward(130, 60);
   vyravn();
   delay(500);
+  if (DEBUG) ST_Link.println("return dir1 = " + String(dir1));
   return dir1;
 }
 
@@ -161,7 +166,7 @@ void vyravnLine() {
 }
 
 void vyravn() {
-  
+
   GyroUARTClear();
   for (int i = 0; i < 5; i++) {
     while (1) {
@@ -184,14 +189,13 @@ void vyravn() {
   else if ((yaw_now < 0) and (yaw_now >= -135)) turnAngle(-90 - yaw_now, 35, 25);
   else if ((yaw_now < 0) and (yaw_now >= -180)) turnAngle(-180 - yaw_now, 35, 25);
   else turnAngle(360 - yaw_now, 35, 25);
-  
 }
 int colorDistance(int red, int green, int blue, int red_read, int green_read, int blue_read) {
   int dist = sqrt((red - red_read) * (red - red_read) + (green - green_read) * (green - green_read) + (blue - blue_read) * (blue - blue_read));
   return dist;
 }
 boolean isCross() {
-  
+
   if ((robot.colorDist1 < COLOR_DIST_LOW) or (robot.colorDist2 < COLOR_DIST_LOW)) {
     return true;
   }

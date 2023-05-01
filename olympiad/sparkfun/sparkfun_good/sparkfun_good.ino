@@ -26,7 +26,7 @@ Supported Platforms:
 #define SerialPort SerialUSB
 #define LEDPIN 13
 
-#define TIME_DELAY 9
+#define TIME_DELAY 7
 
 void (*resetFunc)(void) = 0;
 
@@ -40,8 +40,8 @@ unsigned long time_integrated = millis();
 byte calibrated = 0;
 bool send = true;
 void setup() {
-  //SerialPort.begin(9600);
-  Serial1.begin(9600);
+  //SerialPort.begin(115200);
+  Serial1.begin(115200);
 
   pinMode(LEDPIN, OUTPUT);
   // Call imu.begin() to verify communication and initialize
@@ -107,25 +107,25 @@ void loop() {
         if ((p < 20) and (p > 0)) p = 20;
         else if ((p < -20) and (p < 0)) p = -20;
       }*/
-      if (p > 80) p = 80;
-      else if (p < -80) p = -80;
+
       //if (abs(gyroZ) > 60) p = 0;
 
-      send_pitch = map(round(p1), -180, 180, 0, 255);
+
       if (count < 200) {
         drift = drift + gyroX * 0.005;
         count++;
       }
       p = ((acos(accelY) * 180) / PI) - 90.0;
-
+      if (p > 80) p = 80;
+      else if (p < -80) p = -80;
       //float middle = (p < last_p) ? ((last_p < last_last_p) ? last_p : ((last_last_p < p) ? p : last_last_p)) : ((p < last_last_p) ? p : ((last_last_p < last_p) ? last_p : last_last_p));
       p1 = (p)*k_filter + p1 * (1.0 - k_filter);
-      /*SerialPort.print(p);
-      SerialPort.print(",");
-      SerialPort.println(p1);*/
-      // SerialPort.println(accelY);
+      
       last_last_p = last_p;
       last_p = p1;
+      //SerialPort.println(p1);
+      send_pitch = map(round(p1), -180, 180, 0, 255);
+      
     }
   }
 

@@ -1,9 +1,11 @@
-#define ANGLE_SENSOR_MIN_THRESHOLD 400
-
-
 #define NONE 0
 #define RIGHT 1  //в какой стороне больше места
 #define LEFT 2
+
+#define ANGLE_SENSOR_MIN_THRESHOLD 400
+int side = NONE;
+
+
 void align_bottom() {
   bool end_1 = false;
   bool end_2 = false;
@@ -19,7 +21,7 @@ void align_bottom() {
   delay(300);
 }
 void move_center_zone() {
-  int side = NONE;
+
   robot.dist_right_front = 0;
   robot.dist_right_front_last = 0;
   robot.dist_right = 0;
@@ -37,10 +39,13 @@ void move_center_zone() {
     ST_Link.println("right_front: " + String(robot.dist_right_front));
     ST_Link.println("left_front: " + String(robot.dist_left_front));
   }
-  if (robot.dist_right_front > ANGLE_SENSOR_MIN_THRESHOLD) {
-    side = RIGHT;
+  if ((robot.dist_right_front > ANGLE_SENSOR_MIN_THRESHOLD) and (robot.dist_left_front > ANGLE_SENSOR_MIN_THRESHOLD)) {
+
+    if (robot.dist_right_front > robot.dist_left_front) side = RIGHT;
+    else side = LEFT;
   } else {
-    side = LEFT;
+    if (robot.dist_right_front > ANGLE_SENSOR_MIN_THRESHOLD) side = RIGHT;
+    else side = LEFT;
   }
 
   if (side == RIGHT) {
@@ -56,6 +61,11 @@ void move_center_zone() {
   align_bottom();
   move_forward_mm(500, 45);
   vyravn();
+  if (side == LEFT) {
+    turnAngle(-140, 50, 33);
+  } else if (side == RIGHT) {
+    turnAngle(140, 50, 33);
+  }
   motors(0, 0);
   delay(100);
 }
@@ -67,6 +77,10 @@ void rotate_find_balls() {
   int dist_data_1[max_ind]{};
   int ball_data[max_ind]{};
   long int time_start_rotate = millis();
+
+  float k_filter = 0.1;
+
+
   robot.dist_right_front = 0;
   robot.dist_right_front_last = 0;
   robot.dist_right = 0;
@@ -78,11 +92,13 @@ void rotate_find_balls() {
   robot.v1_target = V_ROTATE_BALLS;
   robot.v2_target = -V_ROTATE_BALLS;
 
-
-
+  long int time_start_dist_read = millis();
+  while ((millis() - time_start_dist_read) < 1000) {
+    read_all_dist_meters();
+  }
   encoder1 = 0;
   while (
-    ((encoder1 < 3100)) and (ind < max_ind)) {
+    ((encoder1 < 3170)) and (ind < max_ind)) {
     robot.dist_right = get_distance(&sensor_r);
     robot.dist_front = get_distance(&sensor_f);
     //if ((robot.dist_front > 65000) or (robot.dist_front < 0)) robot.dist_front = robot.dist_front_last;
@@ -105,6 +121,20 @@ void rotate_find_balls() {
   for (int i = 1; i < max_ind - 1; i++) {
     ball_data[i] = (ball_data[i - 1] + ball_data[i] + ball_data[i + 1]) / 3;
   }
+
+
+
+  for (int i = 1; i < max_ind - 1; i++) {
+    ball_data[i] = 0.5 * (0.5 * (ball_data[i - 1] + ball_data[i + 1]) + ball_data[i]);
+  }
+
+  ball_data[max_ind - 1] = ball_data[max_ind - 2];
+  ball_data[0] = ball_data[1];
+  for (int i = 1; i < max_ind; i++) {
+    ball_data[i] = ball_data[i - 1] * k_filter + ball_data[i] * (1 - k_filter);
+  }
+
+
   if (DEBUG) {
     ST_Link.print("dist_data_1[]= { ");
     for (int i = 0; i < max_ind; i++) {
@@ -118,4 +148,78 @@ void rotate_find_balls() {
     ST_Link.println("}");
   }
   motors(0, 0);
+
+
+  int dist = 0;
+  int dist_last = 0;
+  int count_exits = 0;
+  int exits[10] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+  int out_of_range = 2900;
+  int count_out_of_range = 0;
+  for (int i = 0; i < max_ind; i++) {
+    if ((ball_data[i] > out_of_range) and (ball_data[(i - 1 + max_ind) % max_ind] < out_of_range)) count_out_of_range = 1;
+    else if ((ball_data[i] > out_of_range) and (ball_data[(i - 1 + max_ind) % max_ind] > out_of_range)) count_out_of_range++;
+    else if ((ball_data[i] < out_of_range) and (ball_data[(i - 1 + max_ind) % max_ind] > out_of_range)) {
+      exits[count_exits] = i - (count_out_of_range) / 2;
+      count_exits++;
+    } else if ((ball_data[i] < out_of_range) and (ball_data[(i - 1 + max_ind) % max_ind] < out_of_range)) count_out_of_range = 0;
+  }
+  if (DEBUG) ST_Link.println("exits[] = " + String(exits[0]) + " " + String(exits[1]) + " " + String(exits[2]) + " " + String(exits[3]));
+
+  int exit = -1;
+  for (int i = 0; i < 10; i++) {
+    if (((exits[i]) > max_ind / 5) and ((exits[i]) < (max_ind * 4) / 5)) {
+      exit = exits[i];
+    }
+  }
+
+  int angle = (exit * 360 / max_ind);
+  if (angle > 180) angle = angle - 360;
+
+  turnAngle(-angle, 50, 33);
+  while ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) < 3) {
+    display.clearDisplay();
+    analogWrite(PWM_LIGHTS, PWM_LEDS);
+    int s[6] = { 0, 0, 0, 0, 0, 0 };
+    s[0] = analogRead(SENSOR1);
+    s[1] = analogRead(SENSOR2);
+    s[2] = analogRead(SENSOR3);
+    s[3] = analogRead(SENSOR4);
+    s[4] = analogRead(SENSOR5);
+    s[5] = analogRead(SENSOR6);
+    for (int i = 0; i < 6; i++) {
+      robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
+    }
+    int grey_scaled = 24;
+
+    for (int i = 0; i < 6; i++) {
+      if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
+        robot.sensors[i] = 1;
+        //display.fillRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+      } else {
+        robot.sensors[i] = 0;
+        // display.drawRect(9 + i * 18, 9, 9, 9, SH110X_WHITE);
+      }
+    }
+
+
+    robot.v1_target = V_EVAC;
+    robot.v2_target = V_EVAC;
+    motorsCorrectedSpeed();
+
+    delay(5);
+  }
+  motors(0, 0);
+  delay(300);
+  move_forward(200, V_MAIN);
+  robot.dist_front = -1;
+  robot.dist_right_front = -1;
+  robot.dist_right = -1;
+  robot.timeWhite = millis();
+  robot.sensors[0] = 0;
+  robot.sensors[1] = 0;
+  robot.sensors[2] = 0;
+  robot.sensors[3] = 0;
+  robot.sensors[4] = 0;
+  robot.sensors[5] = 0;
 }

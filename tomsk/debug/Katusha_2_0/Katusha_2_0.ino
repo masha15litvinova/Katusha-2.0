@@ -371,14 +371,12 @@ void loop() {
         digitalWrite(LED1, LOW);
         display.clearDisplay();
         display.setTextSize(1);
-        display.setCursor(0, 20);
-
-
-        display.println(String(distance2));
+        /*display.setCursor(0, 20);
+        display.println(String(distance2));*/
         display.setCursor(0, 30);
         display.println(robot.angle_pitch);
         display.setCursor(0, 40);
-        display.println(robot.dist_front);
+        display.println(robot.start_angle_p);
         display.display();
         robot.up_line = 0;
         robot.ud_line = 0;
@@ -442,8 +440,10 @@ void loop() {
         }
         if (parsingGyro()) {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-          int x = map(bufferGyro[1], 0, 255, 0, 360);
-          robot.angle_pitch = (x - robot.start_angle_p) / 180 * 360;
+          int x = map(bufferGyro[1], 0, 255, -180, 180);
+          //int err = robot.start_angle_p - x;
+
+          robot.angle_pitch = x;
         }
         if (abs((robot.angle_pitch) < 6)) robot.v = V_MAIN;
         else if (((robot.angle_pitch)) > ANGLE_GORKA) robot.v = V_GORKA_UP;
@@ -607,7 +607,7 @@ void loop() {
         }
         if (parsingGyro()) {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
+          robot.angle_pitch = map(bufferGyro[1], 0, 255, -180, 180);
         }
         display.println("Angle: " + String(robot.camLineAngle));
         display.setCursor(0, 20);
@@ -704,7 +704,9 @@ void loop() {
         digitalWrite(LED1, LOW);
 
         // turnAngle(-179, 60, 40);
-
+        if (DEBUG) {
+          ST_Link.println("dir = " + String(dir));
+        }
         switch (dir) {
           case (0):
             {
@@ -714,7 +716,7 @@ void loop() {
             }
           case (1):
             {
-              if (DEBUG) ST_Link.println("right");
+
 
               turnAngle(-90, 50, 35);
               robot.turn_detected = false;
@@ -726,9 +728,10 @@ void loop() {
               robot.turn_detected = false;
               break;
             }
-          default:
+          case (3):
             {
               motors(0, 0);
+              move_forward(100, V_MAIN);
               robot.sensors[0] = 0;
               robot.sensors[1] = 0;
               robot.sensors[2] = 0;
@@ -753,16 +756,18 @@ void loop() {
         display.println("GO...");
         display.display();
         robot.time_remember = 0;
+        robot.timeWhite = millis();
         break;
       }
     case (COLOR_READ_DATA):
       {
-
+        if (DEBUG) ST_Link.println("start read color data");
 
         dir = 3;
         display.clearDisplay();
         dir = direction_color();
         state_robot = ROTATING_GREEN;
+        if (DEBUG) ST_Link.println("dir after color read = " + String(dir));
         break;
       }
     case (MOVE_SLIDERS):
@@ -851,6 +856,13 @@ void loop() {
         robot.dist_front = -1;
         robot.dist_right_front = -1;
         robot.dist_right = -1;
+        robot.timeWhite = millis();
+        robot.sensors[0] = 0;
+        robot.sensors[1] = 0;
+        robot.sensors[2] = 0;
+        robot.sensors[3] = 0;
+        robot.sensors[4] = 0;
+        robot.sensors[5] = 0;
         break;
       }
     case (TAKE_CUBE):
@@ -899,6 +911,13 @@ void loop() {
         /* vyravn();
         turnAngle(-90, 28, 45);
         move_forward(200, 50);*/
+        display.clearDisplay();
+        display.setTextSize(2);
+        display.setCursor(0, 20);
+        display.println("EVAC ZONE");
+        display.display();
+        delay(300);
+        display.setTextSize(1);
         float kp_wall = 0.15;
         float kd_wall = 0.03;
         int ideal_dist = 80;
@@ -918,27 +937,7 @@ void loop() {
         vyravn();
         move_center_zone();
         rotate_find_balls();
-
-        /*while (1) {
-          display.clearDisplay();
-          read_all_dist_meters();
-
-
-          // motorsCorrectedSpeed();
-          display.setTextSize(1);
-          display.setCursor(0, 0);
-          display.println(robot.dist_front);
-          display.setCursor(0, 10);
-          display.println(robot.dist_right_front);
-          display.setCursor(0, 20);
-          display.println(robot.dist_left_front);
-          display.setCursor(0, 30);
-          display.println(robot.dist_right);
-          display.display();
-          //delay(5);
-          err_old_wall = err_wall;
-        }*/
-
+        state_robot = LINE;
         break;
       }
   }

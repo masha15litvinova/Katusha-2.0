@@ -74,11 +74,11 @@ void initGyro() {
     display.display();
   }
   GyroUARTClear();
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 60; i++) {
     while (1) {
       if (parsingGyro()) {
         robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-        robot.angle_pitch = map(bufferGyro[1], 0, 255, -90, 90);
+        robot.angle_pitch = map(bufferGyro[1], 0, 255, 0, 360);
 
         break;
       }
@@ -263,7 +263,7 @@ void initLaserDists() {
   digitalWrite(XSHUT1, 1);
   delay(100);
   //sensor_r.setBus(WIRE1);
-  sensor_rf.setAddress(sensor_rf_newAddress);
+  sensor_lf.setAddress(sensor_lf_newAddress);
   delay(10);
 
   digitalWrite(XSHUT2, 1);
@@ -274,7 +274,7 @@ void initLaserDists() {
 
   digitalWrite(XSHUT3, 1);
   delay(100);
-  sensor_lf.setAddress(sensor_lf_newAddress);
+  sensor_rf.setAddress(sensor_rf_newAddress);
   delay(10);
 
   digitalWrite(XSHUT4, 1);
@@ -294,9 +294,9 @@ void initLaserDists() {
   sensor_rf.setTimeout(500);
   sensor_r.setTimeout(500);
 
-  sensor_lf.startContinuous(5);
-  sensor_f.startContinuous(5);
-  sensor_rf.startContinuous(5);
-  sensor_r.startContinuous(5);
+  sensor_lf.startContinuous();
+  sensor_f.startContinuous();
+  sensor_rf.startContinuous();
+  sensor_r.startContinuous();
   delay(400);
 }
