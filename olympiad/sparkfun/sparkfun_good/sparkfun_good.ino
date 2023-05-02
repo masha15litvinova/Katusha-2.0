@@ -26,7 +26,8 @@ Supported Platforms:
 #define SerialPort SerialUSB
 #define LEDPIN 13
 
-#define TIME_DELAY 7
+#define TIME_DELAY 5
+#define PERIOD 20
 
 void (*resetFunc)(void) = 0;
 
@@ -39,6 +40,7 @@ unsigned long time_led = millis();
 unsigned long time_integrated = millis();
 byte calibrated = 0;
 bool send = true;
+long int last_send = millis();
 void setup() {
   //SerialPort.begin(115200);
   Serial1.begin(115200);
@@ -62,7 +64,7 @@ void setup() {
 int count = 0;
 
 float p = 0;
-float p1 = 0.0;
+int p1 = 0.0;
 byte send_pitch = 0;
 byte angle_y = 0;
 byte angle_p = 0;
@@ -120,12 +122,11 @@ void loop() {
       else if (p < -80) p = -80;
       //float middle = (p < last_p) ? ((last_p < last_last_p) ? last_p : ((last_last_p < p) ? p : last_last_p)) : ((p < last_last_p) ? p : ((last_last_p < last_p) ? last_p : last_last_p));
       p1 = (p)*k_filter + p1 * (1.0 - k_filter);
-      
+
       last_last_p = last_p;
       last_p = p1;
-      //SerialPort.println(p1);
+      SerialPort.println(p1);
       send_pitch = map(round(p1), -180, 180, 0, 255);
-      
     }
   }
 
@@ -145,7 +146,7 @@ void loop() {
     }
   }
 
-  if (true) {
+  if ((millis() - last_send) > PERIOD) {
     if ((millis() - time_led) > 90) {
       digitalWrite(LEDPIN, !state);
       time_led = millis();
@@ -167,6 +168,7 @@ void loop() {
     Serial1.print(';');
     delay(TIME_DELAY);
     digitalWrite(LEDPIN, LOW);
+    last_send = millis();
   }  //*/
   //SerialPort.println("p = " + String(p) + " drift = " + String(drift));
   old_pitch_robot = pitch_robot;

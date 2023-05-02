@@ -74,7 +74,7 @@ void initGyro() {
     display.display();
   }
   GyroUARTClear();
-  for (int i = 0; i < 60; i++) {
+  for (int i = 0; i < 10; i++) {
     while (1) {
       if (parsingGyro()) {
         robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
