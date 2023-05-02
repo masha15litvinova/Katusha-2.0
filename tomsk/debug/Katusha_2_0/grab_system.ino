@@ -103,7 +103,7 @@ void move_servos_180_down()
 }
 void move_servos_angle()
 {
-  for (int i = 180; i > 140; i--)
+  for (int i = 180; i > 150; i--)
   {
     servo2.write(i);
     servo3.write(180 - i);

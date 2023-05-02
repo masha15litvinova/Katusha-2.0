@@ -148,13 +148,7 @@ void initPins() {
   pinMode(ENC3, INPUT);
   pinMode(ENC4, INPUT);
 
-  pinMode(ENDSTOP2, INPUT);
-  pinMode(ENDSTOP4, INPUT);
-
-  pinMode(ENDSTOP1, INPUT);
-  pinMode(ENDSTOP2, INPUT);
-  pinMode(ENDSTOP3, INPUT);
-  pinMode(ENDSTOP4, INPUT);
+  pinMode(GORKA_PIN, INPUT);
 
   pinMode(ENC_INT1, INPUT);
   pinMode(ENC_INT2, INPUT);
@@ -163,6 +157,9 @@ void initPins() {
 
   pinMode(BUTTON1, INPUT);
   pinMode(BUTTON2, INPUT);
+
+  pinMode(ENDSTOP2, INPUT);
+  pinMode(ENDSTOP4, INPUT);
 
   pinMode(SENSOR1, INPUT);
   pinMode(SENSOR2, INPUT);
@@ -205,7 +202,8 @@ void initPins() {
 
 
   pinMode(FRONT_DIST, INPUT);
-  pinMode(CAM_SIGNAL, INPUT);
+  pinMode(CAM_SIGNAL, OUTPUT);
+  digitalWrite(CAM_SIGNAL, LOW);
 }
 
 

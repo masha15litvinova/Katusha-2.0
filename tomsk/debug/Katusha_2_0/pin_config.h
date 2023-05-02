@@ -41,6 +41,7 @@
 #define BALL PA_2
 #define FRONT_DIST PG_15
 #define CAM_SIGNAL PF_13
+#define GORKA_PIN PB_8
 
 /******LASER DIST SENSORS******/
 #define XSHUT1 PG_10

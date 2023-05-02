@@ -41,6 +41,7 @@ byte bufferCam[15];
 byte bufferGyro[15];
 
 int big_err_line_sens = 0.7;
+bool gorka = 0;
 
 bool state = true;
 bool obj = true;  //false;
@@ -223,7 +224,7 @@ void setup() {
 
   resetCamera();
   //resetGyro();
-
+  
 
 
   /*GyroUART.setRx(RX3);
@@ -250,18 +251,13 @@ void setup() {
   StartGyro();
   StartGyro();
 
-  //if (digitalRead(BUTTON2) == 0) {
   initGyro();
-  //} else {
-  //eeprom_read_gyro();
-  //}
-
+ 
   display.clearDisplay();
   display.display();
   ledBlinking();
   analogWrite(PWM_LIGHTS, PWM_LEDS);
 
-  //pwm_start(PWM_LIGHTS, 1000, 0, RESOLUTION_8B_COMPARE_FORMAT);
   initServos();
   calibration_grab();
   close_iris();
@@ -374,9 +370,9 @@ void loop() {
         /*display.setCursor(0, 20);
         display.println(String(distance2));*/
         display.setCursor(0, 30);
-        display.println(robot.angle_pitch);
-        display.setCursor(0, 40);
-        display.println(robot.start_angle_p);
+        display.println(gorka);
+        /*display.setCursor(0, 40);
+        display.println(robot.start_angle_p);*/
         display.display();
         robot.up_line = 0;
         robot.ud_line = 0;
@@ -440,18 +436,15 @@ void loop() {
         }
         if (parsingGyro()) {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-          int x = map(bufferGyro[1], 0, 255, -180, 180);
+          // int x = map(bufferGyro[1], 0, 255, -180, 180);
           //int err = robot.start_angle_p - x;
-
-          robot.angle_pitch = x;
         }
-        if (abs((robot.angle_pitch) < 6)) robot.v = V_MAIN;
-        else if (((robot.angle_pitch)) > ANGLE_GORKA) robot.v = V_GORKA_UP;
-        else if (((robot.angle_pitch)) < -ANGLE_GORKA) {
-          robot.v = V_GORKA_DOWN;
+        gorka = !digitalRead(GORKA_PIN);
+        if (gorka) {
+          robot.v = V_GORKA_UP;
           if (robot.u_line > 10) robot.u_line = 10;
-          else if (robot.u_line < -10) robot.u_line = -10;
-        }
+          if (robot.u_line < -10) robot.u_line = -10;
+        } else robot.v = V_MAIN;
         if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
           robot.timeWhite = millis();
         }
@@ -460,7 +453,7 @@ void loop() {
 
           break;
         }
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs((robot.angle_pitch) < 5) and (millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (!gorka) and ((millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
         {
           if (DEBUG) ST_Link.println("check cross");
           motors(0, 0);
@@ -480,7 +473,7 @@ void loop() {
           robot.timeColors = millis();
         }
 
-        if ((robot.dist_front < DIST_THRESHOLD) and (robot.dist_front > 0) and (abs(robot.angle_pitch) < 5)) {
+        if ((robot.dist_front < DIST_THRESHOLD) and (robot.dist_front > 0) and (!gorka)) {
           state_robot = OBSTACLE;
           break;
         }

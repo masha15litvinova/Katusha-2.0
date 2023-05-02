@@ -42,6 +42,7 @@ byte calibrated = 0;
 bool send = true;
 long int last_send = millis();
 void setup() {
+  pinMode(11, OUTPUT);
   //SerialPort.begin(115200);
   Serial1.begin(115200);
 
@@ -127,6 +128,8 @@ void loop() {
       last_p = p1;
       SerialPort.println(p1);
       send_pitch = map(round(p1), -180, 180, 0, 255);
+      if (abs(p1) > 8) digitalWrite(11, LOW);
+      else digitalWrite(11, HIGH);
     }
   }
 
@@ -157,10 +160,10 @@ void loop() {
     delay(TIME_DELAY);
     Serial1.print('/');
     delay(TIME_DELAY);
-    Serial1.print(send_pitch);
+    /* Serial1.print(send_pitch);
     delay(TIME_DELAY);
     Serial1.print('/');
-    delay(TIME_DELAY);
+    delay(TIME_DELAY);*/
     Serial1.print(calibrated);
     delay(TIME_DELAY);
     Serial1.print('/');

@@ -50,12 +50,12 @@ void move_center_zone() {
 
   if (side == RIGHT) {
     turnAngle(-90, 50, 35);
-    move_forward_mm(450, 40);
+    move_forward_mm(530, 40);
     turnAngle(90, 50, 35);
 
   } else if (side == LEFT) {
     turnAngle(90, 50, 35);
-    move_forward_mm(450, 40);
+    move_forward_mm(530, 40);
     turnAngle(-90, 50, 35);
   }
   align_bottom();
@@ -97,8 +97,21 @@ void rotate_find_balls() {
     read_all_dist_meters();
   }
   encoder1 = 0;
+
+  digitalWrite(CAM_SIGNAL, HIGH);
+  int delta = -1;
+  int i_zone = -1;
+  int x_size = 320;
+  int y_size = 240;
+
   while (
     ((encoder1 < 3170)) and (ind < max_ind)) {
+    if (CamUART.available()) {
+      int x = CamUART.read();
+      delta = map(x, 0, 255, -(x_size) / 2, (x_size / 2));
+      if ((abs(delta) < 10)and(ind>max_ind/7))and(ind<max_ind*6/7) i_zone = ind;
+    }
+
     robot.dist_right = get_distance(&sensor_r);
     robot.dist_front = get_distance(&sensor_f);
     //if ((robot.dist_front > 65000) or (robot.dist_front < 0)) robot.dist_front = robot.dist_front_last;
@@ -156,6 +169,8 @@ void rotate_find_balls() {
   int exits[10] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
   int out_of_range = 2900;
   int count_out_of_range = 0;
+
+
   for (int i = 0; i < max_ind; i++) {
     if ((ball_data[i] > out_of_range) and (ball_data[(i - 1 + max_ind) % max_ind] < out_of_range)) count_out_of_range = 1;
     else if ((ball_data[i] > out_of_range) and (ball_data[(i - 1 + max_ind) % max_ind] > out_of_range)) count_out_of_range++;
@@ -176,7 +191,20 @@ void rotate_find_balls() {
   int angle = (exit * 360 / max_ind);
   if (angle > 180) angle = angle - 360;
 
+
+  int alpha_zone = (i_zone * 360 / max_ind);
+  if (alpha_zone > 180) alpha_zone = alpha_zone - 360;
+
+  if (i_zone > 0) {
+    turnAngle(-alpha_zone, 50, 33);
+    move_object_and_return();
+  }
+
   turnAngle(-angle, 50, 33);
+
+
+
+
   while ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) < 3) {
     display.clearDisplay();
     analogWrite(PWM_LIGHTS, PWM_LEDS);
@@ -222,4 +250,36 @@ void rotate_find_balls() {
   robot.sensors[3] = 0;
   robot.sensors[4] = 0;
   robot.sensors[5] = 0;
+}
+
+void align_forward() {
+  robot.v1_target = V_EVAC;
+  robot.v2_target = V_EVAC;
+  bool estp1 = endstop1;
+  bool estp3 = endstop3;
+  int end_1 = true;
+  int end_3 = true;
+  robot.mode_endstops = 1;
+  while ((!estp1) or (!estp3)) {
+    if (endstop1 != estp1) end_1 = false;
+    if (endstop3 != estp3) end_3 = false;
+    robot.v2_target = (end_1) * (V_ALIGN);
+    robot.v1_target = (end_3) * (V_ALIGN);
+    motorsCorrectedSpeed();
+    delay(5);
+  }
+  robot.mode_endstops = 0;
+  motors(0, 0);
+
+  delay(300);
+}
+void move_object_and_return() {
+  encoder1 = 0;
+  move_servos_angle();
+  align_forward();
+  open_iris();
+  delay(2000);
+  close_iris();
+  int enc_proezd = encoder1;
+  move_backward(enc_proezd, V_EVAC);
 }

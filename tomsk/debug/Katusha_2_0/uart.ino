@@ -53,7 +53,7 @@ int parsingGyro() { /* :yaw/pitch/started/;   */
       bufferGyro[counterg] = numberg.toInt();
       numberg = "";
       counterg++;
-      return 0;
+      //return 0;
     }
 
     if ((parseStartg) and (ing != '/')) {
