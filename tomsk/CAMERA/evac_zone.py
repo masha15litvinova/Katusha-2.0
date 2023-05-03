@@ -21,11 +21,12 @@ def map_value( input_data, min_in, max_in, min_out, max_out): #преобраз�
 x_size = 320
 y_size = 240
 
-k_x = 1
+k_x = 0.7
 k_y = 0.5
+delta_h = 20
 
 red_thr = (0, 44, 29, 127, -128, 127)
-green_thr = (19, 24, -128, 3, -128, 127)
+green_thr = (12, 30, -128, -9, -128, 127)
 uart = UART(3, 9600)
 pin1 = Pin('P1', Pin.IN, Pin.PULL_DOWN)
 
@@ -33,7 +34,7 @@ blue_led = pyb.LED(3)
 green_led = pyb.LED(2)
 red_led = pyb.LED(1)
 
-roi_zone = (round(y_size*(1-k_x)/2), 0, round(x_size*k_x), round(y_size*k_y))
+roi_zone = (round(x_size*(1-k_x)/2), delta_h, round(x_size*k_x), round(y_size*k_y))
 
 clock = time.clock()
 
@@ -41,8 +42,8 @@ while(True):
     clock.tick()
     img = sensor.snapshot()
 
-    red_zone = img.find_blobs([red_thr], roi= roi_zone, area_threshold=650, pixels_threshold=650)
-    green_zone = img.find_blobs([green_thr], roi= roi_zone, area_threshold=650, pixels_threshold=650)
+    red_zone = img.find_blobs([red_thr], roi= roi_zone, area_threshold=500, pixels_threshold=500)
+    green_zone = img.find_blobs([green_thr], roi= roi_zone, area_threshold=500, pixels_threshold=500)
     x_zone_red = -1
     y_zone_red = -1
     x_zone_green = -1
@@ -75,12 +76,14 @@ while(True):
          green_led.on()
     else:
          green_led.off()
-
-    if(uart_access):
+    if(green_zone):
+        print(max_pixels_green)
+    if(True):
         delta = (x_zone_green-round(x_size/2))
 
         coord_send = map_value(delta,-round(x_size/2), round(x_size/2),0,255)
         uart.writechar(coord_send)
+        time.sleep_ms(40)
 
     #uart.writechar(1)
 

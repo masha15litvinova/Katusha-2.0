@@ -1,7 +1,7 @@
 void initEndstopIRQs() {
-  attachInterrupt(digitalPinToInterrupt(ENDSTOP1), endstop1_irq, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENDSTOP1), endstop1_irq, RISING);
   //attachInterrupt(digitalPinToInterrupt(ENDSTOP2), endstop2_irq, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENDSTOP3), endstop3_irq, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENDSTOP3), endstop3_irq, RISING);
   //attachInterrupt(digitalPinToInterrupt(ENDSTOP4), endstop4_irq, CHANGE);
 }
 bool endstop1 = false;

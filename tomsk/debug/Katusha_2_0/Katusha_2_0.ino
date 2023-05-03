@@ -233,7 +233,7 @@ void setup() {
   CamUART.setTx(TX6);*/
 
   GyroUART.begin(UART_BAUDRATE);
-  CamUART.begin(UART_BAUDRATE);
+  CamUART.begin(9600);
   ST_Link.begin(UART_BAUDRATE);
 
   display.begin(0, true);
