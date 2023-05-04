@@ -1,7 +1,7 @@
 #include "project_config.h"
 #include "pin_config.h"
 
-#define DEBUG true
+#define DEBUG false
 
 HardwareSerial GyroUART(RX3, TX3);
 HardwareSerial CamUART(RX6, TX6);
@@ -224,7 +224,7 @@ void setup() {
 
   resetCamera();
   //resetGyro();
-  
+
 
 
   /*GyroUART.setRx(RX3);
@@ -252,7 +252,7 @@ void setup() {
   StartGyro();
 
   initGyro();
- 
+
   display.clearDisplay();
   display.display();
   ledBlinking();
@@ -260,7 +260,7 @@ void setup() {
 
   initServos();
   calibration_grab();
-  close_iris();
+
   sliders(0, 0);
   if (digitalRead(BUTTON2) == 0) {
     state_robot = CALIBRATION;
@@ -779,9 +779,9 @@ void loop() {
     case (OBSTACLE):
       {
 
-        float kp_obst = 0.15;
-        float kd_obst = 0.03;
-        int ideal_dist = 140;
+        float kp_obst = 0.05;
+        float kd_obst = 0.07;
+        int ideal_dist = 115;
         int err_obst = 0;
         int err_old_obst = 0;
         int u_obst = 0;
@@ -791,7 +791,7 @@ void loop() {
         display.println("OBSTACLE");
         display.display();
         motors(0, 0);
-        move_backward(140, 45);
+        move_backward(100, 45);
         turnAngle(60, 50, 35);
         move_forward(150, 40);
         for (int i = 0; i < 6; i++) robot.sensors[i] = 0;
@@ -829,8 +829,8 @@ void loop() {
             }
           }
 
-          robot.dist_right = get_distance(&sensor_r);
-          err_obst = robot.dist_right - ideal_dist;
+          robot.dist_right_front = get_distance(&sensor_rf);
+          err_obst = robot.dist_right_front - ideal_dist;
           u_obst = err_obst * kp_obst + (err_obst - err_old_obst) * kd_obst;
           robot.v1_target = V_OBST + u_obst;
           robot.v2_target = V_OBST - u_obst;
@@ -839,6 +839,7 @@ void loop() {
           display.setTextSize(1);
           display.println(u_obst);
           display.display();
+          GyroUARTClear();
           //delay(5);
           err_old_obst = err_obst;
         }

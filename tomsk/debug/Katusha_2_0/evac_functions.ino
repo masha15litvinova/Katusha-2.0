@@ -39,15 +39,12 @@ void move_center_zone() {
     ST_Link.println("right_front: " + String(robot.dist_right_front));
     ST_Link.println("left_front: " + String(robot.dist_left_front));
   }
-  if ((robot.dist_right_front > ANGLE_SENSOR_MIN_THRESHOLD) and (robot.dist_left_front > ANGLE_SENSOR_MIN_THRESHOLD)) {
 
-    if (robot.dist_right_front > robot.dist_left_front) side = RIGHT;
-    else side = LEFT;
-  } else {
-    if (robot.dist_right_front > ANGLE_SENSOR_MIN_THRESHOLD) side = RIGHT;
-    else side = LEFT;
-  }
 
+  if (robot.dist_right_front > robot.dist_left_front) side = RIGHT;
+  else side = LEFT;
+
+ side = RIGHT;
   if (side == RIGHT) {
     turnAngle(-90, 50, 35);
     move_forward_mm(530, 40);
@@ -61,10 +58,11 @@ void move_center_zone() {
   align_bottom();
   move_forward_mm(600, 45);
   vyravn();
+ 
   if (side == LEFT) {
-    turnAngle(-130, 50, 33);
+    turnAngle(-130, 45, 33);
   } else if (side == RIGHT) {
-    turnAngle(130, 50, 33);
+    turnAngle(130, 45, 33);
   }
   motors(0, 0);
   delay(100);
@@ -110,8 +108,8 @@ void rotate_find_balls() {
     if (CamUART.available()) {
       int x = CamUART.read();
       delta = map(x, 0, 255, -160, 160);
-      if(DEBUG) ST_Link.println(delta);
-      if (((abs(delta) < 30) and (ind > max_ind / 7)) and (ind < max_ind * 6 / 7)) i_zone = ind;
+      if (DEBUG) ST_Link.println(delta);
+      if ((abs(delta) < 35)) i_zone = ind;
     }
 
     robot.dist_right = get_distance(&sensor_r);
@@ -185,7 +183,7 @@ void rotate_find_balls() {
 
   int exit = -1;
   for (int i = 0; i < 10; i++) {
-    if (((exits[i]) > max_ind / 8) and ((exits[i]) < (max_ind * 7) / 8)) {
+    if (((exits[i]) > max_ind / 6) and ((exits[i]) < (max_ind * 7) / 8)) {
       exit = exits[i];
     }
   }
@@ -201,6 +199,13 @@ void rotate_find_balls() {
     turnAngle(-alpha_zone, 50, 33);
     move_object_and_return();
     turnAngle(alpha_zone, 50, 33);
+    /*if(side==RIGHT)turnAngle(50, 50, 33);
+    else turnAngle(-50, 50, 33);
+    vyravn();
+    align_forward();
+    move_backward_mm(600, V_EVAC);
+    vyravn();
+    turnAngle(-50, 50, 33);*/
   }
 
   turnAngle(-angle, 50, 33);
@@ -242,9 +247,10 @@ void rotate_find_balls() {
   }
   motors(0, 0);
   delay(300);
-  if(angle>180) turnAngle(-50, 50, 35);
-  else turnAngle(-50, 50, 35);
   move_forward(200, V_MAIN);
+  if (angle > 180) turnAngle(-50, 50, 35);
+  else turnAngle(-50, 50, 35);
+
   robot.dist_front = -1;
   robot.dist_right_front = -1;
   robot.dist_right = -1;
@@ -265,7 +271,28 @@ void align_forward() {
   int end_1 = true;
   int end_3 = true;
   robot.mode_endstops = 1;
-  while ((estp1==endstop1) or (estp3==endstop3)) {
+  while ((estp1 == endstop1) or (estp3 == endstop3)) {
+    if (endstop1 != estp1) end_1 = false;
+    if (endstop3 != estp3) end_3 = false;
+    robot.v2_target = (end_1) * (V_ALIGN);
+    robot.v1_target = (end_3) * (V_ALIGN);
+    motorsCorrectedSpeed();
+    delay(5);
+  }
+  robot.mode_endstops = 0;
+  motors(0, 0);
+
+  delay(300);
+}
+void to_zone_forward() {
+  robot.v1_target = V_EVAC;
+  robot.v2_target = V_EVAC;
+  bool estp1 = endstop1;
+  bool estp3 = endstop3;
+  int end_1 = true;
+  int end_3 = true;
+  robot.mode_endstops = 1;
+  while ((estp1 == endstop1) and (estp3 == endstop3)) {
     if (endstop1 != estp1) end_1 = false;
     if (endstop3 != estp3) end_3 = false;
     robot.v2_target = (end_1) * (V_ALIGN);
@@ -281,11 +308,12 @@ void align_forward() {
 void move_object_and_return() {
   encoder1 = 0;
   move_servos_angle();
-  align_forward();
+  //align_forward();
+  to_zone_forward();
   open_iris();
-  delay(2000);
+  delay(500);
   close_iris();
   int enc_proezd = encoder1;
   move_servos_180_down();
-  move_backward(enc_proezd, V_EVAC);
+  move_backward(enc_proezd - 100, V_EVAC);
 }

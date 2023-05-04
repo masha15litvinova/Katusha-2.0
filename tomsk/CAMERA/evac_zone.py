@@ -42,8 +42,8 @@ while(True):
     clock.tick()
     img = sensor.snapshot()
 
-    red_zone = img.find_blobs([red_thr], roi= roi_zone, area_threshold=500, pixels_threshold=500)
-    green_zone = img.find_blobs([green_thr], roi= roi_zone, area_threshold=500, pixels_threshold=500)
+    red_zone = img.find_blobs([red_thr], roi= roi_zone, area_threshold=400, pixels_threshold=400)
+    green_zone = img.find_blobs([green_thr], roi= roi_zone, area_threshold=400, pixels_threshold=400)
     x_zone_red = -1
     y_zone_red = -1
     x_zone_green = -1

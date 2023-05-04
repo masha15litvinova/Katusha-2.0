@@ -112,11 +112,11 @@ void move_servos_angle()
 }
 void open_iris()
 {
-  for (int i = 50; i < 90; i++)
-  {
-    servo1.write(i);
-    delay(100);
-  }
+  //for (int i = 50; i < 90; i++)
+  //{
+    servo1.write(90);
+   // delay(100);
+  //}
   delay(300);
   }
   void close_iris()

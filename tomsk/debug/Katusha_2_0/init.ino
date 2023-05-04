@@ -225,6 +225,7 @@ void initServos() {
   servo2.attach(SERVO2);
   servo3.attach(SERVO3);
 
+  servo1.write(50);
   /*servo1.write(90);
   delay(1000);
   servo2.write(180);
