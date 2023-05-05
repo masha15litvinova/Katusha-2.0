@@ -95,6 +95,7 @@ void move_forward(int enc, int v) {
     delay(5);
   }
   motors(0, 0);
+  robot.timeWhite = millis();
 }
 void move_backward(int enc, int v) {
   robot.motor1 = 0;
@@ -109,6 +110,7 @@ void move_backward(int enc, int v) {
     delay(5);
   }
   motors(0, 0);
+  robot.timeWhite = millis();
 }
 
 void move_forward_mm(int mm, int v) {

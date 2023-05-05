@@ -32,17 +32,17 @@ public:
   int angle_pitch = 0;
   int angle_roll = 0;
 
-int dist_front = -1;
-int dist_left_front = -1;
-int dist_right_front = -1;
-int dist_right = -1;
+  int dist_front = -1;
+  int dist_left_front = -1;
+  int dist_right_front = -1;
+  int dist_right = -1;
 
-int dist_front_last = -1;
-int dist_left_front_last = -1;
-int dist_right_front_last = -1;
-int dist_right_last = -1;
+  int dist_front_last = -1;
+  int dist_left_front_last = -1;
+  int dist_right_front_last = -1;
+  int dist_right_last = -1;
 
-long int timeWhite = 0;
+  long int timeWhite = 0;
   byte gyroStarted = 0;
 
   float u_gyro = 0;
@@ -81,10 +81,10 @@ long int timeWhite = 0;
   float d_cam = 0;       //-0.5;//-0.05;
 
 
-  float kp_line = 125;     //1000;//300;//1.2;       //2.2
+  float kp_line = 130;       //1000;//300;//1.2;       //2.2
   float kcube_line = 0.12;  //3;//0.000001;//0.0045;  //0.04; //0.028
-  float kd_line = 0.01;//0.0015;   //0.01;     //1.0;//-1.5;
-  float ki_line = 3.3;     //0.1;//0.5;//0.00001;//0.003;//0.009;     //0.03;//2.0;//0.5;//0.012;//0.0005;//0.009;
+  float kd_line = 0.35;        //0.008;//0.0015;   //0.01;     //1.0;//-1.5;
+  float ki_line = 4.5;        //40;     //0.1;//0.5;//0.00001;//0.003;//0.009;     //0.03;//2.0;//0.5;//0.012;//0.0005;//0.009;
 
   long int timeGyro = 0;
   long int timeCamera = 0;

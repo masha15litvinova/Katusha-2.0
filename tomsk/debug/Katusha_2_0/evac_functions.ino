@@ -56,13 +56,13 @@ void move_center_zone() {
     turnAngle(-90, 50, 35);
   }
   align_bottom();
-  move_forward_mm(600, 45);
+  move_forward_mm(700, 45);
   vyravn();
  
   if (side == LEFT) {
-    turnAngle(-130, 45, 33);
+    turnAngle(-125, 45, 33);
   } else if (side == RIGHT) {
-    turnAngle(130, 45, 33);
+    turnAngle(125, 45, 33);
   }
   motors(0, 0);
   delay(100);

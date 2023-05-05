@@ -1,7 +1,7 @@
 #include "project_config.h"
 #include "pin_config.h"
 
-#define DEBUG false
+#define DEBUG true
 
 HardwareSerial GyroUART(RX3, TX3);
 HardwareSerial CamUART(RX6, TX6);
@@ -53,7 +53,7 @@ uint32_t distance4;
 
 uint32_t distance2_last = 1000;
 
-float weights[6] = { -4.6, -3.3, -2.7, 2.7, 3.3, 4.6 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -4.7, -3.2, -2.5, 2.5, 3.2, 4.7 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 float weights_sum = 0;
 
 
@@ -62,7 +62,7 @@ float weights_sum = 0;
 //float kd_line[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};//{ -1.5, -1.3, -1.1, 1.1, 1.3, 1.5 };
 
 
-float min_err_i = 0.014;
+float min_err_i = 0.018;
 
 float err_line_sens = 0;
 float err_old_line_sens = 0;
@@ -396,7 +396,7 @@ void loop() {
           robot.ui_line = 0;
         }
         int delta_grey = 20;
-        int u_max = 110;
+        int u_max = 128;
         //if (err_line_sens != 0)
         //{
         robot.up_cam = robot.camLineAngle * robot.p_cam + robot.camLineDev * robot.p_cam_line + robot.camLineAngle * robot.camLineAngle * robot.camLineAngle * robot.p_cube_cam;
@@ -448,20 +448,21 @@ void loop() {
         if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) > 0) {
           robot.timeWhite = millis();
         }
-        if ((millis() - robot.timeWhite) > 4200) {
+        if ((millis() - robot.timeWhite) > 5000) {
           state_robot = EVAC_ZONE;
 
           break;
         }
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (!gorka) and ((millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (!gorka) and ((millis() - robot.timeColors) > COLORS_DELAY) and ((robot.dist_front > 220) or (robot.dist_front < 100)))  //условие перекрестка
         {
+
           if (DEBUG) ST_Link.println("check cross");
           motors(0, 0);
           uint16_t r1, g1, b1, c1, r2, g2, b2, c2;
-          delay(150);
+          delay(250);
           tcs1.getRawData(&r1, &g1, &b1, &c1);
           robot.colorDist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
-          delay(150);
+          delay(250);
           tcs2.getRawData(&r2, &g2, &b2, &c2);
           robot.colorDist2 = colorDistance(RED_L, GREEN_L, BLUE_L, r2, g2, b2);
           robot.timeColors = millis();
@@ -469,6 +470,8 @@ void loop() {
           if (isCross()) {
             state_robot = COLOR_READ_DATA;
           }
+          robot.dist_right_front = get_distance(&sensor_rf);
+          robot.dist_left_front = get_distance(&sensor_lf);
 
           robot.timeColors = millis();
         }
@@ -573,7 +576,12 @@ void loop() {
 
         delay(25);
         tcs1.getRawData(&r, &g, &b, &c);
+        float dist1 = sqrt(r * r + g * g + b * b);  //colorDistance(RED_R, GREEN_R, BLUE_R, r, g, b);
+        float dist_ideal1 = sqrt(RED_R * RED_R + GREEN_R * GREEN_R + BLUE_R * BLUE_R);
+        float dist_between1 = colorDistance(RED_R, GREEN_R, BLUE_R, r, g, b);
 
+        float alpha1 = ((dist1 * dist1 + dist_ideal1 * dist_ideal1) - (dist_between1 * dist_between1)) / (2 * dist1 * dist_ideal1);  ///*acos(*/ (RED_R * r + GREEN_R * g + BLUE_R * b) / (dist1 * dist_ideal1);
+        if (DEBUG) ST_Link.println(alpha1);
         display.setCursor(0, 40);
         display.print("R: " + String(r) + " " + String(g) + " " + String(b) + " " + String(colorDistance(RED_R, GREEN_R, BLUE_R, r, g, b)));
 
@@ -611,7 +619,8 @@ void loop() {
 
         display.println("yaw: " + String(robot.angle_yaw));
         display.setCursor(0, 50);
-        display.println("pitch: " + String(robot.angle_pitch));
+        gorka = !digitalRead(GORKA_PIN);
+        display.println("gorka: " + String(gorka));
         display.display();
         break;
       }
@@ -791,8 +800,8 @@ void loop() {
         display.println("OBSTACLE");
         display.display();
         motors(0, 0);
-        move_backward(100, 45);
-        turnAngle(60, 50, 35);
+        move_backward(110, 45);
+        turnAngle(50, 50, 35);
         move_forward(150, 40);
         for (int i = 0; i < 6; i++) robot.sensors[i] = 0;
         long int time_begin_obst = millis();
@@ -804,7 +813,8 @@ void loop() {
             digitalWrite(SWITCH3, LOW);
           }
         }
-        while ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) < 3) {
+        long int time_begin_obstacle = millis();
+        while (((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5]) < 3) or ((millis() - time_begin_obstacle) < 5000)) {
           display.clearDisplay();
           analogWrite(PWM_LIGHTS, PWM_LEDS);
           int s[6] = { 0, 0, 0, 0, 0, 0 };
@@ -817,7 +827,7 @@ void loop() {
           for (int i = 0; i < 6; i++) {
             robot.sensors_analog[i] = map(s[i], white[i], black[i], 0, 100) * 0.01;
           }
-          int grey_scaled = 24;
+          int grey_scaled = 22;
 
           for (int i = 0; i < 6; i++) {
             if (map(s[i], white[i], black[i], 0, 100) > grey_scaled) {
@@ -846,6 +856,7 @@ void loop() {
         motors(0, 0);
         move_forward(200, 40);
         turnAngle(85, 50, 35);
+        move_backward(200, 40);
         state_robot = last_state_robot;
         robot.dist_front = -1;
         robot.dist_right_front = -1;

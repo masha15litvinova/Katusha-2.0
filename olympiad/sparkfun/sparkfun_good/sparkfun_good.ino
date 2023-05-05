@@ -35,7 +35,7 @@ MPU9250_DMP imu;
 
 bool state = 1;
 float drift = 0;
-unsigned long time_begin = millis();
+ long int time_begin = millis();
 unsigned long time_led = millis();
 unsigned long time_integrated = millis();
 byte calibrated = 0;
@@ -43,7 +43,7 @@ bool send = true;
 long int last_send = millis();
 void setup() {
   pinMode(11, OUTPUT);
-  SerialPort.begin(115200);
+  //SerialPort.begin(115200);
   Serial1.begin(115200);
 
   pinMode(LEDPIN, OUTPUT);
@@ -58,7 +58,7 @@ void setup() {
   imu.dmpBegin(DMP_FEATURE_6X_LP_QUAT |  // Enable 6-axis quat
                  DMP_FEATURE_GYRO_CAL,   // Use gyro calibration
                10);                      // Set DMP FIFO rate to 10 Hz
-  //imu.setSampleRate(70);
+  imu.setSampleRate(1000);
 
   // DMP_FEATURE_LP_QUAT can also be used. It uses the
   // accelerometer in low-power mode to estimate quat's.
@@ -76,7 +76,7 @@ float pitch_robot = 0.0;
 float last_p = 0.0;
 float last_last_p = 0.0;
 float old_pitch_robot = 0.0;
-float k_filter = 0.35;
+float k_filter = 0.4;
 long int time_gorka_start = 0;
 float accelY = 0;
 float accelZ = 0;
@@ -139,9 +139,9 @@ void loop() {
 
       last_last_p = last_p;
       last_p = p1;
-      SerialPort.println(p1);
+      //SerialPort.println(p1);
       send_pitch = map(round(p1), -180, 180, 0, 255);
-      if (abs(p1) > 8) digitalWrite(11, LOW);
+      if (abs(p1) > 12) digitalWrite(11, LOW);
       else digitalWrite(11, HIGH);
 
       accelY_last = accelY;
@@ -150,7 +150,7 @@ void loop() {
     }
   }
 
-  time_begin = millis();
+  
 
   if ((millis() - time_begin) > 30000) calibrated = 1;
   if (Serial1.available()) {

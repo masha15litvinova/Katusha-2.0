@@ -42,13 +42,13 @@
 
 
 
-#define RED_R 325
-#define GREEN_R 738
-#define BLUE_R 697
+#define RED_R 323
+#define GREEN_R 730
+#define BLUE_R 701
 
-#define RED_L 358
-#define GREEN_L 610
-#define BLUE_L 561
+#define RED_L 351
+#define GREEN_L 615
+#define BLUE_L 571
 
 #define COLOR_DIST_HIGH 23
 #define COLOR_DIST_LOW 15
@@ -77,7 +77,7 @@
 
 #define BTN_DELAY 400
 
-#define DIST_THRESHOLD 80
+#define DIST_THRESHOLD 60
 #define DIST_NO_OBJECT 160
 
 #define TIMER_FREQ 500000  //в тиках таймера
