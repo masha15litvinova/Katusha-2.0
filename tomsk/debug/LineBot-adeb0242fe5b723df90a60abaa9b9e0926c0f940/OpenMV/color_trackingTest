@@ -1,0 +1,41 @@
+ 1import sensor, image, time
+ 2#red_threshold_01 = (45, 100, -60, 80, 34, 91)
+ 3red_threshold_01 = (21, 29, -72, 6, -11, 17)
+ 4sensor.reset()
+ 5sensor.set_pixformat(sensor.RGB565)
+ 6sensor.set_framesize(sensor.QVGA)
+ 7sensor.skip_frames(20)
+ 8sensor.set_auto_whitebal(False)
+ 9#Turn off white balance. White balance is turned on by default. In color recognition, you need to turn off white balance
+10clock = time.clock()
+11img = sensor.snapshot()
+12blobs = img.find_blobs([red_threshold_01],
+13                         area_threshold=150)
+14last_blobs = blobs
+15while(True):
+16    clock.tick()
+17    img = sensor.snapshot()
+18    if last_blobs:
+19         for b in blobs:
+20            x1 = b[0]-7
+21            y1 = b[1]-7
+22            w1 = b[2]+12
+23            h1 = b[3]+12
+24            #print(b.cx(),b.cy())
+25         roi2 = (x1,y1,w1,h1)
+26         print(roi2)
+27         blobs = img.find_blobs([red_threshold_01],
+28                                    roi = roi2,
+29                                    area_threshold=1000)
+30         last_blobs = blobs
+31    else:
+32        blobs = img.find_blobs([red_threshold_01],
+33                                    area_threshold=1000)
+34        last_blobs = blobs
+35    if last_blobs:
+36        #If the target color is found
+37        #  print(blobs)
+38        for b in last_blobs:#Iteratively find the target color area
+39            img.draw_rectangle(b[0:4])
+40            img.draw_cross(b[5], b[6])
+41    print("Frame rate: ",clock.fps())

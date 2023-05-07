@@ -100,7 +100,7 @@ void turnAngle(int target_angle, int max_v, int min_v) {
   for (int i = 0; i < 5; i++) {
     while (1) {
       if (parsingGyro()) {
-        robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
+        robot.angle_yaw = map(bufferGyro[0], 0, 255, -360, 360);
         robot.angle_pitch = map(bufferGyro[1], 0, 255, -90, 90);
 
         break;

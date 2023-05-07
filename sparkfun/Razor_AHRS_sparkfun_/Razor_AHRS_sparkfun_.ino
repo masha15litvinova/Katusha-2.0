@@ -243,10 +243,10 @@
 //Uart SerialLog(1, 13, 12); // Declares a Uart object called Serial1 using instance 1 of Apollo3 UART peripherals with RX on pin 13 and TX on pin 12 (note, you specify *pins* not Apollo3 pads. This uses the variant's pin map to determine the Apollo3 pad)
 //#define LOG_PORT SerialLog
 #elif HW__VERSION_CODE == 14001
-//#define LOG_PORT SERIAL_PORT_USBVIRTUAL
-#define LOG_PORT SERIAL_PORT_HARDWARE
+#define LOG_PORT SERIAL_PORT_USBVIRTUAL
+/*#define LOG_PORT SERIAL_PORT_HARDWARE
 #else
-#define LOG_PORT Serial1
+#define LOG_PORT Serial1*/
 #endif  // HW__VERSION_CODE
 
 // Sensor data output interval in milliseconds

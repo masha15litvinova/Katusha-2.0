@@ -36,7 +36,7 @@ int direction_color() {
   int dist1 = colorDistance(RED_R, GREEN_R, BLUE_R, r1, g1, b1);
   int dist_ideal1 = sqrt(RED_R * RED_R + GREEN_R * GREEN_R + BLUE_R * BLUE_R);
 
-  int alpha1 = round(acos((RED_R*r1+GREEN_R*g1+BLUE_R*b1))*180/PI);
+  int alpha1 = round(acos((RED_R * r1 + GREEN_R * g1 + BLUE_R * b1)) * 180 / PI);
 
   display.setCursor(0, 20);
   display.print("Right: " + String(r1) + " " + String(g1) + " " + String(b1) + " " + String(dist1));
@@ -48,7 +48,7 @@ int direction_color() {
   int dist2 = colorDistance(RED_L, GREEN_L, BLUE_L, r2, g2, b2);
   int dist_ideal2 = sqrt(RED_L * RED_L + GREEN_L * GREEN_L + BLUE_L * BLUE_L);
 
-int alpha2 = round(acos((RED_L*r2+GREEN_L*g2+BLUE_L*b2))*180/PI);
+  int alpha2 = round(acos((RED_L * r2 + GREEN_L * g2 + BLUE_L * b2)) * 180 / PI);
 
   display.setCursor(0, 30);
   display.print("Left: " + String(r2) + " " + String(g2) + " " + String(b2) + " " + String(dist2));

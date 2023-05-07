@@ -42,19 +42,19 @@
 
 
 
-#define RED_R 323
-#define GREEN_R 730
-#define BLUE_R 701
+#define RED_R 327
+#define GREEN_R 733
+#define BLUE_R 700
 
-#define RED_L 351
-#define GREEN_L 615
-#define BLUE_L 571
+#define RED_L 349
+#define GREEN_L 609
+#define BLUE_L 562
 
 #define COLOR_DIST_HIGH 23
 #define COLOR_DIST_LOW 15
 
 #define V_CALIBR 0  //140
-#define V_MAIN 28
+#define V_MAIN 26
 #define V_GORKA_UP 42
 #define V_GORKA_DOWN 50  //22
 #define V_OBSTACLE 90

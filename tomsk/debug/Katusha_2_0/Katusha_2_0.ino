@@ -38,7 +38,7 @@ int grey[6] = { 0, 0, 0, 0, 0, 0 };
 int cameraData = 0;
 int gyroData = 0;
 byte bufferCam[15];
-byte bufferGyro[15];
+byte bufferGyro[30];
 
 int big_err_line_sens = 0.7;
 bool gorka = 0;
@@ -53,7 +53,7 @@ uint32_t distance4;
 
 uint32_t distance2_last = 1000;
 
-float weights[6] = { -4.7, -3.2, -2.5, 2.5, 3.2, 4.7 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
+float weights[6] = { -4.2, -3.5, -2.8, 2.8, 3.5, 4.2 };  //{0.5, 0.27, 0.23}; //0.7 0.6 0.5
 float weights_sum = 0;
 
 
@@ -62,7 +62,7 @@ float weights_sum = 0;
 //float kd_line[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};//{ -1.5, -1.3, -1.1, 1.1, 1.3, 1.5 };
 
 
-float min_err_i = 0.018;
+float min_err_i = 0.016;
 
 float err_line_sens = 0;
 float err_old_line_sens = 0;
@@ -365,15 +365,7 @@ void loop() {
         }
 
         digitalWrite(LED1, LOW);
-        display.clearDisplay();
-        display.setTextSize(1);
-        /*display.setCursor(0, 20);
-        display.println(String(distance2));*/
-        display.setCursor(0, 30);
-        display.println(gorka);
-        /*display.setCursor(0, 40);
-        display.println(robot.start_angle_p);*/
-        display.display();
+
         robot.up_line = 0;
         robot.ud_line = 0;
         err_line_sens = 0;
@@ -392,11 +384,22 @@ void loop() {
         robot.up_line = err_line_sens * robot.kp_line + err_line_sens * err_line_sens * err_line_sens * robot.kcube_line;
         robot.ud_line = (err_line_sens - err_old_line_sens) * robot.kd_line;
         robot.ui_line = robot.ui_line + err_line_sens * robot.ki_line;
+
+        /*display.clearDisplay();
+        display.setTextSize(1);
+        display.setCursor(0, 20);
+        display.println(robot.up_line);
+        display.setCursor(0, 30);
+        display.println(robot.ud_line);
+        display.setCursor(0, 40);
+        display.println(robot.ui_line);
+        display.display();*/
+
         if (abs(err_line_sens) < min_err_i) {
           robot.ui_line = 0;
         }
         int delta_grey = 20;
-        int u_max = 128;
+        int u_max = 125;
         //if (err_line_sens != 0)
         //{
         robot.up_cam = robot.camLineAngle * robot.p_cam + robot.camLineDev * robot.p_cam_line + robot.camLineAngle * robot.camLineAngle * robot.camLineAngle * robot.p_cube_cam;
@@ -436,11 +439,12 @@ void loop() {
         }
         if (parsingGyro()) {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-          // int x = map(bufferGyro[1], 0, 255, -180, 180);
-          //int err = robot.start_angle_p - x;
+          int x = map(bufferGyro[1], 0, 255, -360, 360);
+          int err = robot.start_angle_p - x;
+          robot.angle_pitch = (err - err / 180 * 360);
         }
-        gorka = !digitalRead(GORKA_PIN);
-        if (gorka) {
+        //gorka = !digitalRead(GORKA_PIN);
+        if (abs(robot.angle_pitch) > 5) {
           robot.v = V_GORKA_UP;
           if (robot.u_line > 10) robot.u_line = 10;
           if (robot.u_line < -10) robot.u_line = -10;
@@ -453,7 +457,7 @@ void loop() {
 
           break;
         }
-        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (!gorka) and ((millis() - robot.timeColors) > COLORS_DELAY) and ((robot.dist_front > 220) or (robot.dist_front < 100)))  //условие перекрестка
+        if ((robot.sensors[0] + robot.sensors[1] + robot.sensors[2] + robot.sensors[3] + robot.sensors[4] + robot.sensors[5] >= 4) and (abs(robot.angle_pitch) < 6) and ((millis() - robot.timeColors) > COLORS_DELAY))  //условие перекрестка
         {
 
           if (DEBUG) ST_Link.println("check cross");
@@ -476,7 +480,7 @@ void loop() {
           robot.timeColors = millis();
         }
 
-        if ((robot.dist_front < DIST_THRESHOLD) and (robot.dist_front > 0) and (!gorka)) {
+        if ((robot.dist_front < DIST_THRESHOLD) and (robot.dist_front > 0) and (abs(robot.angle_pitch) < 6)) {
           state_robot = OBSTACLE;
           break;
         }
@@ -608,7 +612,10 @@ void loop() {
         }
         if (parsingGyro()) {
           robot.angle_yaw = map(bufferGyro[0], 0, 255, 0, 360);
-          robot.angle_pitch = map(bufferGyro[1], 0, 255, -180, 180);
+
+          int x = map(bufferGyro[1], 0, 255, -360, 360);
+          int err = robot.start_angle_p - x;
+          robot.angle_pitch = (err - (err / 180) * 360);
         }
         display.println("Angle: " + String(robot.camLineAngle));
         display.setCursor(0, 20);
@@ -619,8 +626,8 @@ void loop() {
 
         display.println("yaw: " + String(robot.angle_yaw));
         display.setCursor(0, 50);
-        gorka = !digitalRead(GORKA_PIN);
-        display.println("gorka: " + String(gorka));
+
+        display.println("pitch: " + String(robot.angle_pitch));
         display.display();
         break;
       }
@@ -733,7 +740,7 @@ void loop() {
           case (3):
             {
               motors(0, 0);
-              move_forward(100, V_MAIN);
+              //move_forward(100, V_MAIN);
               robot.sensors[0] = 0;
               robot.sensors[1] = 0;
               robot.sensors[2] = 0;

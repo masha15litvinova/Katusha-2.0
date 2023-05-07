@@ -35,7 +35,7 @@ MPU9250_DMP imu;
 
 bool state = 1;
 float drift = 0;
- long int time_begin = millis();
+long int time_begin = millis();
 unsigned long time_led = millis();
 unsigned long time_integrated = millis();
 byte calibrated = 0;
@@ -43,7 +43,7 @@ bool send = true;
 long int last_send = millis();
 void setup() {
   pinMode(11, OUTPUT);
-  //SerialPort.begin(115200);
+  SerialPort.begin(115200);
   Serial1.begin(115200);
 
   pinMode(LEDPIN, OUTPUT);
@@ -56,9 +56,14 @@ void setup() {
   }
 
   imu.dmpBegin(DMP_FEATURE_6X_LP_QUAT |  // Enable 6-axis quat
-                 DMP_FEATURE_GYRO_CAL,   // Use gyro calibration
-               10);                      // Set DMP FIFO rate to 10 Hz
-  imu.setSampleRate(1000);
+                 DMP_FEATURE_GYRO_CAL,                      // Use gyro calibration
+               20);                   // Set DMP FIFO rate to 10 Hz
+  imu.setSampleRate(20);
+
+  imu.setLPF(5);
+  imu.setAccelFSR(16);
+  imu.setGyroFSR(2000);
+
 
   // DMP_FEATURE_LP_QUAT can also be used. It uses the
   // accelerometer in low-power mode to estimate quat's.
@@ -76,7 +81,7 @@ float pitch_robot = 0.0;
 float last_p = 0.0;
 float last_last_p = 0.0;
 float old_pitch_robot = 0.0;
-float k_filter = 0.4;
+float k_filter = 0.5;
 long int time_gorka_start = 0;
 float accelY = 0;
 float accelZ = 0;
@@ -84,7 +89,7 @@ float accelZ = 0;
 float accelY_last = 0;
 float accelZ_last = 0;
 
-float k_accel = 0.4;
+float k_accel = 0.6;
 float max_delta = 0.25;
 void loop() {
   // Check for new data in the FIFO
@@ -97,9 +102,9 @@ void loop() {
       imu.update(UPDATE_ACCEL | UPDATE_GYRO | UPDATE_COMPASS);
       printIMUData();
       float accelX = imu.calcAccel(imu.ax);
-      accelY = k_filter * (imu.calcAccel(imu.ay)) + (1 - k_filter) * accelY_last;
+      accelY = k_accel * (imu.calcAccel(imu.ay)) + (1 - k_accel) * accelY_last;
       if (abs(accelY - accelY_last) > max_delta) accelY = (accelY + accelY_last) / 2;
-      accelZ = k_filter * (imu.calcAccel(imu.az)) + (1 - k_filter) * accelZ_last;
+      accelZ = k_accel * (imu.calcAccel(imu.az)) + (1 - k_accel) * accelZ_last;
       if (abs(accelZ - accelZ_last) > max_delta) accelZ = (accelZ + accelZ_last) / 2;
       float gyroX = imu.calcGyro(imu.gx);
       float gyroY = imu.calcGyro(imu.gy);
@@ -107,41 +112,31 @@ void loop() {
       float magX = imu.calcMag(imu.mx);
       float magY = imu.calcMag(imu.my);
       float magZ = imu.calcMag(imu.mz);
-      if (accelZ == 0) pitch_robot = 90;
-      else pitch_robot = (atan((accelY) / (accelZ)) * 180 / PI);
+      if (accelZ == 0) p = 90;
+      else p = (atan((accelY) / (accelZ)) * 180 / PI);
+      //SerialPort.println((accelY) / (accelZ));
       accelY = constrain(accelY, -1.0, 1.0);
-      //p = pitch_robot * k_filter + old_pitch_robot * (1 - k_filter);
-      /*if (count > 199) {
-        p = p + (gyroX - drift) * (millis() - time_integrated) * 0.001;
-      } else {
-        p = 0;
-      }*/
+
       time_integrated = millis();
 
       SerialPort.println(p1);
-      /*if (abs(p) > 7) {
-        if ((p < 20) and (p > 0)) p = 20;
-        else if ((p < -20) and (p < 0)) p = -20;
-      }*/
-
-      //if (abs(gyroZ) > 60) p = 0;
 
 
       if (count < 200) {
         drift = drift + gyroX * 0.005;
         count++;
       }
-      p = ((acos(accelY) * 180) / PI) - 90.0;
+
       if (p > 80) p = 80;
       else if (p < -80) p = -80;
-      //float middle = (p < last_p) ? ((last_p < last_last_p) ? last_p : ((last_last_p < p) ? p : last_last_p)) : ((p < last_last_p) ? p : ((last_last_p < last_p) ? last_p : last_last_p));
+
       p1 = (p)*k_filter + p1 * (1.0 - k_filter);
 
       last_last_p = last_p;
       last_p = p1;
       //SerialPort.println(p1);
       send_pitch = map(round(p1), -180, 180, 0, 255);
-      if (abs(p1) > 12) digitalWrite(11, LOW);
+      if (abs(p1) > 4) digitalWrite(11, LOW);
       else digitalWrite(11, HIGH);
 
       accelY_last = accelY;
@@ -150,7 +145,7 @@ void loop() {
     }
   }
 
-  
+
 
   if ((millis() - time_begin) > 30000) calibrated = 1;
   if (Serial1.available()) {
